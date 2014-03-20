@@ -41,6 +41,10 @@ See the SYNOPSIS for an example.
 
 =back
 
+=head1 LIMITATIONS
+
+Only seekable files are supported.
+
 =head1 INSTALLATION
 
 It is possible to install this script via perl normal install routines. 
