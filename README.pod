@@ -1,0 +1,77 @@
+=pod
+
+=head1 NAME
+
+dategrep - print lines matching ranges of dates
+
+=head1 SYNOPSIS
+
+  dategrep --start "12:00" --end "12:15" syslog
+  dategrep --end "12:15" --format "%b %d %H:%M:%S" syslog
+
+=head1 DESCRIPTION
+
+dategrep searches the names input files for lines matching a date range and prints them to stdout.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --start DATESPEC
+
+Print all lines from DATESPEC inclusively. Defauls to Jan 1, 1970 00:00:00 GMT.
+See
+L<VALID-DATE-FORMATS|https://metacpan.org/pod/distribution/Date-Manip/lib/Date/Manip/Date.pod#VALID-DATE-FORMATS>
+for a list of possible formats for DATESPEC.
+
+=item --end DATESPEC
+
+Print all lines until DATESPEC exclusively. Default to the current time. See
+L<VALID-DATE-FORMATS|https://metacpan.org/pod/distribution/Date-Manip/lib/Date/Manip/Date.pod#VALID-DATE-FORMATS>
+for a l
+ist of possible formats for DATESPEC.
+
+=item --format
+
+When this paramenter is missing, dategrep tries to match multiple formats and
+use the first one that matches. If your format is not parsable by dategrep, you
+can supply your own format based on the sequences listed unter L<PRINTF
+DIRECTIVES|https://metacpan.org/pod/distribution/Date-Manip/lib/Date/Manip/Date.pod#PRINTF-DIRECTIVES>.
+See the SYNOPSIS for an example.
+
+=back
+
+=head1 INSTALLATION
+
+It is possible to install this script via perl normal install routines. 
+
+  perl Build.PL
+  ./Build
+  ./Build install
+
+Or you can just copy the script somewhere in your path and install its only
+dependency Date::Manip. In Debian you just need the following:
+
+  apt-get install libdate-manip-perl
+
+=head1 SEE ALSO
+
+L<https://metacpan.org/pod/Date::Manip>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2014 Mario Domgoergen L<E<lt>mario@domgoergen.comE<gt>>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+

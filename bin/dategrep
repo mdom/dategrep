@@ -1,0 +1,182 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Date::Manip;
+use Getopt::Long qw(:config pass_through);
+use Fcntl ":seek";
+
+our $VERSION = '0.01';
+
+my %options;
+GetOptions( \%options, 'start=s', 'end=s', 'format=s' );
+
+my ( $start, $end ) = ( 0, time() );
+
+if ( defined $options{'start'} ) {
+    $start = date_to_epoch( $options{'start'} );
+}
+
+if ( defined $options{'end'} ) {
+    $end = date_to_epoch( $options{'end'} );
+}
+
+if ( $end < $start ) {
+    die "$0: Starting time after end time\n";
+}
+
+for my $filename (@ARGV) {
+    open( my $fh, '<', $filename ) or die "$0: Can't open $filename: $!\n";
+
+    my $test_line = <$fh>;
+    if ( !date_to_epoch( $test_line, $options{'format'} ) ) {
+        die "Format not parsable\n";
+    }
+    seek( $fh, 0, SEEK_SET );
+
+    my $tell_beg = search( $fh, $start, $options{'format'} );
+    my $tell_end = search( $fh, $end,   $options{'format'} );
+
+    if ( defined $tell_beg ) {
+        seek( $fh, $tell_beg, SEEK_SET );
+        while (<$fh>) {
+            last if defined($tell_end) && ( tell() >= $tell_end );
+            print;
+        }
+    }
+}
+
+exit 0;
+
+sub date_to_epoch {
+    my ( $str, $format ) = @_;
+    my $date = Date::Manip::Date->new();
+    my $err =
+      defined($format)
+      ? $date->parse_format( $format, $str )
+      : $date->parse($str);
+    die "$0:".$date->err."\n" if $err;
+    return $date->secs_since_1970_GMT();
+}
+
+# Modified version of File::SortedSeek::_look
+
+sub search {
+    my ( $fh, $key, $format ) = @_;
+    return undef if not defined $key;
+    my @stat = stat($fh) or return undef;
+    my ( $size, $blksize ) = @stat[ 7, 11 ];
+    $blksize ||= 8192;
+
+    # find the right block
+    my ( $min, $max, $mid ) = ( 0, int( $size / $blksize ) );
+    while ( $max - $min > 1 ) {
+        $mid = int( ( $max + $min ) / 2 );
+        seek( $fh, $mid * $blksize, 0 ) or return undef;
+        <$fh> if $mid;    # probably a partial line
+        my $line = <$fh>;
+        if ( defined($line) ) {
+            date_to_epoch( $line, $format ) < $key
+              ? $min = $mid
+              : $max = $mid;
+        }
+    }
+
+    # find the right line
+    $min *= $blksize;
+    seek( $fh, $min, 0 ) or return undef;
+    <$fh> if $min;        # probably a partial line
+    my $prev_min = $min;
+    for ( ; ; ) {
+        $min = tell($fh);
+        defined( my $line = <$fh> ) or last;
+        my $epoch = date_to_epoch( $line, $format );
+        if ( $epoch >= $key ) {
+            seek( $fh, $min, 0 );
+            return $min;
+        }
+        $prev_min = $min;
+    }
+    return undef;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+dategrep - print lines matching ranges of dates
+
+=head1 SYNOPSIS
+
+  dategrep --start "12:00" --end "12:15" syslog
+  dategrep --end "12:15" --format "%b %d %H:%M:%S" syslog
+
+=head1 DESCRIPTION
+
+dategrep searches the names input files for lines matching a date range and prints them to stdout.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --start DATESPEC
+
+Print all lines from DATESPEC inclusively. Defauls to Jan 1, 1970 00:00:00 GMT.
+See
+L<VALID-DATE-FORMATS|https://metacpan.org/pod/distribution/Date-Manip/lib/Date/Manip/Date.pod#VALID-DATE-FORMATS>
+for a list of possible formats for DATESPEC.
+
+=item --end DATESPEC
+
+Print all lines until DATESPEC exclusively. Default to the current time. See
+L<VALID-DATE-FORMATS|https://metacpan.org/pod/distribution/Date-Manip/lib/Date/Manip/Date.pod#VALID-DATE-FORMATS>
+for a l
+ist of possible formats for DATESPEC.
+
+=item --format
+
+When this paramenter is missing, dategrep tries to match multiple formats and
+use the first one that matches. If your format is not parsable by dategrep, you
+can supply your own format based on the sequences listed unter L<PRINTF
+DIRECTIVES|https://metacpan.org/pod/distribution/Date-Manip/lib/Date/Manip/Date.pod#PRINTF-DIRECTIVES>.
+See the SYNOPSIS for an example.
+
+=back
+
+=head1 INSTALLATION
+
+It is possible to install this script via perl normal install routines. 
+
+  perl Build.PL
+  ./Build
+  ./Build install
+
+Or you can just copy the script somewhere in your path and install its only
+dependency Date::Manip. In Debian you just need the following:
+
+  apt-get install libdate-manip-perl
+
+=head1 SEE ALSO
+
+L<https://metacpan.org/pod/Date::Manip>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2014 Mario Domgoergen L<E<lt>mario@domgoergen.comE<gt>>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+=cut
