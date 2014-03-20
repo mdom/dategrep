@@ -11,7 +11,7 @@ dategrep - print lines matching ranges of dates
 
 =head1 DESCRIPTION
 
-dategrep searches the names input files for lines matching a date range and prints them to stdout.
+dategrep searches the named input files for lines matching a date range and prints them to stdout.
 
 =head1 OPTIONS
 
