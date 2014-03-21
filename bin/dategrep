@@ -16,14 +16,16 @@ GetOptions( \%options, 'start=s', 'end=s', 'format=s','help|?','man' )
 pod2usage(1) if $options{help};
 pod2usage(-exitstatus => 0, -verbose => 2) if $options{man};
 
-my ( $start, $end ) = ( 0, time() );
+my ( $start, $end, $error ) = ( 0, time() );
 
 if ( defined $options{'start'} ) {
-    $start = date_to_epoch( $options{'start'} );
+    ($start,$error) = date_to_epoch( $options{'start'} );
+    die "$0: Illegal start time: $error\n" if $error;
 }
 
 if ( defined $options{'end'} ) {
-    $end = date_to_epoch( $options{'end'} );
+    ($end,$error) = date_to_epoch( $options{'end'} );
+    die "$0: Illegal start time: $error\n" if $error;
 }
 
 if ( $end < $start ) {
@@ -34,8 +36,8 @@ for my $filename (@ARGV) {
     open( my $fh, '<', $filename ) or die "$0: Can't open $filename: $!\n";
 
     my $test_line = <$fh>;
-    if ( !date_to_epoch( $test_line, $options{'format'} ) ) {
-        die "Format not parsable\n";
+    if ( my ($epoch,$error) = date_to_epoch( $test_line, $options{'format'} ) ) {
+        die "$0: Format not parsable: $error\n";
     }
     seek( $fh, 0, SEEK_SET );
 
@@ -60,8 +62,10 @@ sub date_to_epoch {
       defined($format)
       ? $date->parse_format( $format, $str )
       : $date->parse($str);
-    die "$0:".$date->err."\n" if $err;
-    return $date->secs_since_1970_GMT();
+    if ($err) {
+        return ( undef, $error );
+    }
+    return ( $date->secs_since_1970_GMT() );
 }
 
 # Modified version of File::SortedSeek::_look
@@ -81,7 +85,8 @@ sub search {
         <$fh> if $mid;    # probably a partial line
         my $line = <$fh>;
         if ( defined($line) ) {
-            date_to_epoch( $line, $format ) < $key
+	    my ($epoch) = date_to_epoch( $line, $format );
+            $epoch < $key
               ? $min = $mid
               : $max = $mid;
         }
@@ -95,7 +100,7 @@ sub search {
     for ( ; ; ) {
         $min = tell($fh);
         defined( my $line = <$fh> ) or last;
-        my $epoch = date_to_epoch( $line, $format );
+        my ($epoch) = date_to_epoch( $line, $format );
         if ( $epoch >= $key ) {
             seek( $fh, $min, 0 );
             return $min;
