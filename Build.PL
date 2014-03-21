@@ -9,6 +9,8 @@ my $builder = Module::Build->new(
     configure_requires => {
         'Module::Build'  => 0,
         'Date::Manip'    => 0,
+	'Getopt::Long'   => 0,
+	'Pod::Usage'     => 0,
     },
     create_makefile_pl => 'traditional',
 );

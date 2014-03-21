@@ -3,13 +3,18 @@
 use strict;
 use warnings;
 use Date::Manip;
+use Pod::Usage;
 use Getopt::Long qw(:config pass_through);
 use Fcntl ":seek";
 
 our $VERSION = '0.01';
 
 my %options;
-GetOptions( \%options, 'start=s', 'end=s', 'format=s' );
+GetOptions( \%options, 'start=s', 'end=s', 'format=s','help|?','man' )
+	or pod2usage(2);
+
+pod2usage(1) if $options{help};
+pod2usage(-exitstatus => 0, -verbose => 2) if $options{man};
 
 my ( $start, $end ) = ( 0, time() );
 
