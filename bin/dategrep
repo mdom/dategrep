@@ -35,8 +35,9 @@ if ( $end < $start ) {
 for my $filename (@ARGV) {
     if ( $filename eq '-' ) {
         open( my $fh, $filename );
-        while (<$fh>) {
-            my ( $epoch, $error ) = date_to_epoch( $_, $options{'format'} );
+        while ( my $line = <$fh> ) {
+            chomp($line);
+            my ( $epoch, $error ) = date_to_epoch( $line, $options{'format'} );
             die "$0: Unparsable line: $line\n";
             last  if $epoch >= $end;
             print if $epoch >= $start;
@@ -98,6 +99,7 @@ sub search {
         if ( defined($line) ) {
             my ($epoch) = date_to_epoch( $line, $format );
             if ( !$epoch ) {
+                chomp($line);
                 die "Unparsable line: $line\n";
             }
             $epoch < $key
@@ -116,6 +118,7 @@ sub search {
         defined( my $line = <$fh> ) or last;
         my ($epoch) = date_to_epoch( $line, $format );
         if ( !$epoch ) {
+            chomp($line);
             die "Unparsable line: $line\n";
         }
         if ( $epoch >= $key ) {
