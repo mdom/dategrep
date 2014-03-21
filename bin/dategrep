@@ -10,21 +10,21 @@ use Fcntl ":seek";
 our $VERSION = '0.01';
 
 my %options;
-GetOptions( \%options, 'start=s', 'end=s', 'format=s','help|?','man' )
-	or pod2usage(2);
+GetOptions( \%options, 'start=s', 'end=s', 'format=s', 'help|?', 'man' )
+  or pod2usage(2);
 
 pod2usage(1) if $options{help};
-pod2usage(-exitstatus => 0, -verbose => 2) if $options{man};
+pod2usage( -exitstatus => 0, -verbose => 2 ) if $options{man};
 
 my ( $start, $end, $error ) = ( 0, time() );
 
 if ( defined $options{'start'} ) {
-    ($start,$error) = date_to_epoch( $options{'start'} );
+    ( $start, $error ) = date_to_epoch( $options{'start'} );
     die "$0: Illegal start time: $error\n" if $error;
 }
 
 if ( defined $options{'end'} ) {
-    ($end,$error) = date_to_epoch( $options{'end'} );
+    ( $end, $error ) = date_to_epoch( $options{'end'} );
     die "$0: Illegal end time: $error\n" if $error;
 }
 
@@ -34,20 +34,20 @@ if ( $end < $start ) {
 
 for my $filename (@ARGV) {
     if ( $filename eq '-' ) {
-	    open( my $fh, $filename );
-	    while (<$fh>) {
-		    my ( $epoch, $error ) = date_to_epoch($_, $options{'format'});
-		    die "$0: Unparsable line: $line\n";
-		    last  if $epoch >= $end;
-		    print if $epoch >= $start;
-	    }
-	    next;
+        open( my $fh, $filename );
+        while (<$fh>) {
+            my ( $epoch, $error ) = date_to_epoch( $_, $options{'format'} );
+            die "$0: Unparsable line: $line\n";
+            last  if $epoch >= $end;
+            print if $epoch >= $start;
+        }
+        next;
     }
     open( my $fh, '<', $filename ) or die "$0: Can't open $filename: $!\n";
 
     my $test_line = <$fh>;
-    my ($epoch,$error) = date_to_epoch( $test_line, $options{'format'} );
-    if ( $error ) {
+    my ( $epoch, $error ) = date_to_epoch( $test_line, $options{'format'} );
+    if ($error) {
         die "$0: No date found in first line: $error\n";
     }
     seek( $fh, 0, SEEK_SET );
@@ -96,10 +96,10 @@ sub search {
         <$fh> if $mid;    # probably a partial line
         my $line = <$fh>;
         if ( defined($line) ) {
-	    my ($epoch) = date_to_epoch( $line, $format );
-	    if ( !$epoch ) {
-		    die "Unparsable line: $line\n";
-	    }
+            my ($epoch) = date_to_epoch( $line, $format );
+            if ( !$epoch ) {
+                die "Unparsable line: $line\n";
+            }
             $epoch < $key
               ? $min = $mid
               : $max = $mid;
@@ -109,15 +109,15 @@ sub search {
     # find the right line
     $min *= $blksize;
     seek( $fh, $min, 0 ) or return undef;
-    <$fh> if $min;        # probably a partial line
+    <$fh> if $min;    # probably a partial line
     my $prev_min = $min;
     for ( ; ; ) {
         $min = tell($fh);
         defined( my $line = <$fh> ) or last;
         my ($epoch) = date_to_epoch( $line, $format );
-	    if ( !$epoch ) {
-		    die "Unparsable line: $line\n";
-	    }
+        if ( !$epoch ) {
+            die "Unparsable line: $line\n";
+        }
         if ( $epoch >= $key ) {
             seek( $fh, $min, 0 );
             return $min;
