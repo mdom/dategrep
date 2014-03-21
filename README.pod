@@ -8,10 +8,17 @@ dategrep - print lines matching ranges of dates
 
   dategrep --start "12:00" --end "12:15" syslog
   dategrep --end "12:15" --format "%b %d %H:%M:%S" syslog
+  dategrep --last-minutes 5 syslog
+  cat syslog | dategrep --end "12:15" -
 
 =head1 DESCRIPTION
 
 dategrep searches the named input files for lines matching a date range and prints them to stdout.
+
+If dategrep works on a seekable file, it can do a binary search to find
+the first and last line to print pretty efficiently. dategrep can also
+read from stdin if one the filename arguments is just a hyphen, but in
+this case it has to parse every single line which will be slower.
 
 =head1 OPTIONS
 
@@ -31,6 +38,12 @@ L<VALID-DATE-FORMATS|https://metacpan.org/pod/distribution/Date-Manip/lib/Date/M
 for a l
 ist of possible formats for DATESPEC.
 
+=item --last-minutes MINUTES
+
+Print all lines from MINUTES minutes ago until the beginning of the current
+minute. So if we have 19:25:43 and MINUTES is five, dategrep will print all
+lines from 19:20:00 to 19:24:59.
+
 =item --format
 
 When this paramenter is missing, dategrep tries to match multiple formats and
@@ -40,10 +53,6 @@ DIRECTIVES|https://metacpan.org/pod/distribution/Date-Manip/lib/Date/Manip/Date.
 See the SYNOPSIS for an example.
 
 =back
-
-=head1 LIMITATIONS
-
-Only seekable files are supported.
 
 =head1 INSTALLATION
 
@@ -57,6 +66,11 @@ Or you can just copy the script somewhere in your path and install its only
 dependency Date::Manip. In Debian you just need the following:
 
   apt-get install libdate-manip-perl
+
+=head1 LIMITATION
+
+At the moment dategrep will die as soon as it finds a line that is not parsable.
+In a future version this will be configurable.
 
 =head1 SEE ALSO
 
