@@ -25,7 +25,7 @@ if ( defined $options{'start'} ) {
 
 if ( defined $options{'end'} ) {
     ($end,$error) = date_to_epoch( $options{'end'} );
-    die "$0: Illegal start time: $error\n" if $error;
+    die "$0: Illegal end time: $error\n" if $error;
 }
 
 if ( $end < $start ) {
