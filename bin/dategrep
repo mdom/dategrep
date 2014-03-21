@@ -196,6 +196,11 @@ dependency Date::Manip. In Debian you just need the following:
 
   apt-get install libdate-manip-perl
 
+=head1 LIMITATION
+
+At the moment dategrep will die as soon as it finds a line that is not parsable.
+In a future version this will be configurable.
+
 =head1 SEE ALSO
 
 L<https://metacpan.org/pod/Date::Manip>
