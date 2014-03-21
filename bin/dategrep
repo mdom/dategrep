@@ -10,7 +10,8 @@ use Fcntl ":seek";
 our $VERSION = '0.01';
 
 my %options;
-GetOptions( \%options, 'start=s', 'end=s', 'format=s', 'help|?', 'man' )
+GetOptions( \%options, 'start=s', 'end=s', 'format=s', 'last-minutes=i',
+    'help|?', 'man' )
   or pod2usage(2);
 
 pod2usage(1) if $options{help};
@@ -26,6 +27,16 @@ if ( defined $options{'start'} ) {
 if ( defined $options{'end'} ) {
     ( $end, $error ) = date_to_epoch( $options{'end'} );
     die "$0: Illegal end time: $error\n" if $error;
+}
+
+if ( defined $options{'last-minutes'} ) {
+    my $now = Date::Manip::Date->new("now");
+    $now->set( 's', 0 );
+    my $ago =
+      Date::Manip::Date->new( $options{'last-minutes'} . "minutes ago" );
+    $ago->set( 's', 0 );
+    ( $start, $end ) =
+      ( $ago->secs_since_1970_GMT(), $now->secs_since_1970_GMT() );
 }
 
 if ( $end < $start ) {
@@ -144,6 +155,7 @@ dategrep - print lines matching ranges of dates
 
   dategrep --start "12:00" --end "12:15" syslog
   dategrep --end "12:15" --format "%b %d %H:%M:%S" syslog
+  dategrep --last-minutes 5 syslog
   cat syslog | dategrep --end "12:15" -
 
 =head1 DESCRIPTION
@@ -172,6 +184,12 @@ Print all lines until DATESPEC exclusively. Default to the current time. See
 L<VALID-DATE-FORMATS|https://metacpan.org/pod/distribution/Date-Manip/lib/Date/Manip/Date.pod#VALID-DATE-FORMATS>
 for a l
 ist of possible formats for DATESPEC.
+
+=item --last-minutes MINUTES
+
+Print all lines from MINUTES minutes ago until the beginning of the current
+minute. So if we have 19:25:43 and MINUTES is five, dategrep will print all
+lines from 19:20:00 to 19:24:59.
 
 =item --format
 
