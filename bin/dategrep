@@ -33,6 +33,16 @@ if ( $end < $start ) {
 }
 
 for my $filename (@ARGV) {
+    if ( $filename eq '-' ) {
+	    open( my $fh, $filename );
+	    while (<$fh>) {
+		    my ( $epoch, $error ) = date_to_epoch($_, $options{'format'});
+		    die "$0: Unparsable line: $line\n";
+		    last  if $epoch >= $end;
+		    print if $epoch >= $start;
+	    }
+	    next;
+    }
     open( my $fh, '<', $filename ) or die "$0: Can't open $filename: $!\n";
 
     my $test_line = <$fh>;
