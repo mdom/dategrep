@@ -36,8 +36,9 @@ for my $filename (@ARGV) {
     open( my $fh, '<', $filename ) or die "$0: Can't open $filename: $!\n";
 
     my $test_line = <$fh>;
-    if ( my ($epoch,$error) = date_to_epoch( $test_line, $options{'format'} ) ) {
-        die "$0: Format not parsable: $error\n";
+    my ($epoch,$error) = date_to_epoch( $test_line, $options{'format'} );
+    if ( $error ) {
+        die "$0: No date found in first line: $error\n";
     }
     seek( $fh, 0, SEEK_SET );
 
