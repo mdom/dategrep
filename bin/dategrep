@@ -38,9 +38,11 @@ for my $filename (@ARGV) {
         while ( my $line = <$fh> ) {
             chomp($line);
             my ( $epoch, $error ) = date_to_epoch( $line, $options{'format'} );
-            die "$0: Unparsable line: $line\n";
-            last  if $epoch >= $end;
-            print if $epoch >= $start;
+            if ( !$epoch ) {
+                die "$0: Unparsable line: $line\n";
+            }
+            last if $epoch >= $end;
+            print "$line\n" if $epoch >= $start;
         }
         next;
     }
