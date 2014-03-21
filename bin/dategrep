@@ -87,6 +87,9 @@ sub search {
         my $line = <$fh>;
         if ( defined($line) ) {
 	    my ($epoch) = date_to_epoch( $line, $format );
+	    if ( !$epoch ) {
+		    die "Unparsable line: $line\n";
+	    }
             $epoch < $key
               ? $min = $mid
               : $max = $mid;
@@ -102,6 +105,9 @@ sub search {
         $min = tell($fh);
         defined( my $line = <$fh> ) or last;
         my ($epoch) = date_to_epoch( $line, $format );
+	    if ( !$epoch ) {
+		    die "Unparsable line: $line\n";
+	    }
         if ( $epoch >= $key ) {
             seek( $fh, $min, 0 );
             return $min;
