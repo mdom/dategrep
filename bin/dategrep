@@ -59,12 +59,12 @@ exit 0;
 sub date_to_epoch {
     my ( $str, $format ) = @_;
     my $date = Date::Manip::Date->new();
-    my $err =
+    my $error =
       defined($format)
       ? $date->parse_format( $format, $str )
       : $date->parse($str);
-    if ($err) {
-        return ( undef, $error );
+    if ($error) {
+        return ( undef, $date->err );
     }
     return ( $date->secs_since_1970_GMT() );
 }
