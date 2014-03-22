@@ -106,8 +106,8 @@ sub search {
     # find the right block
     my ( $min, $max, $mid ) = ( 0, int( $size / $blksize ) );
 
-    if ( $min_byte ) {
-	    $min = POSIX::ceil($min_byte/$blksize);
+    if ($min_byte) {
+        $min = POSIX::ceil( $min_byte / $blksize );
     }
 
     while ( $max - $min > 1 ) {
