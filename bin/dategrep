@@ -67,9 +67,9 @@ for my $filename (@ARGV) {
     seek( $fh, 0, SEEK_SET );
 
     my $tell_beg = search( $fh, $start, $options{'format'} );
-    my $tell_end = search( $fh, $end,   $options{'format'}, $tell_beg );
 
     if ( defined $tell_beg ) {
+        my $tell_end = search( $fh, $end, $options{'format'}, $tell_beg );
         seek( $fh, $tell_beg, SEEK_SET );
         while (<$fh>) {
             last if defined($tell_end) && ( tell() >= $tell_end );
