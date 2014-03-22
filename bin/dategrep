@@ -6,7 +6,6 @@ use Date::Manip;
 use Pod::Usage;
 use Getopt::Long qw(:config pass_through);
 use Fcntl ":seek";
-use POSIX;
 
 our $VERSION = '0.01';
 
@@ -107,7 +106,7 @@ sub search {
     my ( $min, $max, $mid ) = ( 0, int( $size / $blksize ) );
 
     if ($min_byte) {
-        $min = POSIX::ceil( $min_byte / $blksize );
+        $min = int( $min_byte / $blksize );
     }
 
     while ( $max - $min > 1 ) {
