@@ -6,6 +6,7 @@ use Date::Manip;
 use Pod::Usage;
 use Getopt::Long qw(:config pass_through);
 use Fcntl ":seek";
+use POSIX;
 
 our $VERSION = '0.01';
 
@@ -67,7 +68,7 @@ for my $filename (@ARGV) {
     seek( $fh, 0, SEEK_SET );
 
     my $tell_beg = search( $fh, $start, $options{'format'} );
-    my $tell_end = search( $fh, $end,   $options{'format'} );
+    my $tell_end = search( $fh, $end,   $options{'format'}, $tell_beg );
 
     if ( defined $tell_beg ) {
         seek( $fh, $tell_beg, SEEK_SET );
@@ -96,7 +97,7 @@ sub date_to_epoch {
 # Modified version of File::SortedSeek::_look
 
 sub search {
-    my ( $fh, $key, $format ) = @_;
+    my ( $fh, $key, $format, $min_byte ) = @_;
     return undef if not defined $key;
     my @stat = stat($fh) or return undef;
     my ( $size, $blksize ) = @stat[ 7, 11 ];
@@ -104,6 +105,11 @@ sub search {
 
     # find the right block
     my ( $min, $max, $mid ) = ( 0, int( $size / $blksize ) );
+
+    if ( $min_byte ) {
+	    $min = POSIX::ceil($min_byte/$blksize);
+    }
+
     while ( $max - $min > 1 ) {
         $mid = int( ( $max + $min ) / 2 );
         seek( $fh, $mid * $blksize, 0 ) or return undef;
