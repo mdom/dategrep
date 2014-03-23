@@ -72,7 +72,7 @@ for my $filename (@ARGV) {
         my $tell_end = search( $fh, $end, $options{'format'}, $tell_beg );
         seek( $fh, $tell_beg, SEEK_SET );
         while (<$fh>) {
-            last if defined($tell_end) && ( tell() >= $tell_end );
+            last if defined($tell_end) && ( tell() >  $tell_end );
             print;
         }
     }
