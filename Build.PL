@@ -12,6 +12,9 @@ my $builder = Module::Build->new(
 	'Getopt::Long'   => 0,
 	'Pod::Usage'     => 0,
     },
+    test_requires => {
+	'Test::Command::Simple' => 0,
+    },
     create_makefile_pl => 'traditional',
 );
 
