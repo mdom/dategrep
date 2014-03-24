@@ -64,20 +64,22 @@ for my $filename (@ARGV) {
     open( my $fh, '<', $filename ) or die "$0: Can't open $filename: $!\n";
 
     my $test_line = <$fh>;
-    my ( $epoch, $error ) = date_to_epoch( $test_line, $options{'format'} );
-    if ($error) {
-        die "$0: No date found in first line: $error\n";
-    }
-    seek( $fh, 0, SEEK_SET );
+    if ( defined($test_line) ) {
+        my ( $epoch, $error ) = date_to_epoch( $test_line, $options{'format'} );
+        if ($error) {
+            die "$0: No date found in first line: $error\n";
+        }
+        seek( $fh, 0, SEEK_SET );
 
-    my $tell_beg = search( $fh, $start, $options{'format'} );
+        my $tell_beg = search( $fh, $start, $options{'format'} );
 
-    if ( defined $tell_beg ) {
-        my $tell_end = search( $fh, $end, $options{'format'}, $tell_beg );
-        seek( $fh, $tell_beg, SEEK_SET );
-        while (<$fh>) {
-            last if defined($tell_end) && ( tell() >  $tell_end );
-            print;
+        if ( defined $tell_beg ) {
+            my $tell_end = search( $fh, $end, $options{'format'}, $tell_beg );
+            seek( $fh, $tell_beg, SEEK_SET );
+            while (<$fh>) {
+                last if defined($tell_end) && ( tell() > $tell_end );
+                print;
+            }
         }
     }
 }
