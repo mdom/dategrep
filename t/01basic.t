@@ -9,7 +9,7 @@ use FindBin qw($Bin);
 my @lines;
 
 # empty files
-run_ok( './bin/dategrep', "$Bin/files/empty" );
+run_ok( './bin/dategrep','--format=%Y',"$Bin/files/empty" );
 
 # files with line before and after date range
 run_ok(
@@ -28,5 +28,10 @@ is( $lines[1], "2014-03-23 14:16 line 1" );
 run_ok( './bin/dategrep', '--format=%Y-%m-%d %H:%M', "$Bin/files/test01.log" );
 (@lines) = split( /\n/, stdout() );
 is( @lines, 4 );
+
+run( './bin/dategrep',"$Bin/files/empty" );
+isnt(rc(),0);
+chomp(my $error = stderr());
+is($error,'./bin/dategrep: --format is a required parameter');
 
 done_testing();

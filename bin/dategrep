@@ -17,6 +17,10 @@ GetOptions( \%options, 'start=s', 'end=s', 'format=s', 'last-minutes=i',
 pod2usage(1) if $options{help};
 pod2usage( -exitstatus => 0, -verbose => 2 ) if $options{man};
 
+if ( not defined $options{'format'} ) {
+    die "$0: --format is a required parameter\n";
+}
+
 my ( $start, $end, $error ) = ( 0, time() );
 
 if ( defined $options{'start'} ) {
