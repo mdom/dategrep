@@ -9,7 +9,10 @@ use Fcntl ":seek";
 
 our $VERSION = '0.01';
 
-my %options;
+my %options = (
+	format => $ENV{DATEGREP_DEFAULT_FORMAT},
+);
+
 GetOptions( \%options, 'start=s', 'end=s', 'format=s', 'last-minutes=i',
     'help|?', 'man' )
   or pod2usage(2);
