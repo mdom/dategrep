@@ -167,9 +167,9 @@ dategrep - print lines matching ranges of dates
 
 =head1 SYNOPSIS
 
-  dategrep --start "12:00" --end "12:15" syslog
+  dategrep --start "12:00" --end "12:15" --format "%b %d %H:%M:%S" syslog
   dategrep --end "12:15" --format "%b %d %H:%M:%S" syslog
-  dategrep --last-minutes 5 syslog
+  dategrep --last-minutes 5 --format "%b %d %H:%M:%S" syslog
   cat syslog | dategrep --end "12:15" -
 
 =head1 DESCRIPTION
@@ -205,13 +205,25 @@ Print all lines from MINUTES minutes ago until the beginning of the current
 minute. So if we have 19:25:43 and MINUTES is five, dategrep will print all
 lines from 19:20:00 to 19:24:59.
 
-=item --format
+=item --format FORMAT
 
-When this paramenter is missing, dategrep tries to match multiple formats and
-use the first one that matches. If your format is not parsable by dategrep, you
-can supply your own format based on the sequences listed unter L<PRINTF
+Defines a strftime-based FORMAT that is used to parse the input
+lines for a date. The first date found on a line is used. The
+list of possible escape sequences can be found under L<PRINTF
 DIRECTIVES|https://metacpan.org/pod/distribution/Date-Manip/lib/Date/Manip/Date.pod#PRINTF-DIRECTIVES>.
-See the SYNOPSIS for an example.
+
+This is a required parameter. Alternatively you can supply the format
+via the environment variable I<DATEGREP_DEFAULT_FORMAT>.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item DATEGREP_DEFAULT_FORMAT
+
+Default for the I<--format> parameter. The syntax is described there.
 
 =back
 
