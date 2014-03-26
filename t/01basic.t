@@ -36,5 +36,6 @@ is($error,'./bin/dategrep: --format is a required parameter');
 
 $ENV{DATEGREP_DEFAULT_FORMAT} = '%Y-%m-%d %H:%M';
 run_ok( './bin/dategrep', "$Bin/files/test01.log" );
+delete $ENV{DATEGREP_DEFAULT_FORMAT};
 
 done_testing();
