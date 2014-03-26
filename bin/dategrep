@@ -9,9 +9,12 @@ use Fcntl ":seek";
 
 our $VERSION = '0.01';
 
-my %options = (
-	format => $ENV{DATEGREP_DEFAULT_FORMAT},
+my %named_formats = (
+    'rsyslog' => "%b %d %H:%M:%S",
+    'apache'  => "%d/%b/%Y:%T %z",
 );
+
+my %options = ( format => $ENV{DATEGREP_DEFAULT_FORMAT}, );
 
 GetOptions( \%options, 'start=s', 'end=s', 'format=s', 'last-minutes=i',
     'help|?', 'man' )
@@ -22,6 +25,10 @@ pod2usage( -exitstatus => 0, -verbose => 2 ) if $options{man};
 
 if ( not defined $options{'format'} ) {
     die "$0: --format is a required parameter\n";
+}
+
+if ( exists $named_formats{ $options{'format'} } ) {
+    $options{'format'} = $named_formats{ $options{'format'} };
 }
 
 my ( $start, $end, $error ) = ( 0, time() );
@@ -170,6 +177,7 @@ dategrep - print lines matching ranges of dates
   dategrep --start "12:00" --end "12:15" --format "%b %d %H:%M:%S" syslog
   dategrep --end "12:15" --format "%b %d %H:%M:%S" syslog
   dategrep --last-minutes 5 --format "%b %d %H:%M:%S" syslog
+  dategrep --last-minutes 5 --format rsyslog syslog
   cat syslog | dategrep --end "12:15" -
 
 =head1 DESCRIPTION
@@ -214,6 +222,16 @@ DIRECTIVES|https://metacpan.org/pod/distribution/Date-Manip/lib/Date/Manip/Date.
 
 This is a required parameter. Alternatively you can supply the format
 via the environment variable I<DATEGREP_DEFAULT_FORMAT>.
+
+Additionally, dategrep supports named formats:
+
+=over 4
+
+=item * rsyslog "%b %d %H:%M:%S"
+
+=item * apache "%d/%b/%Y:%T %z"
+
+=back
 
 =back
 
