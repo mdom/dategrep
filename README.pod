@@ -25,14 +25,14 @@ this case it has to parse every single line which will be slower.
 
 =over 4
 
-=item --start DATESPEC
+=item --start|--from DATESPEC
 
 Print all lines from DATESPEC inclusively. Defauls to Jan 1, 1970 00:00:00 GMT.
 See
 L<VALID-DATE-FORMATS|https://metacpan.org/pod/distribution/Date-Manip/lib/Date/Manip/Date.pod#VALID-DATE-FORMATS>
 for a list of possible formats for DATESPEC.
 
-=item --end DATESPEC
+=item --end|--to DATESPEC
 
 Print all lines until DATESPEC exclusively. Default to the current time. See
 L<VALID-DATE-FORMATS|https://metacpan.org/pod/distribution/Date-Manip/lib/Date/Manip/Date.pod#VALID-DATE-FORMATS>
