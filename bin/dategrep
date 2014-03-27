@@ -233,6 +233,14 @@ Additionally, dategrep supports named formats:
 
 =back
 
+=item --help 
+
+Shows a short help message
+
+=item --man
+
+Shows the complete man page in your pager.
+
 =back
 
 =head1 ENVIRONMENT
