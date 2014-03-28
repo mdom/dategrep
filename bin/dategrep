@@ -9,92 +9,101 @@ use Fcntl ":seek";
 
 our $VERSION = '0.01';
 
-my %named_formats = (
-    'rsyslog' => "%b %d %H:%M:%S",
-    'apache'  => "%d/%b/%Y:%T %z",
-);
+sub run {
 
-my %options = ( format => $ENV{DATEGREP_DEFAULT_FORMAT}, );
+    my %named_formats = (
+        'rsyslog' => "%b %d %H:%M:%S",
+        'apache'  => "%d/%b/%Y:%T %z",
+    );
 
-GetOptions( \%options, 'start|from=s', 'end|to=s', 'format=s', 'last-minutes=i',
-    'help|?', 'man' )
-  or pod2usage(2);
+    my %options = ( format => $ENV{DATEGREP_DEFAULT_FORMAT}, );
 
-pod2usage(1) if $options{help};
-pod2usage( -exitstatus => 0, -verbose => 2 ) if $options{man};
+    GetOptions( \%options, 'start|from=s', 'end|to=s', 'format=s',
+        'last-minutes=i', 'help|?', 'man' )
+      or pod2usage(2);
 
-if ( not defined $options{'format'} ) {
-    die "$0: --format is a required parameter\n";
-}
+    pod2usage(1) if $options{help};
+    pod2usage( -exitstatus => 0, -verbose => 2 ) if $options{man};
 
-if ( exists $named_formats{ $options{'format'} } ) {
-    $options{'format'} = $named_formats{ $options{'format'} };
-}
-
-my ( $start, $end, $error ) = ( 0, time() );
-
-if ( defined $options{'start'} ) {
-    ( $start, $error ) = date_to_epoch( $options{'start'} );
-    die "$0: Illegal start time: $error\n" if $error;
-}
-
-if ( defined $options{'end'} ) {
-    ( $end, $error ) = date_to_epoch( $options{'end'} );
-    die "$0: Illegal end time: $error\n" if $error;
-}
-
-if ( defined $options{'last-minutes'} ) {
-    my $now = Date::Manip::Date->new("now");
-    $now->set( 's', 0 );
-    my $ago =
-      Date::Manip::Date->new( $options{'last-minutes'} . "minutes ago" );
-    $ago->set( 's', 0 );
-    ( $start, $end ) =
-      ( $ago->secs_since_1970_GMT(), $now->secs_since_1970_GMT() );
-}
-
-if ( $end < $start ) {
-    die "$0: Starting time after end time\n";
-}
-
-for my $filename (@ARGV) {
-    if ( $filename eq '-' ) {
-        open( my $fh, $filename );
-        while ( my $line = <$fh> ) {
-            chomp($line);
-            my ( $epoch, $error ) = date_to_epoch( $line, $options{'format'} );
-            if ( !$epoch ) {
-                die "$0: Unparsable line: $line\n";
-            }
-            last if $epoch >= $end;
-            print "$line\n" if $epoch >= $start;
-        }
-        next;
+    if ( not defined $options{'format'} ) {
+        die "$0: --format is a required parameter\n";
     }
-    open( my $fh, '<', $filename ) or die "$0: Can't open $filename: $!\n";
 
-    my $test_line = <$fh>;
-    if ( defined($test_line) ) {
-        my ( $epoch, $error ) = date_to_epoch( $test_line, $options{'format'} );
-        if ($error) {
-            die "$0: No date found in first line: $error\n";
+    if ( exists $named_formats{ $options{'format'} } ) {
+        $options{'format'} = $named_formats{ $options{'format'} };
+    }
+
+    my ( $start, $end, $error ) = ( 0, time() );
+
+    if ( defined $options{'start'} ) {
+        ( $start, $error ) = date_to_epoch( $options{'start'} );
+        die "$0: Illegal start time: $error\n" if $error;
+    }
+
+    if ( defined $options{'end'} ) {
+        ( $end, $error ) = date_to_epoch( $options{'end'} );
+        die "$0: Illegal end time: $error\n" if $error;
+    }
+
+    if ( defined $options{'last-minutes'} ) {
+        my $now = Date::Manip::Date->new("now");
+        $now->set( 's', 0 );
+        my $ago =
+          Date::Manip::Date->new( $options{'last-minutes'} . "minutes ago" );
+        $ago->set( 's', 0 );
+        ( $start, $end ) =
+          ( $ago->secs_since_1970_GMT(), $now->secs_since_1970_GMT() );
+    }
+
+    if ( $end < $start ) {
+        die "$0: Starting time after end time\n";
+    }
+
+    for my $filename (@ARGV) {
+        if ( $filename eq '-' ) {
+            open( my $fh, $filename );
+            while ( my $line = <$fh> ) {
+                chomp($line);
+                my ( $epoch, $error ) =
+                  date_to_epoch( $line, $options{'format'} );
+                if ( !$epoch ) {
+                    die "$0: Unparsable line: $line\n";
+                }
+                last if $epoch >= $end;
+                print "$line\n" if $epoch >= $start;
+            }
+            next;
         }
-        seek( $fh, 0, SEEK_SET );
+        open( my $fh, '<', $filename ) or die "$0: Can't open $filename: $!\n";
 
-        my $tell_beg = search( $fh, $start, $options{'format'} );
+        my $test_line = <$fh>;
+        if ( defined($test_line) ) {
+            my ( $epoch, $error ) =
+              date_to_epoch( $test_line, $options{'format'} );
+            if ($error) {
+                die "$0: No date found in first line: $error\n";
+            }
+            seek( $fh, 0, SEEK_SET );
 
-        if ( defined $tell_beg ) {
-            my $tell_end = search( $fh, $end, $options{'format'}, $tell_beg );
-            seek( $fh, $tell_beg, SEEK_SET );
-            while (<$fh>) {
-                last if defined($tell_end) && ( tell() > $tell_end );
-                print;
+            my $tell_beg = search( $fh, $start, $options{'format'} );
+
+            if ( defined $tell_beg ) {
+                my $tell_end =
+                  search( $fh, $end, $options{'format'}, $tell_beg );
+                seek( $fh, $tell_beg, SEEK_SET );
+                while (<$fh>) {
+                    last if defined($tell_end) && ( tell() > $tell_end );
+                    print;
+                }
             }
         }
     }
 }
 
-exit 0;
+if ( not caller ) {
+    run();
+    exit 0;
+}
 
 sub date_to_epoch {
     my ( $str, $format ) = @_;
