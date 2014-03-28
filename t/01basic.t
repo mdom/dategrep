@@ -32,7 +32,7 @@ is( @lines, 4 );
 run( './bin/dategrep',"$Bin/files/empty" );
 isnt(rc(),0);
 chomp(my $error = stderr());
-is($error,'./bin/dategrep: --format is a required parameter');
+is($error,'dategrep: --format is a required parameter');
 
 $ENV{DATEGREP_DEFAULT_FORMAT} = '%Y-%m-%d %H:%M';
 run_ok( './bin/dategrep', "$Bin/files/test01.log" );

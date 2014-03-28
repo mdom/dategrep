@@ -6,8 +6,11 @@ use Date::Manip;
 use Pod::Usage;
 use Getopt::Long qw(:config pass_through);
 use Fcntl ":seek";
+use File::Basename qw(basename);
 
 our $VERSION = '0.01';
+
+my $app = basename($0);
 
 sub run {
 
@@ -26,7 +29,7 @@ sub run {
     pod2usage( -exitstatus => 0, -verbose => 2 ) if $options{man};
 
     if ( not defined $options{'format'} ) {
-        die "$0: --format is a required parameter\n";
+        die "$app: --format is a required parameter\n";
     }
 
     if ( exists $named_formats{ $options{'format'} } ) {
@@ -37,12 +40,12 @@ sub run {
 
     if ( defined $options{'start'} ) {
         ( $start, $error ) = date_to_epoch( $options{'start'} );
-        die "$0: Illegal start time: $error\n" if $error;
+        die "$app: Illegal start time: $error\n" if $error;
     }
 
     if ( defined $options{'end'} ) {
         ( $end, $error ) = date_to_epoch( $options{'end'} );
-        die "$0: Illegal end time: $error\n" if $error;
+        die "$app: Illegal end time: $error\n" if $error;
     }
 
     if ( defined $options{'last-minutes'} ) {
@@ -56,7 +59,7 @@ sub run {
     }
 
     if ( $end < $start ) {
-        die "$0: Starting time after end time\n";
+        die "$app: Starting time after end time\n";
     }
 
     for my $filename (@ARGV) {
@@ -67,21 +70,21 @@ sub run {
                 my ( $epoch, $error ) =
                   date_to_epoch( $line, $options{'format'} );
                 if ( !$epoch ) {
-                    die "$0: Unparsable line: $line\n";
+                    die "$app: Unparsable line: $line\n";
                 }
                 last if $epoch >= $end;
                 print "$line\n" if $epoch >= $start;
             }
             next;
         }
-        open( my $fh, '<', $filename ) or die "$0: Can't open $filename: $!\n";
+        open( my $fh, '<', $filename ) or die "$app: Can't open $filename: $!\n";
 
         my $test_line = <$fh>;
         if ( defined($test_line) ) {
             my ( $epoch, $error ) =
               date_to_epoch( $test_line, $options{'format'} );
             if ($error) {
-                die "$0: No date found in first line: $error\n";
+                die "$app: No date found in first line: $error\n";
             }
             seek( $fh, 0, SEEK_SET );
 
