@@ -15,7 +15,7 @@ my $app = basename($0);
 sub run {
 
     my %named_formats = (
-        'rsyslog' => "%b %d %H:%M:%S",
+        'rsyslog' => "%b %e %H:%M:%S",
         'apache'  => "%d/%b/%Y:%T %z",
     );
 
