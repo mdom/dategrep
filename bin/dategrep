@@ -21,9 +21,11 @@ sub run {
 
     my %options = ( format => $ENV{DATEGREP_DEFAULT_FORMAT}, );
 
-    GetOptions( \%options, 'start|from=s', 'end|to=s', 'format=s',
-        'last-minutes=i','multiline!', 'help|?', 'man' )
-      or pod2usage(2);
+    GetOptions(
+        \%options,        'start|from=s', 'end|to=s',    'format=s',
+        'last-minutes=i', 'multiline!',   'blocksize=i', 'help|?',
+        'man'
+    ) or pod2usage(2);
 
     pod2usage(1) if $options{help};
     pod2usage( -exitstatus => 0, -verbose => 2 ) if $options{man};
@@ -94,15 +96,20 @@ sub run {
             }
             seek( $fh, 0, SEEK_SET );
 
-            my $tell_beg = search( $fh, $start, $options{'format'},
-                multiline => $options{multiline} );
+            my $tell_beg = search(
+                $fh, $start, $options{'format'},
+                multiline => $options{multiline},
+                blocksize => $options{blocksize},
+            );
 
             if ( defined $tell_beg ) {
                 my $tell_end = search(
                     $fh, $end, $options{'format'},
                     min_byte  => $tell_beg,
-                    multiline => $options{multiline}
+                    multiline => $options{multiline},
+                    blocksize => $options{blocksize},
                 );
+
                 seek( $fh, $tell_beg, SEEK_SET );
                 while (<$fh>) {
                     last if defined($tell_end) && ( tell() > $tell_end );
@@ -111,6 +118,7 @@ sub run {
             }
         }
     }
+    
 }
 
 if ( not caller ) {
@@ -138,7 +146,7 @@ sub search {
     return undef if not defined $key;
     my @stat = stat($fh) or return undef;
     my ( $size, $blksize ) = @stat[ 7, 11 ];
-    $blksize ||= 8192;
+    $blksize = $blksize || $options{blocksize} || 8192;
     my $min_byte = $options{min_byte};
     my $multiline = $options{multiline};
 
@@ -268,6 +276,11 @@ Additionally, dategrep supports named formats:
 =item --multiline
 
 Print all lines between the start and end line even if they are not timestamped.
+
+=item --blocksize
+
+Size of the intervals used in the binary search. Defaults to the native
+blocksize of the file's filesystem or 8129.
 
 =item --help 
 
