@@ -4,7 +4,7 @@ use warnings FATAL => 'all';
 use Module::Build;
 
 my $builder = Module::Build->new(
-    dist_name          => 'dategrep',
+    dist_name          => 'App-dategrep',
     dist_version_from  => 'bin/dategrep',
     configure_requires => {
         'Module::Build' => 0,
