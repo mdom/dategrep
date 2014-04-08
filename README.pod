@@ -65,6 +65,10 @@ Additionally, dategrep supports named formats:
 
 =back
 
+=item --multiline
+
+Print all lines between the start and end line even if they are not timestamped.
+
 =item --help 
 
 Shows a short help message
@@ -100,10 +104,7 @@ dependency Date::Manip. In Debian you just need the following:
 
 =head1 LIMITATION
 
-At the moment dategrep will die as soon as it finds a line that is not parsable.
-In a future version this will be configurable.
-
-dategrep also expects the files to be sorted. If the time serie is not
+dategrep expects the files to be sorted. If the time serie is not
 ascending dategrep might be exiting before the last line in its date range is
 printed.
 
