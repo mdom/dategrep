@@ -75,6 +75,16 @@ Print all lines between the start and end line even if they are not timestamped.
 Size of the intervals used in the binary search. Defaults to the native
 blocksize of the file's filesystem or 8129.
 
+=item --sort-files
+
+Sort files in the order of the first line with a timestamp. For example:
+If you have a common logrotate configuration, you probably have files
+like syslog, syslog.1, syslog.2 etc. For dategrep to work we need those
+files in reverse order: syslog.2, syslog.1, syslog. This options handles
+that for you.
+
+The special filename '-' is always sorted last ... at least until 2999.
+
 =item --help 
 
 Shows a short help message
