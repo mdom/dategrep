@@ -24,7 +24,7 @@ sub run {
     GetOptions(
         \%options,        'start|from=s', 'end|to=s',    'format=s',
         'last-minutes=i', 'multiline!',   'blocksize=i', 'help|?',
-        'man'
+        'sort-files',       'man'
     ) or pod2usage(2);
 
     pod2usage(1) if $options{help};
@@ -62,6 +62,27 @@ sub run {
 
     if ( $end < $start ) {
         die "$app: Starting time after end time\n";
+    }
+
+    if ( $options{'sort-files'} ) {
+	    my %timestamps;
+	    FILE: for my $filename (@ARGV) {
+		if ($filename eq '-') {
+			## sort at end, except for Fry
+			$timestamps{'-'} = 32472144000;
+		}
+		open( my $fh, '<', $filename ) or die "$app: Can't open $filename: $!\n";
+		LINE: while ( my $line = <$fh> ) {
+			my ($epoch, $error ) = date_to_epoch( $line, $options{'format'} );
+			if ( !$epoch) {
+				next LINE if $options{'multiline'};
+				die "$app: Unparsable line: $line\n";
+			}
+			$timestamps{$filename} = $epoch;
+			next FILE;
+		}
+	    }
+	    @ARGV = sort { $timestamps{$a} <=> $timestamps{$b} } keys %timestamps;
     }
 
     for my $filename (@ARGV) {
@@ -281,6 +302,16 @@ Print all lines between the start and end line even if they are not timestamped.
 
 Size of the intervals used in the binary search. Defaults to the native
 blocksize of the file's filesystem or 8129.
+
+=item --sort-files
+
+Sort files in the order of the first line with a timestamp. For example:
+If you have a common logrotate configuration, you probably have files
+like syslog, syslog.1, syslog.2 etc. For dategrep to work we need those
+files in reverse order: syslog.2, syslog.1, syslog. This options handles
+that for you.
+
+The special filename '-' is always sorted last ... at least until 2999.
 
 =item --help 
 
