@@ -213,7 +213,8 @@ dategrep - print lines matching ranges of dates
 
 =head1 DESCRIPTION
 
-dategrep searches the named input files for lines matching a date range and prints them to stdout.
+dategrep searches the named input files for lines matching a date range
+and prints them to stdout.
 
 If dategrep works on a seekable file, it can do a binary search to find
 the first and last line to print pretty efficiently. dategrep can also
@@ -303,9 +304,9 @@ dependency Date::Manip. In Debian you just need the following:
 
 =head1 LIMITATION
 
-dategrep expects the files to be sorted. If the time serie is not
-ascending dategrep might be exiting before the last line in its date range is
-printed.
+dategrep expects the files to be sorted. If the timestamps are not
+ascending, dategrep might be exiting before the last line in its date
+range is printed.
 
 =head1 SEE ALSO
 
