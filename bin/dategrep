@@ -22,7 +22,7 @@ sub run {
     my %options = ( format => $ENV{DATEGREP_DEFAULT_FORMAT}, );
 
     GetOptions( \%options, 'start|from=s', 'end|to=s', 'format=s',
-        'last-minutes=i', 'help|?', 'man' )
+        'last-minutes=i','multiline!', 'help|?', 'man' )
       or pod2usage(2);
 
     pod2usage(1) if $options{help};
@@ -65,15 +65,21 @@ sub run {
     for my $filename (@ARGV) {
         if ( $filename eq '-' ) {
             open( my $fh, $filename );
-            while ( my $line = <$fh> ) {
+	    my $last_epoch=0;
+          LINE: while ( my $line = <$fh> ) {
                 chomp($line);
                 my ( $epoch, $error ) =
                   date_to_epoch( $line, $options{'format'} );
                 if ( !$epoch ) {
+                    if ($options{'multiline'}) {
+			    print "$line\n" if $last_epoch >= $start;
+			    next LINE;
+		    }
                     die "$app: Unparsable line: $line\n";
                 }
                 last if $epoch >= $end;
                 print "$line\n" if $epoch >= $start;
+		$last_epoch = $epoch;
             }
             next;
         }
@@ -88,11 +94,15 @@ sub run {
             }
             seek( $fh, 0, SEEK_SET );
 
-            my $tell_beg = search( $fh, $start, $options{'format'} );
+            my $tell_beg = search( $fh, $start, $options{'format'},
+                multiline => $options{multiline} );
 
             if ( defined $tell_beg ) {
-                my $tell_end =
-                  search( $fh, $end, $options{'format'}, $tell_beg );
+                my $tell_end = search(
+                    $fh, $end, $options{'format'},
+                    min_byte  => $tell_beg,
+                    multiline => $options{multiline}
+                );
                 seek( $fh, $tell_beg, SEEK_SET );
                 while (<$fh>) {
                     last if defined($tell_end) && ( tell() > $tell_end );
@@ -124,33 +134,41 @@ sub date_to_epoch {
 # Modified version of File::SortedSeek::_look
 
 sub search {
-    my ( $fh, $key, $format, $min_byte ) = @_;
+    my ( $fh, $key, $format, %options ) = @_;
     return undef if not defined $key;
     my @stat = stat($fh) or return undef;
     my ( $size, $blksize ) = @stat[ 7, 11 ];
     $blksize ||= 8192;
+    my $min_byte = $options{min_byte};
+    my $multiline = $options{multiline};
 
     # find the right block
     my ( $min, $max, $mid ) = ( 0, int( $size / $blksize ) );
 
-    if ($min_byte) {
+    if (defined $min_byte) {
         $min = int( $min_byte / $blksize );
     }
 
-    while ( $max - $min > 1 ) {
+    BLOCK: while ( $max - $min > 1 ) {
         $mid = int( ( $max + $min ) / 2 );
         seek( $fh, $mid * $blksize, 0 ) or return undef;
         <$fh> if $mid;    # probably a partial line
-        my $line = <$fh>;
-        if ( defined($line) ) {
+        LINE: while ( my $line = <$fh> ) {
             my ($epoch) = date_to_epoch( $line, $format );
             if ( !$epoch ) {
-                chomp($line);
+                next LINE if $multiline;
+
+		chomp($line);
                 die "Unparsable line: $line\n";
             }
+	    if ( $multiline ) {
+		my $byte  = tell($fh);
+		$mid = int( $byte / $blksize );
+	    }
             $epoch < $key
               ? $min = $mid
               : $max = $mid;
+	    next BLOCK;
         }
     }
 
@@ -164,6 +182,7 @@ sub search {
         defined( my $line = <$fh> ) or last;
         my ($epoch) = date_to_epoch( $line, $format );
         if ( !$epoch ) {
+	    next if $multiline;
             chomp($line);
             die "Unparsable line: $line\n";
         }
@@ -245,6 +264,10 @@ Additionally, dategrep supports named formats:
 
 =back
 
+=item --multiline
+
+Print all lines between the start and end line even if they are not timestamped.
+
 =item --help 
 
 Shows a short help message
@@ -280,10 +303,7 @@ dependency Date::Manip. In Debian you just need the following:
 
 =head1 LIMITATION
 
-At the moment dategrep will die as soon as it finds a line that is not parsable.
-In a future version this will be configurable.
-
-dategrep also expects the files to be sorted. If the time serie is not
+dategrep expects the files to be sorted. If the time serie is not
 ascending dategrep might be exiting before the last line in its date range is
 printed.
 
