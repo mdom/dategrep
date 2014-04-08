@@ -65,24 +65,23 @@ sub run {
     }
 
     if ( $options{'sort-files'} ) {
-	    my %timestamps;
-	    FILE: for my $filename (@ARGV) {
-		if ($filename eq '-') {
-			## sort at end, except for Fry
-			$timestamps{'-'} = 32472144000;
-		}
-		open( my $fh, '<', $filename ) or die "$app: Can't open $filename: $!\n";
-		LINE: while ( my $line = <$fh> ) {
-			my ($epoch, $error ) = date_to_epoch( $line, $options{'format'} );
-			if ( !$epoch) {
-				next LINE if $options{'multiline'};
-				die "$app: Unparsable line: $line\n";
-			}
-			$timestamps{$filename} = $epoch;
-			next FILE;
-		}
-	    }
-	    @ARGV = sort { $timestamps{$a} <=> $timestamps{$b} } keys %timestamps;
+        my %timestamps;
+      FILE: for my $filename (@ARGV) {
+            if ( $filename eq '-' ) {
+                ## sort at end, except for Fry
+                $timestamps{'-'} = 32472144000;
+            }
+            open( my $fh, '<', $filename )
+              or die "$app: Can't open $filename: $!\n";
+            my $line = <$fh>;
+            my ( $epoch, $error ) = date_to_epoch( $line, $options{'format'} );
+            if ( !$epoch ) {
+                die "$app: No date found in first line: $error\n";
+            }
+            $timestamps{$filename} = $epoch;
+            next FILE;
+        }
+        @ARGV = sort { $timestamps{$a} <=> $timestamps{$b} } keys %timestamps;
     }
 
     for my $filename (@ARGV) {
