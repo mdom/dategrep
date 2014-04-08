@@ -1,4 +1,6 @@
 bin/dategrep
 Build.PL
 MANIFEST			This list of files
-syslog
+Makefile.PL
+META.yml
+META.json
