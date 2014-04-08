@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Date::Manip;
 use Pod::Usage;
-use Getopt::Long qw(:config pass_through);
+use Getopt::Long;
 use Fcntl ":seek";
 use File::Basename qw(basename);
 
