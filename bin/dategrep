@@ -205,7 +205,6 @@ sub search {
     $min *= $blksize;
     seek( $fh, $min, 0 ) or return undef;
     <$fh> if $min;    # probably a partial line
-    my $prev_min = $min;
     for ( ; ; ) {
         $min = tell($fh);
         defined( my $line = <$fh> ) or last;
@@ -219,7 +218,6 @@ sub search {
             seek( $fh, $min, 0 );
             return $min;
         }
-        $prev_min = $min;
     }
     return undef;
 }
