@@ -12,19 +12,24 @@ our $VERSION = '0.01';
 
 my $app = basename($0);
 
-sub run {
+my %named_formats = (
+    'rsyslog' => "%b %e %H:%M:%S",
+    'apache'  => "%d/%b/%Y:%T %z",
+);
 
-    my %named_formats = (
-        'rsyslog' => "%b %e %H:%M:%S",
-        'apache'  => "%d/%b/%Y:%T %z",
-    );
+if ( not caller ) {
+    run();
+    exit 0;
+}
+
+sub run {
 
     my %options = ( format => $ENV{DATEGREP_DEFAULT_FORMAT}, );
 
     GetOptions(
         \%options,        'start|from=s', 'end|to=s',    'format=s',
         'last-minutes=i', 'multiline!',   'blocksize=i', 'help|?',
-        'sort-files',       'man'
+        'sort-files',     'man'
     ) or pod2usage(2);
 
     pod2usage(1) if $options{help};
@@ -65,85 +70,96 @@ sub run {
     }
 
     if ( $options{'sort-files'} ) {
-        my %timestamps;
-      FILE: for my $filename (@ARGV) {
-            if ( $filename eq '-' ) {
-                ## sort at end, except for Fry
-                $timestamps{'-'} = 32472144000;
-            }
-            open( my $fh, '<', $filename )
-              or die "$app: Can't open $filename: $!\n";
-            my $line = <$fh>;
-            my ( $epoch, $error ) = date_to_epoch( $line, $options{'format'} );
-            if ( !$epoch ) {
-                die "$app: No date found in first line: $error\n";
-            }
-            $timestamps{$filename} = $epoch;
-            next FILE;
-        }
-        @ARGV = sort { $timestamps{$a} <=> $timestamps{$b} } keys %timestamps;
+        @ARGV = sort_files( $options{'format'}, @ARGV );
     }
 
-    for my $filename (@ARGV) {
+  FILE: for my $filename (@ARGV) {
         if ( $filename eq '-' ) {
-            open( my $fh, $filename );
-	    my $last_epoch=0;
-          LINE: while ( my $line = <$fh> ) {
-                chomp($line);
-                my ( $epoch, $error ) =
-                  date_to_epoch( $line, $options{'format'} );
-                if ( !$epoch ) {
-                    if ($options{'multiline'}) {
-			    print "$line\n" if $last_epoch >= $start;
-			    next LINE;
-		    }
-                    die "$app: Unparsable line: $line\n";
-                }
-                last if $epoch >= $end;
-                print "$line\n" if $epoch >= $start;
-		$last_epoch = $epoch;
-            }
-            next;
+            process_stdin( $start, $end, %options );
         }
-        open( my $fh, '<', $filename ) or die "$app: Can't open $filename: $!\n";
+        else {
+            process_normal_file( $filename, $start, $end, %options );
+        }
+        return;
+    }
+}
 
-        my $test_line = <$fh>;
-        if ( defined($test_line) ) {
-            my ( $epoch, $error ) =
-              date_to_epoch( $test_line, $options{'format'} );
-            if ($error) {
-                die "$app: No date found in first line: $error\n";
-            }
-            seek( $fh, 0, SEEK_SET );
+sub sort_files {
+    my ( $format, @files ) = @_;
+    my %timestamps;
+  FILE: for my $filename (@files) {
+        if ( $filename eq '-' ) {
+            ## sort at end, except for Fry
+            $timestamps{'-'} = 32472144000;
+        }
+        open( my $fh, '<', $filename )
+          or die "$app: Can't open $filename: $!\n";
+        my $line = <$fh>;
+        my ( $epoch, $error ) = date_to_epoch( $line, $format );
+        if ( !$epoch ) {
+            die "$app: No date found in first line: $error\n";
+        }
+        $timestamps{$filename} = $epoch;
+    }
+    return sort { $timestamps{$a} <=> $timestamps{$b} } keys %timestamps;
+}
 
-            my $tell_beg = search(
-                $fh, $start, $options{'format'},
+sub process_normal_file {
+    my ( $filename, $start, $end, %options ) = @_;
+
+    open( my $fh, '<', $filename ) or die "$app: Can't open $filename: $!\n";
+    my $test_line = <$fh>;
+    if ( defined($test_line) ) {
+        my ( $epoch, $error ) =
+          date_to_epoch( $test_line, $options{'format'} );
+        if ($error) {
+            die "$app: No date found in first line: $error\n";
+        }
+        seek( $fh, 0, SEEK_SET );
+
+        my $tell_beg = search(
+            $fh, $start, $options{'format'},
+            multiline => $options{multiline},
+            blocksize => $options{blocksize},
+        );
+
+        if ( defined $tell_beg ) {
+            my $tell_end = search(
+                $fh, $end, $options{'format'},
+                min_byte  => $tell_beg,
                 multiline => $options{multiline},
                 blocksize => $options{blocksize},
             );
 
-            if ( defined $tell_beg ) {
-                my $tell_end = search(
-                    $fh, $end, $options{'format'},
-                    min_byte  => $tell_beg,
-                    multiline => $options{multiline},
-                    blocksize => $options{blocksize},
-                );
-
-                seek( $fh, $tell_beg, SEEK_SET );
-                while (<$fh>) {
-                    last if defined($tell_end) && ( tell() > $tell_end );
-                    print;
-                }
+            seek( $fh, $tell_beg, SEEK_SET );
+            while (<$fh>) {
+                return if defined($tell_end) && ( tell() > $tell_end );
+                print;
             }
         }
     }
-    
+    return;
 }
 
-if ( not caller ) {
-    run();
-    exit 0;
+sub process_stdin {
+    my ( $start, $end, %options ) = @_;
+    my $last_epoch = 0;
+  LINE: while ( my $line = <STDIN> ) {
+        chomp($line);
+        my ( $epoch, $error ) =
+          date_to_epoch( $line, $options{'format'} );
+        if ( !$epoch ) {
+            if ( $options{'multiline'} ) {
+                print "$line\n" if $last_epoch >= $start;
+                next LINE;
+            }
+            die "$app: Unparsable line: $line\n";
+        }
+        last if $epoch >= $end;
+        print "$line\n" if $epoch >= $start;
+        $last_epoch = $epoch;
+    }
+    return;
 }
 
 sub date_to_epoch {
@@ -167,36 +183,36 @@ sub search {
     my @stat = stat($fh) or return undef;
     my ( $size, $blksize ) = @stat[ 7, 11 ];
     $blksize = $blksize || $options{blocksize} || 8192;
-    my $min_byte = $options{min_byte};
+    my $min_byte  = $options{min_byte};
     my $multiline = $options{multiline};
 
     # find the right block
     my ( $min, $max, $mid ) = ( 0, int( $size / $blksize ) );
 
-    if (defined $min_byte) {
+    if ( defined $min_byte ) {
         $min = int( $min_byte / $blksize );
     }
 
-    BLOCK: while ( $max - $min > 1 ) {
+  BLOCK: while ( $max - $min > 1 ) {
         $mid = int( ( $max + $min ) / 2 );
         seek( $fh, $mid * $blksize, 0 ) or return undef;
         <$fh> if $mid;    # probably a partial line
-        LINE: while ( my $line = <$fh> ) {
+      LINE: while ( my $line = <$fh> ) {
             my ($epoch) = date_to_epoch( $line, $format );
             if ( !$epoch ) {
                 next LINE if $multiline;
 
-		chomp($line);
+                chomp($line);
                 die "Unparsable line: $line\n";
             }
-	    if ( $multiline ) {
-		my $byte  = tell($fh);
-		$mid = int( $byte / $blksize );
-	    }
+            if ($multiline) {
+                my $byte = tell($fh);
+                $mid = int( $byte / $blksize );
+            }
             $epoch < $key
               ? $min = $mid
               : $max = $mid;
-	    next BLOCK;
+            next BLOCK;
         }
     }
 
@@ -209,7 +225,7 @@ sub search {
         defined( my $line = <$fh> ) or last;
         my ($epoch) = date_to_epoch( $line, $format );
         if ( !$epoch ) {
-	    next if $multiline;
+            next if $multiline;
             chomp($line);
             die "Unparsable line: $line\n";
         }
