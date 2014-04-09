@@ -201,17 +201,21 @@ sub loadconfig {
 	return \%config;
 }
 
-sub date_to_epoch {
-    my ( $str, $format ) = @_;
-    my $date = Date::Manip::Date->new();
-    my $error =
-      defined($format)
-      ? $date->parse_format( $format, $str )
-      : $date->parse($str);
-    if ($error) {
-        return ( undef, $date->err );
+{
+    my $date;
+
+    sub date_to_epoch {
+        my ( $str, $format ) = @_;
+	$date = Date::Manip::Date->new() unless $date;
+        my $error =
+          defined($format)
+          ? $date->parse_format( $format, $str )
+          : $date->parse($str);
+        if ($error) {
+            return ( undef, $date->err );
+        }
+        return ( $date->secs_since_1970_GMT() );
     }
-    return ( $date->secs_since_1970_GMT() );
 }
 
 # Modified version of File::SortedSeek::_look
