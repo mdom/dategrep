@@ -24,16 +24,25 @@ if ( not caller ) {
 
 sub run {
 
-    my %options = ( format => $ENV{DATEGREP_DEFAULT_FORMAT}, );
+    my %options;
+    if ( $ENV{DATEGREP_DEFAULT_FORMAT} ) {
+	   $options{format} = $ENV{DATEGREP_DEFAULT_FORMAT};
+   }
 
     GetOptions(
         \%options,        'start|from=s', 'end|to=s',    'format=s',
         'last-minutes=i', 'multiline!',   'blocksize=i', 'help|?',
-        'sort-files',     'man'
+        'sort-files',     'man',          'configfile=s',
     ) or pod2usage(2);
 
     pod2usage(1) if $options{help};
     pod2usage( -exitstatus => 0, -verbose => 2 ) if $options{man};
+
+    my $config = loadconfig($options{configfile});
+
+    if ( exists $config->{formats} ) {
+	    %named_formats = ( %named_formats,  %{$config->{formats} } );
+    }
 
     if ( not defined $options{'format'} ) {
         die "$app: --format is a required parameter\n";
@@ -160,6 +169,36 @@ sub process_stdin {
         $last_epoch = $epoch;
     }
     return;
+}
+
+sub loadconfig {
+	my $configfile = shift;
+	if ( not defined $configfile ) {
+		$configfile = "$ENV{HOME}/.dategreprc";
+	}
+	my %config;
+	return if !-e $configfile;
+
+	my $section;
+	open(my $cfg_fh,'<',$configfile)
+		or die "$app: Can't open config file: $!\n";
+	while (<$cfg_fh>) {
+		next if /^\s*\#/ || /^\s*$/;
+		if (/^\[([^\]]*)\]\s*$/) {
+			$section = lc $1;
+		}
+		elsif (/^(\w+)\s*=\s*(.*)/) {
+			my ($key,$val) = ($1,$2);
+			if ( not defined $section ) {
+				die "$app: parameter $key not in section\n"
+			}
+			$config{$section}->{$key} = $val;
+		}
+		else {
+			die "$app: Parse error in configuration file\n";
+		}
+	}
+	return \%config;
 }
 
 sub date_to_epoch {
@@ -311,9 +350,9 @@ Additionally, dategrep supports named formats:
 
 Print all lines between the start and end line even if they are not timestamped.
 
-=item --blocksize
+=item --blocksize SIZE
 
-Size of the intervals used in the binary search. Defaults to the native
+SIZE of the intervals used in the binary search. Defaults to the native
 blocksize of the file's filesystem or 8129.
 
 =item --sort-files
@@ -326,6 +365,10 @@ that for you.
 
 The special filename '-' is always sorted last ... at least until 2999.
 
+=item --configfile FILE
+
+Reads configuration from FILE instead of I<~/.dategreprc>.
+
 =item --help 
 
 Shows a short help message
@@ -335,6 +378,22 @@ Shows a short help message
 Shows the complete man page in your pager.
 
 =back
+
+=head1 CONFIGURATION FILE
+
+On startup dategrep reads a configraution file from I<$HOME/.dategreprc> or the
+file specified by I<--configfile>. 
+
+The file consists of sections and variables. A section begins with the name of
+the section in square brackets and continues until the next section begins.
+Section names are not case sensitive. Empty lines and lines with comments are
+skipped. Comments are started with a hash character. dategrep reckognizes
+only one sections: Under I<format> you can list additional named formats.
+
+Example:
+
+  [formats]
+  time = %H:%M:%S
 
 =head1 ENVIRONMENT
 
