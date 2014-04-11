@@ -83,12 +83,14 @@ sub run {
     }
 
   FILE: for my $filename (@ARGV) {
+	my $iter;
         if ( $filename eq '-' ) {
-            process_stdin( $start, $end, %options );
+            $iter = stdin_iterator( $start, $end, %options );
         }
         else {
-            process_normal_file( $filename, $start, $end, %options );
+            $iter = normal_file_iterator( $filename, $start, $end, %options );
         }
+	print while $iter->();
         return;
     }
 }
@@ -113,7 +115,7 @@ sub sort_files {
     return sort { $timestamps{$a} <=> $timestamps{$b} } keys %timestamps;
 }
 
-sub process_normal_file {
+sub normal_file_iterator {
     my ( $filename, $start, $end, %options ) = @_;
 
     open( my $fh, '<', $filename ) or die "$app: Can't open $filename: $!\n";
@@ -150,7 +152,7 @@ sub process_normal_file {
     return;
 }
 
-sub process_stdin {
+sub stdin_iterator {
     my ( $start, $end, %options ) = @_;
     my $last_epoch = 0;
   LINE: while ( my $line = <STDIN> ) {
