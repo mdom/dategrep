@@ -83,14 +83,18 @@ sub run {
     }
 
   FILE: for my $filename (@ARGV) {
-	my $iter;
+        my $iter;
         if ( $filename eq '-' ) {
-            $iter = stdin_iterator( $start, $end, %options );
+            $iter = stdin_iterator( $filename, $start, $end, %options );
         }
         else {
             $iter = normal_file_iterator( $filename, $start, $end, %options );
         }
-	print while $iter->();
+        if ($iter) {
+            while ( my $line = $iter->() ) {
+                print $line;
+            }
+        }
         return;
     }
 }
@@ -143,34 +147,36 @@ sub normal_file_iterator {
             );
 
             seek( $fh, $tell_beg, SEEK_SET );
-            while (<$fh>) {
+            return sub {
+                my $line = <$fh>;
                 return if defined($tell_end) && ( tell() > $tell_end );
-                print;
-            }
+                return $line;
+            };
         }
     }
     return;
 }
 
 sub stdin_iterator {
-    my ( $start, $end, %options ) = @_;
+    my ( $filename, $start, $end, %options ) = @_;
     my $last_epoch = 0;
-  LINE: while ( my $line = <STDIN> ) {
-        chomp($line);
-        my ( $epoch, $error ) =
-          date_to_epoch( $line, $options{'format'} );
-        if ( !$epoch ) {
-            if ( $options{'multiline'} ) {
-                print "$line\n" if $last_epoch >= $start;
-                next LINE;
+    return sub {
+      LINE: while ( my $line = <STDIN> ) {
+            my ( $epoch, $error ) =
+              date_to_epoch( $line, $options{'format'} );
+            if ( !$epoch ) {
+                if ( $options{'multiline'} ) {
+                    return $line if $last_epoch >= $start;
+                }
+                die "$app: Unparsable line: $line";
             }
-            die "$app: Unparsable line: $line\n";
+            next LINE if $epoch < $start;
+            $last_epoch = $epoch;
+            return if $epoch >= $end;
+            return $line if $epoch >= $start;
         }
-        last if $epoch >= $end;
-        print "$line\n" if $epoch >= $start;
-        $last_epoch = $epoch;
-    }
-    return;
+	return;
+    };
 }
 
 sub loadconfig {
