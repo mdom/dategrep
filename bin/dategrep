@@ -208,7 +208,9 @@ sub loadconfig {
 
     sub date_to_epoch {
         my ( $str, $format ) = @_;
-	$date = Date::Manip::Date->new() unless $date;
+	if ( ! $date ) {
+		$date = Date::Manip::Date->new();
+	}
         my $error =
           defined($format)
           ? $date->parse_format( $format, $str )
