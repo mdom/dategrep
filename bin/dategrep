@@ -26,8 +26,8 @@ sub run {
 
     my %options;
     if ( $ENV{DATEGREP_DEFAULT_FORMAT} ) {
-	   $options{format} = $ENV{DATEGREP_DEFAULT_FORMAT};
-   }
+        $options{format} = $ENV{DATEGREP_DEFAULT_FORMAT};
+    }
 
     GetOptions(
         \%options,        'start|from=s', 'end|to=s',    'format=s',
@@ -38,10 +38,10 @@ sub run {
     pod2usage(1) if $options{help};
     pod2usage( -exitstatus => 0, -verbose => 2 ) if $options{man};
 
-    my $config = loadconfig($options{configfile});
+    my $config = loadconfig( $options{configfile} );
 
     if ( exists $config->{formats} ) {
-	    %named_formats = ( %named_formats,  %{$config->{formats} } );
+        %named_formats = ( %named_formats, %{ $config->{formats} } );
     }
 
     if ( not defined $options{'format'} ) {
@@ -175,38 +175,38 @@ sub stdin_iterator {
             return if $epoch >= $end;
             return $line if $epoch >= $start;
         }
-	return;
+        return;
     };
 }
 
 sub loadconfig {
-	my $configfile = shift;
-	if ( not defined $configfile ) {
-		$configfile = "$ENV{HOME}/.dategreprc";
-	}
-	my %config;
-	return if !-e $configfile;
+    my $configfile = shift;
+    if ( not defined $configfile ) {
+        $configfile = "$ENV{HOME}/.dategreprc";
+    }
+    my %config;
+    return if !-e $configfile;
 
-	my $section;
-	open(my $cfg_fh,'<',$configfile)
-		or die "$app: Can't open config file: $!\n";
-	while (<$cfg_fh>) {
-		next if /^\s*\#/ || /^\s*$/;
-		if (/^\[([^\]]*)\]\s*$/) {
-			$section = lc $1;
-		}
-		elsif (/^(\w+)\s*=\s*(.*)/) {
-			my ($key,$val) = ($1,$2);
-			if ( not defined $section ) {
-				die "$app: parameter $key not in section\n"
-			}
-			$config{$section}->{$key} = $val;
-		}
-		else {
-			die "$app: Parse error in configuration file\n";
-		}
-	}
-	return \%config;
+    my $section;
+    open( my $cfg_fh, '<', $configfile )
+      or die "$app: Can't open config file: $!\n";
+    while (<$cfg_fh>) {
+        next if /^\s*\#/ || /^\s*$/;
+        if (/^\[([^\]]*)\]\s*$/) {
+            $section = lc $1;
+        }
+        elsif (/^(\w+)\s*=\s*(.*)/) {
+            my ( $key, $val ) = ( $1, $2 );
+            if ( not defined $section ) {
+                die "$app: parameter $key not in section\n";
+            }
+            $config{$section}->{$key} = $val;
+        }
+        else {
+            die "$app: Parse error in configuration file\n";
+        }
+    }
+    return \%config;
 }
 
 {
@@ -214,9 +214,9 @@ sub loadconfig {
 
     sub date_to_epoch {
         my ( $str, $format ) = @_;
-	if ( ! $date ) {
-		$date = Date::Manip::Date->new();
-	}
+        if ( !$date ) {
+            $date = Date::Manip::Date->new();
+        }
         my $error =
           defined($format)
           ? $date->parse_format( $format, $str )
