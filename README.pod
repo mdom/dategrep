@@ -70,9 +70,9 @@ Additionally, dategrep supports named formats:
 
 Print all lines between the start and end line even if they are not timestamped.
 
-=item --blocksize
+=item --blocksize SIZE
 
-Size of the intervals used in the binary search. Defaults to the native
+SIZE of the intervals used in the binary search. Defaults to the native
 blocksize of the file's filesystem or 8129.
 
 =item --sort-files
@@ -85,6 +85,12 @@ that for you.
 
 The special filename '-' is always sorted last ... at least until 2999.
 
+This does not yet work with compressed files and dategrep will die trying.
+
+=item --configfile FILE
+
+Reads configuration from FILE instead of I<~/.dategreprc>.
+
 =item --help 
 
 Shows a short help message
@@ -95,6 +101,22 @@ Shows the complete man page in your pager.
 
 =back
 
+=head1 CONFIGURATION FILE
+
+On startup dategrep reads a configraution file from I<$HOME/.dategreprc> or the
+file specified by I<--configfile>. 
+
+The file consists of sections and variables. A section begins with the name of
+the section in square brackets and continues until the next section begins.
+Section names are not case sensitive. Empty lines and lines with comments are
+skipped. Comments are started with a hash character. dategrep reckognizes
+only one sections: Under I<format> you can list additional named formats.
+
+Example:
+
+  [formats]
+  time = %H:%M:%S
+
 =head1 ENVIRONMENT
 
 =over 4
@@ -104,6 +126,14 @@ Shows the complete man page in your pager.
 Default for the I<--format> parameter. The syntax is described there.
 
 =back
+
+=head1 COMPRESSED FILES
+
+dategrep has only minimal support for compressed files. If any file in
+ARGV has an extension like I<.z>,I<.gz>,I<.bz2>,I<.bz>, dategrep will
+cal I<zcat> or I<bzcat> respectivily and read from it like from stdin.
+
+Does not yet work with auto-sorting files!
 
 =head1 INSTALLATION
 
@@ -123,6 +153,10 @@ dependency Date::Manip. In Debian you just need the following:
 dategrep expects the files to be sorted. If the timestamps are not
 ascending, dategrep might be exiting before the last line in its date
 range is printed.
+
+Sorting files does not yet work with compressed files.
+
+Compressed files are just piped into dategrep via bzcat or zcat.
 
 =head1 SEE ALSO
 

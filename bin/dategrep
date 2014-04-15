@@ -83,13 +83,7 @@ sub run {
     }
 
   FILE: for my $filename (@ARGV) {
-        my $iter;
-        if ( $filename eq '-' ) {
-            $iter = stdin_iterator( $filename, $start, $end, %options );
-        }
-        else {
-            $iter = normal_file_iterator( $filename, $start, $end, %options );
-        }
+        my $iter = get_iterator( $filename, $start, $end, %options );
         if ($iter) {
             while ( my $line = $iter->() ) {
                 print $line;
@@ -97,6 +91,21 @@ sub run {
         }
         return;
     }
+}
+
+sub get_iterator {
+	my ( $filename, $start, $end, %options ) = @_;
+        my $iter;
+        if ( $filename eq '-' ) {
+            $iter = stdin_iterator( $filename, $start, $end, %options );
+        }
+	elsif ( $filename =~ /\.(bz|bz2|gz|z)$/ ) {
+		$iter = uncompress_iterator( $filename, $start, $end, %options );
+	}
+        else {
+            $iter = normal_file_iterator( $filename, $start, $end, %options );
+        }
+        return $iter;
 }
 
 sub sort_files {
@@ -157,11 +166,33 @@ sub normal_file_iterator {
     return;
 }
 
+sub uncompress_iterator {
+    my ( $filename, $start, $end, %options ) = @_;
+    my $uncompress;
+    if ( $filename =~ /\.(bz|bz2)$/ ) {
+	    $uncompress = 'bzcat';
+    }
+    elsif ( $filename =~ /\.(gz|z)$/ ) {
+	    $uncompress = 'zcat';
+    }
+    else {
+	    die "$app: unknown ending for compressed file\n";
+    }
+    open( my $pipe, '-|', $uncompress, $filename )
+    	or die "Can't open $uncompress: $!\n";
+    return fh_iterator( $pipe, $start, $end, %options );
+}
+
 sub stdin_iterator {
     my ( $filename, $start, $end, %options ) = @_;
+    return fh_iterator( \*STDIN, $start, $end, %options );
+}
+
+sub fh_iterator {
+    my ( $fh, $start, $end, %options ) = @_;
     my $last_epoch = 0;
     return sub {
-      LINE: while ( my $line = <STDIN> ) {
+      LINE: while ( my $line = <$fh> ) {
             my ( $epoch, $error ) =
               date_to_epoch( $line, $options{'format'} );
             if ( !$epoch ) {
@@ -379,6 +410,8 @@ that for you.
 
 The special filename '-' is always sorted last ... at least until 2999.
 
+This does not yet work with compressed files and dategrep will die trying.
+
 =item --configfile FILE
 
 Reads configuration from FILE instead of I<~/.dategreprc>.
@@ -419,6 +452,14 @@ Default for the I<--format> parameter. The syntax is described there.
 
 =back
 
+=head1 COMPRESSED FILES
+
+dategrep has only minimal support for compressed files. If any file in
+ARGV has an extension like I<.z>,I<.gz>,I<.bz2>,I<.bz>, dategrep will
+cal I<zcat> or I<bzcat> respectivily and read from it like from stdin.
+
+Does not yet work with auto-sorting files!
+
 =head1 INSTALLATION
 
 It is possible to install this script via perl normal install routines. 
@@ -437,6 +478,10 @@ dependency Date::Manip. In Debian you just need the following:
 dategrep expects the files to be sorted. If the timestamps are not
 ascending, dategrep might be exiting before the last line in its date
 range is printed.
+
+Sorting files does not yet work with compressed files.
+
+Compressed files are just piped into dategrep via bzcat or zcat.
 
 =head1 SEE ALSO
 
