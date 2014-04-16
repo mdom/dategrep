@@ -36,6 +36,16 @@ is($error,'dategrep: --format is a required parameter');
 
 $ENV{DATEGREP_DEFAULT_FORMAT} = '%Y-%m-%d %H:%M';
 run_ok( './bin/dategrep', "$Bin/files/test01.log" );
+
+run_ok( './bin/dategrep', '--sort-files', "$Bin/files/test01.log", "$Bin/files/test02.log" );
+(@lines) = split( /\n/, stdout() );
+is( $lines[0], "2014-03-23 13:14 line 1" );
+
+run_ok( './bin/dategrep', "$Bin/files/test01.log", "$Bin/files/test02.log" );
+(@lines) = split( /\n/, stdout() );
+is( $lines[0], "2014-03-23 14:14 line 1" );
+
+
 delete $ENV{DATEGREP_DEFAULT_FORMAT};
 
 done_testing();
