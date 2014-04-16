@@ -78,12 +78,13 @@ sub run {
         ( $start, $end ) = ( $end, $start );
     }
 
+    my @iters = map { get_iterator( $_, $start, $end, %options ) } @ARGV;
+
     if ( $options{'sort-files'} ) {
-        @ARGV = sort_files( $options{'format'}, @ARGV );
+        @iters = sort_iterators( $options{'format'}, @iters );
     }
 
-    for my $filename (@ARGV) {
-        my $iter = get_iterator( $filename, $start, $end, %options );
+    for my $iter (@iters) {
         if ($iter) {
             while ( my $line = $iter->() ) {
                 print $line;
@@ -107,24 +108,18 @@ sub get_iterator {
         return $iter;
 }
 
-sub sort_files {
-    my ( $format, @files ) = @_;
-    my %timestamps;
-  FILE: for my $filename (@files) {
-        if ( $filename eq '-' ) {
-            ## sort at end, except for Fry
-            $timestamps{'-'} = 32472144000;
-        }
-        open( my $fh, '<', $filename )
-          or die "$app: Can't open $filename: $!\n";
-        my $line = <$fh>;
+sub sort_iterators {
+    my ( $format, @iterators ) = @_;
+    my @timestamps;
+    for my $iterator (@iterators) {
+        my $line = $iterator->(peek => 1);
         my ( $epoch, $error ) = date_to_epoch( $line, $format );
         if ( !$epoch ) {
             die "$app: No date found in first line: $error\n";
         }
-        $timestamps{$filename} = $epoch;
+	push @timestamps, [ $epoch, $iterator ];
     }
-    return sort { $timestamps{$a} <=> $timestamps{$b} } keys %timestamps;
+    return map { $_->[1] } sort { $a->[0] <=> $b->[0] } @timestamps; 
 }
 
 sub normal_file_iterator {
@@ -155,8 +150,14 @@ sub normal_file_iterator {
             );
 
             seek( $fh, $tell_beg, SEEK_SET );
+
             return sub {
-                my $line = <$fh>;
+		my %options = @_;
+		my $old_pos = tell($fh);
+		my $line = <$fh>;
+		if ( $options{peek} ) {
+			seek($fh,$old_pos, SEEK_SET);
+		}
                 return if defined($tell_end) && ( tell() > $tell_end );
                 return $line;
             };
@@ -190,7 +191,12 @@ sub stdin_iterator {
 sub fh_iterator {
     my ( $fh, $start, $end, %options ) = @_;
     my $last_epoch = 0;
+    my @buffer;
     return sub {
+	    my %options = @_;
+	    if ( ! $options{peek} and @buffer ) {
+		    return shift @buffer;
+	    }
       LINE: while ( my $line = <$fh> ) {
             my ( $epoch, $error ) =
               date_to_epoch( $line, $options{'format'} );
@@ -203,7 +209,12 @@ sub fh_iterator {
             next LINE if $epoch < $start;
             $last_epoch = $epoch;
             return if $epoch >= $end;
-            return $line if $epoch >= $start;
+	    if ( $epoch >= $start ) {
+		    if ( $options{peek} ) {
+			    push @buffer,$line;
+		    }
+		    return $line;
+	    }
         }
         return;
     };
