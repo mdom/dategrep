@@ -83,10 +83,6 @@ like syslog, syslog.1, syslog.2 etc. For dategrep to work we need those
 files in reverse order: syslog.2, syslog.1, syslog. This options handles
 that for you.
 
-The special filename '-' is always sorted last ... at least until 2999.
-
-This does not yet work with compressed files and dategrep will die trying.
-
 =item --configfile FILE
 
 Reads configuration from FILE instead of I<~/.dategreprc>.
@@ -133,8 +129,6 @@ dategrep has only minimal support for compressed files. If any file in
 ARGV has an extension like I<.z>,I<.gz>,I<.bz2>,I<.bz>, dategrep will
 cal I<zcat> or I<bzcat> respectivily and read from it like from stdin.
 
-Does not yet work with auto-sorting files!
-
 =head1 INSTALLATION
 
 It is possible to install this script via perl normal install routines. 
@@ -153,8 +147,6 @@ dependency Date::Manip. In Debian you just need the following:
 dategrep expects the files to be sorted. If the timestamps are not
 ascending, dategrep might be exiting before the last line in its date
 range is printed.
-
-Sorting files does not yet work with compressed files.
 
 Compressed files are just piped into dategrep via bzcat or zcat.
 
