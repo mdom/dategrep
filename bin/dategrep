@@ -89,7 +89,6 @@ sub run {
                 print $line;
             }
         }
-        return;
     }
 }
 
