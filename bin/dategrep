@@ -82,7 +82,7 @@ sub run {
         @ARGV = sort_files( $options{'format'}, @ARGV );
     }
 
-  FILE: for my $filename (@ARGV) {
+    for my $filename (@ARGV) {
         my $iter = get_iterator( $filename, $start, $end, %options );
         if ($iter) {
             while ( my $line = $iter->() ) {
