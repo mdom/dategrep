@@ -78,6 +78,10 @@ sub run {
         ( $start, $end ) = ( $end, $start );
     }
 
+    if ( !@ARGV ) {
+	    push @ARGV, '-';
+    }
+
     my @iters = map { get_iterator( $_, $start, $end, %options ) } @ARGV;
 
     if ( $options{'sort-files'} ) {
