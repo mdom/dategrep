@@ -10,7 +10,7 @@ dategrep - print lines matching ranges of dates
   dategrep --end "12:15" --format "%b %d %H:%M:%S" syslog
   dategrep --last-minutes 5 --format "%b %d %H:%M:%S" syslog
   dategrep --last-minutes 5 --format rsyslog syslog
-  cat syslog | dategrep --end "12:15" -
+  cat syslog | dategrep --end "12:15"
 
 =head1 DESCRIPTION
 
@@ -19,8 +19,8 @@ and prints them to stdout.
 
 If dategrep works on a seekable file, it can do a binary search to find
 the first and last line to print pretty efficiently. dategrep can also
-read from stdin if one the filename arguments is just a hyphen, but in
-this case it has to parse every single line which will be slower.
+read from stdin and compressed files, but it has to parse every single
+line until the end of the range for those.
 
 =head1 OPTIONS
 
