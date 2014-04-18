@@ -79,7 +79,7 @@ sub run {
     }
 
     if ( !@ARGV ) {
-	    push @ARGV, '-';
+        push @ARGV, '-';
     }
 
     my @iters = map { get_iterator( $_, $start, $end, %options ) } @ARGV;
@@ -98,16 +98,18 @@ sub run {
 }
 
 sub get_iterator {
-	my ( $filename, $start, $end, %options ) = @_;
-        my $iter;
-        if ( $filename eq '-' ) {
-            $iter = stdin_iterator( $filename, $start, $end, %options );
+    my ( $filename, $start, $end, %options ) = @_;
+    my $iter;
+    if ( $filename eq '-' ) {
+        $iter = stdin_iterator( $filename, $start, $end, %options );
+    }
+    elsif ( $filename =~ /\.(bz|bz2|gz|z)$/ ) {
+        $iter = uncompress_iterator( $filename, $start, $end, %options );
+    }
+    else {
+        $iter = normal_file_iterator( $filename, $start, $end, %options );
+    }
         }
-	elsif ( $filename =~ /\.(bz|bz2|gz|z)$/ ) {
-		$iter = uncompress_iterator( $filename, $start, $end, %options );
-	}
-        else {
-            $iter = normal_file_iterator( $filename, $start, $end, %options );
         }
         return $iter;
 }
@@ -116,14 +118,14 @@ sub sort_iterators {
     my ( $format, @iterators ) = @_;
     my @timestamps;
     for my $iterator (@iterators) {
-        my $line = $iterator->(peek => 1);
+        my $line = $iterator->( peek => 1 );
         my ( $epoch, $error ) = date_to_epoch( $line, $format );
         if ( !$epoch ) {
             die "$app: No date found in first line: $error\n";
         }
-	push @timestamps, [ $epoch, $iterator ];
+        push @timestamps, [ $epoch, $iterator ];
     }
-    return map { $_->[1] } sort { $a->[0] <=> $b->[0] } @timestamps; 
+    return map { $_->[1] } sort { $a->[0] <=> $b->[0] } @timestamps;
 }
 
 sub normal_file_iterator {
@@ -174,16 +176,16 @@ sub uncompress_iterator {
     my ( $filename, $start, $end, %options ) = @_;
     my $uncompress;
     if ( $filename =~ /\.(bz|bz2)$/ ) {
-	    $uncompress = 'bzcat';
+        $uncompress = 'bzcat';
     }
     elsif ( $filename =~ /\.(gz|z)$/ ) {
-	    $uncompress = 'zcat';
+        $uncompress = 'zcat';
     }
     else {
-	    die "$app: unknown ending for compressed file\n";
+        die "$app: unknown ending for compressed file\n";
     }
     open( my $pipe, '-|', $uncompress, $filename )
-    	or die "Can't open $uncompress: $!\n";
+      or die "Can't open $uncompress: $!\n";
     return fh_iterator( $pipe, $start, $end, %options );
 }
 
