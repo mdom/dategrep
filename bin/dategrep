@@ -109,9 +109,19 @@ sub get_iterator {
     else {
         $iter = normal_file_iterator( $filename, $start, $end, %options );
     }
+    return if !$iter;
+    my @buffer;
+    return sub {
+        my %options = @_;
+        if (@buffer) {
+            return $options{peek} ? $buffer[0] : shift @buffer;
         }
+        my $line = $iter->();
+        if ( $options{peek} and $line ) {
+            push @buffer, $line;
         }
-        return $iter;
+        return $line;
+    };
 }
 
 sub sort_iterators {
@@ -158,12 +168,7 @@ sub normal_file_iterator {
             seek( $fh, $tell_beg, SEEK_SET );
 
             return sub {
-		my %options = @_;
-		my $old_pos = tell($fh);
-		my $line = <$fh>;
-		if ( $options{peek} ) {
-			seek($fh,$old_pos, SEEK_SET);
-		}
+                my $line = <$fh>;
                 return if defined($tell_end) && ( tell() > $tell_end );
                 return $line;
             };
@@ -197,12 +202,7 @@ sub stdin_iterator {
 sub fh_iterator {
     my ( $fh, $start, $end, %options ) = @_;
     my $last_epoch = 0;
-    my @buffer;
     return sub {
-	    my %options = @_;
-	    if ( ! $options{peek} and @buffer ) {
-		    return shift @buffer;
-	    }
       LINE: while ( my $line = <$fh> ) {
             my ( $epoch, $error ) =
               date_to_epoch( $line, $options{'format'} );
@@ -215,12 +215,9 @@ sub fh_iterator {
             next LINE if $epoch < $start;
             $last_epoch = $epoch;
             return if $epoch >= $end;
-	    if ( $epoch >= $start ) {
-		    if ( $options{peek} ) {
-			    push @buffer,$line;
-		    }
-		    return $line;
-	    }
+            if ( $epoch >= $start ) {
+                return $line;
+            }
         }
         return;
     };
