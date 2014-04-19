@@ -100,6 +100,7 @@ sub run {
             }
         }
     }
+    return;
 }
 
 sub interleave_iterators {
@@ -124,6 +125,7 @@ sub interleave_iterators {
         @choices =
           sort { $a->[0] <=> $b->[0] } @choices, [ $epoch, $line, $iter ];
     }
+    return;
 }
 
 sub get_iterator {
