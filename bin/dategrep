@@ -305,8 +305,8 @@ sub loadconfig {
 
 sub search {
     my ( $fh, $key, $format, %options ) = @_;
-    return undef if not defined $key;
-    my @stat = stat($fh) or return undef;
+    return if not defined $key;
+    my @stat = stat($fh) or return;
     my ( $size, $blksize ) = @stat[ 7, 11 ];
     $blksize = $blksize || $options{blocksize} || 8192;
     my $min_byte  = $options{min_byte};
@@ -321,7 +321,7 @@ sub search {
 
   BLOCK: while ( $max - $min > 1 ) {
         $mid = int( ( $max + $min ) / 2 );
-        seek( $fh, $mid * $blksize, 0 ) or return undef;
+        seek( $fh, $mid * $blksize, 0 ) or return;
         <$fh> if $mid;    # probably a partial line
       LINE: while ( my $line = <$fh> ) {
             my ($epoch) = date_to_epoch( $line, $format );
@@ -344,7 +344,7 @@ sub search {
 
     # find the right line
     $min *= $blksize;
-    seek( $fh, $min, 0 ) or return undef;
+    seek( $fh, $min, 0 ) or return;
     <$fh> if $min;    # probably a partial line
     for ( ; ; ) {
         $min = tell($fh);
@@ -360,7 +360,7 @@ sub search {
             return $min;
         }
     }
-    return undef;
+    return;
 }
 
 __END__
