@@ -1,0 +1,13 @@
+0.10 2014-??-??
+
+ - Swap end and start time if end < start
+ - New options --sort-files: sort input filesj
+ - New options --blocksize: specifiy blocksize for random access
+ - Optimization: cache date object
+ - Added minimal support for compressed files
+ - Read from stdin if no files are provided
+ - New option --interleave: sort overlapping input files
+ 
+0.01 2014-04-08
+
+ - Initial release
