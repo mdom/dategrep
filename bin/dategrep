@@ -365,6 +365,8 @@ sub search {
     return;
 }
 
+1;
+
 __END__
 
 =pod
