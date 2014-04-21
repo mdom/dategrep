@@ -22,8 +22,15 @@ my %named_formats = (
 );
 
 if ( not caller ) {
-    run();
-    exit 0;
+    exit run();
+}
+
+sub error {
+    my ( $msg, $rc ) = @_;
+    $rc = defined $rc ? $rc : 1;
+    chomp($msg);
+    warn "$app: $msg\n";
+    return $rc;
 }
 
 sub run {
@@ -33,14 +40,24 @@ sub run {
         $options{format} = $ENV{DATEGREP_DEFAULT_FORMAT};
     }
 
-    GetOptions(
+    my $rc = GetOptions(
         \%options,        'start|from=s', 'end|to=s',     'format=s',
         'last-minutes=i', 'multiline!',   'blocksize=i',  'help|?',
         'sort-files',     'man',          'configfile=s', 'interleave',
-    ) or pod2usage(2);
+    );
+    if ( !$rc ) {
+        pod2usage( -exitstatus => "NOEXIT", -verbose => 0 );
+        return 2;
+    }
 
-    pod2usage(1) if $options{help};
-    pod2usage( -exitstatus => 0, -verbose => 2 ) if $options{man};
+    if ( $options{help} ) {
+        pod2usage( -verbose => 1, -exitstatus => 'NOEXIT' );
+        return 0;
+    }
+    if ( $options{man} ) {
+        pod2usage( -exitstatus => "NOEXIT", -verbose => 2 );
+        return 0;
+    }
 
     my $config = loadconfig( $options{configfile} );
 
@@ -49,7 +66,7 @@ sub run {
     }
 
     if ( not defined $options{'format'} ) {
-        die "$app: --format is a required parameter\n";
+        return error("--format is a required parameter");
     }
 
     if ( exists $named_formats{ $options{'format'} } ) {
@@ -60,12 +77,12 @@ sub run {
 
     if ( defined $options{'start'} ) {
         ( $start, $error ) = date_to_epoch( $options{'start'} );
-        die "$app: Illegal start time: $error\n" if $error;
+        return error("Illegal start time: $error") if $error;
     }
 
     if ( defined $options{'end'} ) {
         ( $end, $error ) = date_to_epoch( $options{'end'} );
-        die "$app: Illegal end time: $error\n" if $error;
+        return error("Illegal end time: $error") if $error;
     }
 
     if ( defined $options{'last-minutes'} ) {
@@ -86,25 +103,29 @@ sub run {
         push @ARGV, '-';
     }
 
-    my @iters = map { get_iterator( $_, $start, $end, %options ) } @ARGV;
+    eval {
 
-    if ( $options{'interleave'} ) {
-        interleave_iterators( $options{'format'}, @iters );
-        return;
-    }
+        my @iters = map { get_iterator( $_, $start, $end, %options ) } @ARGV;
 
-    if ( $options{'sort-files'} ) {
-        @iters = sort_iterators( $options{'format'}, @iters );
-    }
+        if ( $options{'interleave'} ) {
+            interleave_iterators( $options{'format'}, @iters );
+            return 0;
+        }
 
-    for my $iter (@iters) {
-        if ($iter) {
-            while ( my $line = $iter->() ) {
-                print $line;
+        if ( $options{'sort-files'} ) {
+            @iters = sort_iterators( $options{'format'}, @iters );
+        }
+
+        for my $iter (@iters) {
+            if ($iter) {
+                while ( my $line = $iter->() ) {
+                    print $line;
+                }
             }
         }
-    }
-    return;
+    };
+    return error($@) if $@;
+    return 0;
 }
 
 sub interleave_iterators {
@@ -166,7 +187,7 @@ sub sort_iterators {
         my $line = $iterator->( peek => 1 );
         my ( $epoch, $error ) = date_to_epoch( $line, $format );
         if ( !$epoch ) {
-            die "$app: No date found in first line: $error\n";
+            die "No date found in first line: $error\n";
         }
         push @timestamps, [ $epoch, $iterator ];
     }
@@ -176,13 +197,13 @@ sub sort_iterators {
 sub normal_file_iterator {
     my ( $filename, $start, $end, %options ) = @_;
 
-    open( my $fh, '<', $filename ) or die "$app: Can't open $filename: $!\n";
+    open( my $fh, '<', $filename ) or die "Can't open $filename: $!\n";
     my $test_line = <$fh>;
     if ( defined($test_line) ) {
         my ( $epoch, $error ) =
           date_to_epoch( $test_line, $options{'format'} );
         if ($error) {
-            die "$app: No date found in first line: $error\n";
+            die "No date found in first line: $error\n";
         }
         seek( $fh, 0, SEEK_SET );
 
@@ -222,7 +243,7 @@ sub uncompress_iterator {
         $uncompress = 'zcat';
     }
     else {
-        die "$app: unknown ending for compressed file\n";
+        die "unknown ending for compressed file\n";
     }
     open( my $pipe, '-|', $uncompress, $filename )
       or die "Can't open $uncompress: $!\n";
@@ -245,7 +266,7 @@ sub fh_iterator {
                 if ( $options{'multiline'} ) {
                     return $line if $last_epoch >= $start;
                 }
-                die "$app: Unparsable line: $line";
+                die "Unparsable line: $line\n";
             }
             next LINE if $epoch < $start;
             $last_epoch = $epoch;
@@ -268,7 +289,7 @@ sub loadconfig {
 
     my $section;
     open( my $cfg_fh, '<', $configfile )
-      or die "$app: Can't open config file: $!\n";
+      or die "Can't open config file: $!\n";
     while (<$cfg_fh>) {
         next if /^\s*\#/ || /^\s*$/;
         if (/^\[([^\]]*)\]\s*$/) {
@@ -277,12 +298,12 @@ sub loadconfig {
         elsif (/^(\w+)\s*=\s*(.*)/) {
             my ( $key, $val ) = ( $1, $2 );
             if ( not defined $section ) {
-                die "$app: parameter $key not in section\n";
+                die "parameter $key not in section\n";
             }
             $config{$section}->{$key} = $val;
         }
         else {
-            die "$app: Parse error in configuration file\n";
+            die "Parse error in configuration file\n";
         }
     }
     return \%config;
