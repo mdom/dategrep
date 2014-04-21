@@ -14,7 +14,7 @@ our @EXPORT_OK = qw(run);
 
 our $VERSION = '0.01';
 
-my $app = basename($0);
+our $app = basename($0);
 
 my %named_formats = (
     'rsyslog' => "%b %e %H:%M:%S",
