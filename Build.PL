@@ -8,9 +8,11 @@ my $builder = Module::Build->new(
     dist_version_from  => 'bin/dategrep',
     configure_requires => {
         'Module::Build' => 0,
-        'Date::Manip'   => 0,
-        'Getopt::Long'  => 0,
-        'Pod::Usage'    => 0,
+    },
+    build_requires => {
+        'Date::Manip'  => 0,
+        'Getopt::Long' => 0,
+        'Pod::Usage'   => 0,
     },
     test_requires => {
         'Test::Output' => 0,
