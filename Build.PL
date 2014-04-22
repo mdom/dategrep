@@ -13,7 +13,9 @@ my $builder = Module::Build->new(
         'Pod::Usage'    => 0,
     },
     test_requires => {
-        'Test::Command::Simple' => 0,
+        'Test::Output' => 0,
+        'Test::More'   => 0,
+        'FindBin'      => 0,
     },
     create_makefile_pl => 'traditional',
 );
