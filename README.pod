@@ -1,5 +1,7 @@
 =pod
 
+=for HTML <a href="https://travis-ci.org/mdom/dategrep"><img src="https://travis-ci.org/mdom/dategrep.svg?branch=master"></a>
+
 =head1 NAME
 
 dategrep - print lines matching ranges of dates
@@ -74,6 +76,11 @@ Print all lines between the start and end line even if they are not timestamped.
 
 SIZE of the intervals used in the binary search. Defaults to the native
 blocksize of the file's filesystem or 8129.
+
+=item --interleave
+
+Print lines sorted by timestamp even if the timestamps in the input files
+are overlapping.
 
 =item --sort-files
 
