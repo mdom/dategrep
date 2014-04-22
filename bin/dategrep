@@ -3,6 +3,9 @@
 use strict;
 use warnings;
 
+#TODO this should be part of App::dategrep
+our $VERSION = '0.01';
+
 package App::dategrep;
 use Date::Manip;
 use Pod::Usage;
@@ -11,8 +14,6 @@ use Fcntl ":seek";
 use File::Basename qw(basename);
 use base 'Exporter';
 our @EXPORT_OK = qw(run);
-
-our $VERSION = '0.01';
 
 our $app = basename($0);
 
