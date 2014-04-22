@@ -397,6 +397,8 @@ __END__
 
 =pod
 
+=for HTML <a href="https://travis-ci.org/mdom/dategrep"><img src="https://travis-ci.org/mdom/dategrep.svg?branch=master"></a>
+
 =head1 NAME
 
 dategrep - print lines matching ranges of dates
