@@ -83,4 +83,13 @@ test_dategrep( ["$Bin/files/test01.log", "$Bin/files/test02.log" ], <<'EOF','sam
 2014-03-23 13:17 line 1
 EOF
 
+test_dategrep([
+    '--end=2014-03-23 14:15',
+    '--start=2014-03-23 14:17',
+    "$Bin/files/test01.log"
+    ], <<'EOF','auto swap end and start if end is before start');
+2014-03-23 14:15 line 1
+2014-03-23 14:16 line 1
+EOF
+
 done_testing();
