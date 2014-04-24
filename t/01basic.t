@@ -92,4 +92,21 @@ test_dategrep([
 2014-03-23 14:16 line 1
 EOF
 
+{
+    my $stdin = <<'EOF';
+2014-03-23 14:13 line 1
+2014-03-23 14:15 line 1
+2014-03-23 14:16 line 1
+2014-03-23 16:16 line 1
+EOF
+
+    open( my $stdin_fh, '<', \$stdin );
+    local *STDIN = $stdin_fh;
+
+    test_dategrep( [ '--end=2014-03-23 14:15', '--start=2014-03-23 14:17', ],
+        <<'EOF', 'read from stdin without files' );
+2014-03-23 14:15 line 1
+2014-03-23 14:16 line 1
+EOF
+}
 done_testing();
