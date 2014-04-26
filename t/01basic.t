@@ -23,6 +23,10 @@ test_dategrep([ '--start=32.13.2013', '--end=01.04.2014','--format=%Y-%m-%d %H:%
 dategrep: Illegal start time: [parse] Invalid date
 EOF
 
+test_dategrep([ '--end=32.13.2013', '--start=01.04.2014','--format=%Y-%m-%d %H:%M', "$Bin/files/empty"],<<'EOF','unparsable date for --end');
+dategrep: Illegal end time: [parse] Invalid date
+EOF
+
 # files with line before and after date range
 test_dategrep([
     '--format=%Y-%m-%d %H:%M',
