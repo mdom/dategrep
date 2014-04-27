@@ -7,10 +7,15 @@ use Test::More;
 use FindBin qw($Bin);
 use lib "$Bin/lib";
 use Test::Dategrep;
+use POSIX qw(tzset);
 
-set_absolute_time(1395580908);
+$ENV{TZ} = 'GMT';
+tzset;
+
+set_absolute_time(1395584508);
 
 $ENV{DATEGREP_DEFAULT_FORMAT} = '%Y-%m-%d %H:%M';
+
 
 test_dategrep [
     '--last-minutes=5',"$Bin/files/test01.log"

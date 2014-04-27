@@ -19,6 +19,7 @@ my $builder = Module::Build->new(
         'Test::More'     => 0,
         'Test::MockTime' => 0,
         'FindBin'        => 0,
+        'POSIX'          => 0,
     },
     create_makefile_pl => 'traditional',
 );
