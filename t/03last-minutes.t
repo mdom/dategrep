@@ -12,7 +12,9 @@ use POSIX qw(tzset);
 $ENV{TZ} = 'GMT';
 tzset;
 
-set_absolute_time(1395584508);
+set_absolute_time(1395584450);
+
+diag scalar gmtime();
 
 $ENV{DATEGREP_DEFAULT_FORMAT} = '%Y-%m-%d %H:%M';
 
