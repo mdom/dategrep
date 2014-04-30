@@ -431,7 +431,7 @@ line until the end of the range for those.
 
 =item --start|--from DATESPEC
 
-Print all lines from DATESPEC inclusively. Defauls to Jan 1, 1970 00:00:00 GMT.
+Print all lines from DATESPEC inclusively. Defaults to Jan 1, 1970 00:00:00 GMT.
 See
 L<VALID-DATE-FORMATS|https://metacpan.org/pod/distribution/Date-Manip/lib/Date/Manip/Date.pod#VALID-DATE-FORMATS>
 for a list of possible formats for DATESPEC.
@@ -440,8 +440,7 @@ for a list of possible formats for DATESPEC.
 
 Print all lines until DATESPEC exclusively. Default to the current time. See
 L<VALID-DATE-FORMATS|https://metacpan.org/pod/distribution/Date-Manip/lib/Date/Manip/Date.pod#VALID-DATE-FORMATS>
-for a l
-ist of possible formats for DATESPEC.
+for a list of possible formats for DATESPEC.
 
 =item --last-minutes MINUTES
 
@@ -507,13 +506,13 @@ Shows the complete man page in your pager.
 
 =head1 CONFIGURATION FILE
 
-On startup dategrep reads a configraution file from I<$HOME/.dategreprc> or the
+On startup dategrep reads a configuration file from I<$HOME/.dategreprc> or the
 file specified by I<--configfile>. 
 
 The file consists of sections and variables. A section begins with the name of
 the section in square brackets and continues until the next section begins.
 Section names are not case sensitive. Empty lines and lines with comments are
-skipped. Comments are started with a hash character. dategrep reckognizes
+skipped. Comments are started with a hash character. dategrep recognizes
 only one sections: Under I<format> you can list additional named formats.
 
 Example:
@@ -535,7 +534,7 @@ Default for the I<--format> parameter. The syntax is described there.
 
 dategrep has only minimal support for compressed files. If any file in
 ARGV has an extension like I<.z>,I<.gz>,I<.bz2>,I<.bz>, dategrep will
-call I<zcat> or I<bzcat> respectivily and read from it like from stdin.
+call I<zcat> or I<bzcat> respectively and read from it like from stdin.
 
 =head1 INSTALLATION
 
