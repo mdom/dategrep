@@ -533,7 +533,7 @@ Default for the I<--format> parameter. The syntax is described there.
 
 dategrep has only minimal support for compressed files. If any file in
 ARGV has an extension like I<.z>,I<.gz>,I<.bz2>,I<.bz>, dategrep will
-cal I<zcat> or I<bzcat> respectivily and read from it like from stdin.
+call I<zcat> or I<bzcat> respectivily and read from it like from stdin.
 
 =head1 INSTALLATION
 
