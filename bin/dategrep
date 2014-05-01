@@ -336,7 +336,7 @@ sub search {
     return if not defined $key;
     my @stat = stat($fh) or return;
     my ( $size, $blksize ) = @stat[ 7, 11 ];
-    $blksize = $blksize || $options{blocksize} || 8192;
+    $blksize = $options{blocksize} || $blksize || 8192;
     my $min_byte  = $options{min_byte};
     my $multiline = $options{multiline};
 
