@@ -49,6 +49,14 @@ test_dategrep([
 2014-03-23 14:17 line 1
 EOF
 
+test_dategrep([
+    '--format=%Y-%m-%d %H:%M',
+    '--start=2014-03-23 18:15',
+    '--end=2014-03-23 19:17',
+    "$Bin/files/test01.log"
+    ], <<'EOF','files with parsable lines but not in range');
+EOF
+
 test_dategrep [
 	'--format=rsyslog',
 	"$Bin/files/syslog01.log",
