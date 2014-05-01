@@ -38,6 +38,17 @@ test_dategrep([
 2014-03-23 14:16 line 1
 EOF
 
+test_dategrep([
+    '--format=%Y-%m-%d %H:%M',
+    '--start=2014-03-23 14:16',
+    '--end=2014-03-23 14:18',
+    '--blocksize=23',
+    "$Bin/files/test01.log"
+    ], <<'EOF','use --blocksize');
+2014-03-23 14:16 line 1
+2014-03-23 14:17 line 1
+EOF
+
 test_dategrep [
 	'--format=rsyslog',
 	"$Bin/files/syslog01.log",
