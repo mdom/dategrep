@@ -11,16 +11,11 @@ use base 'Exporter';
 our @EXPORT_OK = qw(run);
 
 our $VERSION = '0.01';
-our ($app);
-my (%named_formats);
+
+our $app;
 
 BEGIN {
     $app = basename($0);
-
-    %named_formats = (
-        'rsyslog' => "%b %e %H:%M:%S",
-        'apache'  => "%d/%b/%Y:%T %z",
-    );
 }
 
 sub error {
@@ -58,6 +53,11 @@ sub run {
     }
 
     my $config = loadconfig( $options{configfile} );
+
+    my %named_formats = (
+        'rsyslog' => "%b %e %H:%M:%S",
+        'apache'  => "%d/%b/%Y:%T %z",
+    );
 
     if ( exists $config->{formats} ) {
         %named_formats = ( %named_formats, %{ $config->{formats} } );
