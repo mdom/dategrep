@@ -157,9 +157,12 @@ It is possible to install this script via perl normal install routines.
   ./Build
   ./Build install
 
-Or you can just copy the script somewhere in your path and install its only
-dependency Date::Manip. In Debian you just need the following:
+Or you can build a standalone script, copy it somewhere in your path and
+install its only dependency Date::Manip. In Debian you just need the following:
 
+  perl Build.PL
+  ./Build standalone
+  cp dategrep-standalone ~/bin/dategrep
   apt-get install libdate-manip-perl
 
 =head1 LIMITATION
