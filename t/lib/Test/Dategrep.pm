@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::Output;
-require './bin/dategrep';
+use App::dategrep;
 
 sub test_dategrep {
     my ( $argv, $output, $name ) = @_;
