@@ -1,5 +1,7 @@
 =pod
 
+=for stopwords dategrep DATESPEC datespec syslog apache blocksize zcat bzcat rsyslog timestamped logrotate ARGV Domgoergen merchantability configfile !syslog
+
 =for HTML <a href="https://travis-ci.org/mdom/dategrep"><img src="https://travis-ci.org/mdom/dategrep.svg?branch=master"></a>
 
 =for HTML <a href='https://coveralls.io/r/mdom/dategrep?branch=master'><img src='https://coveralls.io/repos/mdom/dategrep/badge.png?branch=master' alt='Coverage Status' /></a> 
@@ -32,7 +34,7 @@ line until the end of the range for those.
 
 =item --start|--from DATESPEC
 
-Print all lines from DATESPEC inclusively. Defauls to Jan 1, 1970 00:00:00 GMT.
+Print all lines from DATESPEC inclusively. Defaults to Jan 1, 1970 00:00:00 GMT.
 See
 L<VALID-DATE-FORMATS|https://metacpan.org/pod/distribution/Date-Manip/lib/Date/Manip/Date.pod#VALID-DATE-FORMATS>
 for a list of possible formats for DATESPEC.
@@ -41,8 +43,7 @@ for a list of possible formats for DATESPEC.
 
 Print all lines until DATESPEC exclusively. Default to the current time. See
 L<VALID-DATE-FORMATS|https://metacpan.org/pod/distribution/Date-Manip/lib/Date/Manip/Date.pod#VALID-DATE-FORMATS>
-for a l
-ist of possible formats for DATESPEC.
+for a list of possible formats for DATESPEC.
 
 =item --last-minutes MINUTES
 
@@ -108,13 +109,13 @@ Shows the complete man page in your pager.
 
 =head1 CONFIGURATION FILE
 
-On startup dategrep reads a configraution file from I<$HOME/.dategreprc> or the
+On startup dategrep reads a configuration file from I<$HOME/.dategreprc> or the
 file specified by I<--configfile>. 
 
 The file consists of sections and variables. A section begins with the name of
 the section in square brackets and continues until the next section begins.
 Section names are not case sensitive. Empty lines and lines with comments are
-skipped. Comments are started with a hash character. dategrep reckognizes
+skipped. Comments are started with a hash character. dategrep recognizes
 only one sections: Under I<format> you can list additional named formats.
 
 Example:
@@ -136,7 +137,7 @@ Default for the I<--format> parameter. The syntax is described there.
 
 dategrep has only minimal support for compressed files. If any file in
 ARGV has an extension like I<.z>,I<.gz>,I<.bz2>,I<.bz>, dategrep will
-cal I<zcat> or I<bzcat> respectivily and read from it like from stdin.
+call I<zcat> or I<bzcat> respectively and read from it like from stdin.
 
 =head1 INSTALLATION
 
@@ -146,9 +147,12 @@ It is possible to install this script via perl normal install routines.
   ./Build
   ./Build install
 
-Or you can just copy the script somewhere in your path and install its only
-dependency Date::Manip. In Debian you just need the following:
+Or you can build a standalone script, copy it somewhere in your path and
+install its only dependency Date::Manip. In Debian you just need the following:
 
+  perl Build.PL
+  ./Build standalone
+  cp dategrep-standalone ~/bin/dategrep
   apt-get install libdate-manip-perl
 
 =head1 LIMITATION
@@ -165,7 +169,7 @@ L<https://metacpan.org/pod/Date::Manip>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2014 Mario Domgoergen L<E<lt>mario@domgoergen.comE<gt>>
+Copyright 2014 Mario Domgoergen C<< <mario@domgoergen.com> >>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
