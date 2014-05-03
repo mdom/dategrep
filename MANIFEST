@@ -1,5 +1,6 @@
 bin/dategrep
 Build.PL
+Changes
 lib/App/dategrep.pm
 LICENSE
 Makefile.PL
@@ -13,7 +14,6 @@ t/03last-minutes.t
 t/04compressed.t
 t/04multiline.t
 t/05configfile.t
-t/Changes
 t/files/dategreprc01
 t/files/empty
 t/files/interleave01.log

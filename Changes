@@ -1,4 +1,4 @@
-0.10 2014-??-??
+0.10 2014-05-03
 
  - Swap end and start time if end < start
  - New options --sort-files: sort input filesj
@@ -7,7 +7,9 @@
  - Added minimal support for compressed files
  - Read from stdin if no files are provided
  - New option --interleave: sort overlapping input files
- 
+ - convert dategrep to module
+ - improved coverage 
+
 0.01 2014-04-08
 
  - Initial release
