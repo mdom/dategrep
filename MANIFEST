@@ -1,6 +1,29 @@
 bin/dategrep
 Build.PL
-MANIFEST			This list of files
+lib/App/dategrep.pm
+LICENSE
 Makefile.PL
-META.yml
+MANIFEST			This list of files
 META.json
+META.yml
+README.pod
+t/01basic.t
+t/02interleave.t
+t/03last-minutes.t
+t/04compressed.t
+t/04multiline.t
+t/05configfile.t
+t/Changes
+t/files/dategreprc01
+t/files/empty
+t/files/interleave01.log
+t/files/interleave02.log
+t/files/interleave03.log
+t/files/multiline01.log
+t/files/syslog.bz
+t/files/syslog.gz
+t/files/syslog01.log
+t/files/syslog02.log
+t/files/test01.log
+t/files/test02.log
+t/lib/Test/Dategrep.pm
