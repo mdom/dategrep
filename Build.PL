@@ -38,7 +38,7 @@ HEADER
 );
 
 my $builder = $class->new(
-    module_name => 'App::dategrep',
+    module_name        => 'App::dategrep',
     configure_requires => {
         'Module::Build' => 0,
     },
@@ -55,6 +55,12 @@ my $builder = $class->new(
         'POSIX'          => 0,
     },
     create_makefile_pl => 'traditional',
+    meta_merge         => {
+        resources => {
+            bugtracker => 'https://github.com/mdom/dategrep/issues',
+            repository => 'https://github.com/mdom/dategrep'
+        }
+    },
 );
 
 $builder->create_build_script();
