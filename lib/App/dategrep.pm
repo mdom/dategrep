@@ -74,13 +74,19 @@ sub run {
     my ( $start, $end, $error ) = ( 0, time() );
 
     if ( defined $options{'start'} ) {
-        ( $start, $error ) = date_to_epoch( $options{'start'} );
-        return error("Illegal start time: $error") if $error;
+        ( $start ) = date_to_epoch( $options{'start'} );
+	if ( not defined $start ) {
+		( $start ) = date_to_epoch( $options{'start'}, $options{'format'} );
+	}
+        return error("Illegal start time.") if not defined $start;
     }
 
     if ( defined $options{'end'} ) {
-        ( $end, $error ) = date_to_epoch( $options{'end'} );
-        return error("Illegal end time: $error") if $error;
+        ( $end ) = date_to_epoch( $options{'end'} );
+	if ( not defined $end ) {
+		( $end ) = date_to_epoch( $options{'end'}, $options{'format'} );
+	}
+        return error("Illegal end time.") if not defined $end;
     }
 
     if ( defined $options{'last-minutes'} ) {
