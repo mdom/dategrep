@@ -279,7 +279,7 @@ sub fh_iterator {
 
 sub loadconfig {
     my $configfile = shift;
-    if ( not defined $configfile ) {
+    if ( not $configfile and $ENV{HOME} ) {
         $configfile = "$ENV{HOME}/.dategreprc";
     }
     my %config;
