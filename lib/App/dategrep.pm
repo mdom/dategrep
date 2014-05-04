@@ -282,10 +282,9 @@ sub loadconfig {
     if ( not $configfile and $ENV{HOME} ) {
         $configfile = "$ENV{HOME}/.dategreprc";
     }
-    my %config;
     return if !-e $configfile;
 
-    my $section;
+    my ( %config, $section );
     open( my $cfg_fh, '<', $configfile )
       or die "Can't open config file: $!\n";
     while (<$cfg_fh>) {
