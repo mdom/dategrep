@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package App::dategrep;
-use Date::Manip;
+use Date::Manip::Date;
 use Pod::Usage;
 use Getopt::Long;
 use Fcntl ":seek";
