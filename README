@@ -1,0 +1,67 @@
+App::dategrep
+
+dategrep searches the named input files for lines matching a date range
+and prints them to stdout.
+
+If dategrep works on a seekable file, it can do a binary search to find
+the first and last line to print pretty efficiently. dategrep can also
+read from stdin and compressed files, but it has to parse every single
+line until the end of the range for those.
+
+INSTALLATION
+
+It is possible to install this script via perl normal install routines. 
+
+  perl Build.PL
+  ./Build
+  ./Build install
+
+Or you can build a standalone script, copy it somewhere in your path
+and install its only dependency Date::Manip. In Debian you just need
+the following:
+
+  perl Build.PL
+  ./Build standalone
+  cp dategrep-standalone ~/bin/dategrep
+  apt-get install libdate-manip-perl
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Foo
+
+You can also look for information at:
+
+    Github Issues
+        https://github.com/mdom/dategrep/issues
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/App-dategrep
+
+    CPAN Ratings
+        http://cpanratings.perl.org/dist/App-dategrep
+
+    Search CPAN
+        http://search.cpan.org/dist/App.dategrep
+
+
+LICENSE AND COPYRIGHT
+
+Copyright 2014 Mario Domgoergen
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
