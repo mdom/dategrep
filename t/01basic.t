@@ -20,11 +20,11 @@ dategrep: --format is a required parameter
 EOF
 
 test_dategrep([ '--start=32.13.2013', '--end=01.04.2014','--format=%Y-%m-%d %H:%M', "$Bin/files/empty"],<<'EOF','unparsable date for --start');
-dategrep: Illegal start time: [parse] Invalid date
+dategrep: Illegal start time.
 EOF
 
 test_dategrep([ '--end=32.13.2013', '--start=01.04.2014','--format=%Y-%m-%d %H:%M', "$Bin/files/empty"],<<'EOF','unparsable date for --end');
-dategrep: Illegal end time: [parse] Invalid date
+dategrep: Illegal end time.
 EOF
 
 # files with line before and after date range
