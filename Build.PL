@@ -40,7 +40,7 @@ HEADER
 my $builder = $class->new(
     module_name        => 'App::dategrep',
     configure_requires => {
-        'Module::Build' => 0,
+        'Module::Build' => '0.4004',
     },
     build_requires => {
         'Date::Manip'  => 0,
