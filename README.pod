@@ -8,7 +8,7 @@
 
 =head1 NAME
 
-dategrep - print lines matching ranges of dates
+dategrep - print lines matching a date range
 
 =head1 SYNOPSIS
 
