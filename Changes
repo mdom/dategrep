@@ -1,3 +1,11 @@
+0.12 2014-05-06
+
+ - runs on older perls
+ - runs on windows
+ - use --format to parse --start and --end
+ - added links to github
+ - test_requires needs at least Module::Build 0.4004
+
 0.10 2014-05-03
 
  - Swap end and start time if end < start
