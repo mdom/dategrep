@@ -9,6 +9,8 @@ use lib "$Bin/lib";
 use Test::Dategrep;
 use POSIX qw(tzset);
 
+plan( skip_all => 'skip tests using tzset windows' ) if $^O eq 'MSWin32';
+
 $ENV{TZ} = 'GMT';
 tzset;
 
