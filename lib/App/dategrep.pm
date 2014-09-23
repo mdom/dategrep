@@ -239,18 +239,18 @@ sub normal_file_iterator {
 
 sub uncompress_iterator {
     my ( $filename, $start, $end, %options ) = @_;
-    my $uncompress;
+    my @uncompress;
     if ( $filename =~ /\.(bz|bz2)$/ ) {
-        $uncompress = 'bzcat';
+        @uncompress = qw(bzcat);
     }
     elsif ( $filename =~ /\.(gz|z)$/ ) {
-        $uncompress = 'zcat';
+        @uncompress = qw(gzip -c -d);
     }
     else {
         die "unknown ending for compressed file\n";
     }
-    open( my $pipe, '-|', $uncompress, $filename )
-      or die "Can't open $uncompress: $!\n";
+    open( my $pipe, '-|', @uncompress, $filename )
+      or die "Can't open @uncompress: $!\n";
     return fh_iterator( $pipe, $start, $end, %options );
 }
 

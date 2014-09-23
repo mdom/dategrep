@@ -11,7 +11,7 @@ $ENV{DATEGREP_DEFAULT_FORMAT} = 'rsyslog';
 
 my $have_zcat = eval {
     no warnings;
-    open( my $zcat, '-|', 'zcat',"$Bin/files/syslog.gz" ) or die;
+    open( my $zcat, '-|', 'gzip', '-c', '-d' ,"$Bin/files/syslog.gz" ) or die;
     close $zcat;
     1;
 };
