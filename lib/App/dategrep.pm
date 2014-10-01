@@ -198,7 +198,7 @@ sub sort_iterators {
     return map { $_->[1] } sort { $a->[0] <=> $b->[0] } @timestamps;
 }
 
-sub normal_file_iterator {
+sub normal_file_byte_offsets {
     my ( $filename, $start, $end, %options ) = @_;
 
     open( my $fh, '<', $filename ) or die "Can't open $filename: $!\n";
@@ -208,7 +208,7 @@ sub normal_file_iterator {
           date_to_epoch( $test_line, $options{'format'} );
         if ($error) {
             die "No date found in first line: $error\n";
-        }
+	}
         seek( $fh, 0, SEEK_SET );
 
         my $tell_beg = search(
@@ -225,14 +225,22 @@ sub normal_file_iterator {
                 blocksize => $options{blocksize},
             );
 
-            seek( $fh, $tell_beg, SEEK_SET );
+	    return $fh, $tell_beg, $tell_end;
+	}
+    }
+    return;
+}
 
-            return sub {
-                my $line = <$fh>;
-                return if defined($tell_end) && ( tell() > $tell_end );
-                return $line;
-            };
-        }
+sub normal_file_iterator {
+    my ( $filename, $start, $end, %options ) = @_;
+    my ( $fh, $tell_beg, $tell_end ) = normal_file_byte_offsets(@_);
+    if ( defined($tell_beg) ) {
+	seek( $fh, $tell_beg, SEEK_SET );
+	return sub {
+	    my $line = <$fh>;
+	    return if defined($tell_end) && ( tell() > $tell_end );
+	    return $line;
+	};
     }
     return;
 }
