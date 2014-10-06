@@ -37,6 +37,7 @@ sub run {
         \%options,        'start|from=s', 'end|to=s',     'format=s',
         'last-minutes=i', 'multiline!',   'blocksize=i',  'help|?',
         'sort-files',     'man',          'configfile=s', 'interleave',
+#	'byte-offsets',
     );
     if ( !$rc ) {
         pod2usage( -exitstatus => "NOEXIT", -verbose => 0 );
@@ -108,6 +109,17 @@ sub run {
     }
 
     eval {
+
+#       if ( $options{'byte-offsets'} ) {
+# 	    if ( @ARGV == 1 and -f $ARGV[0] ) {
+# 		my ($fh, $byte_beg, $byte_end ) = normal_file_byte_offsets($ARGV[0], $start, $end, %options);
+# 		if ( not defined $byte_end ) {
+# 		    $byte_end = (stat($fh))[7];
+# 		}
+# 		print "$byte_beg $byte_end\n";
+# 		return 0;
+# 	    }
+#	}
 
         my @iters = map { get_iterator( $_, $start, $end, %options ) } @ARGV;
 
