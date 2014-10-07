@@ -53,6 +53,7 @@ my $builder = $class->new(
         'Test::MockTime' => 0,
         'FindBin'        => 0,
         'POSIX'          => 0,
+        'IPC::Cmd'       => 0,
     },
     create_makefile_pl => 'traditional',
     meta_merge         => {
