@@ -27,7 +27,6 @@ sub error {
 }
 
 sub run {
-
     my %options;
     if ( $ENV{DATEGREP_DEFAULT_FORMAT} ) {
         $options{format} = $ENV{DATEGREP_DEFAULT_FORMAT};
@@ -37,7 +36,7 @@ sub run {
         \%options,        'start|from=s', 'end|to=s',     'format=s',
         'last-minutes=i', 'multiline!',   'blocksize=i',  'help|?',
         'sort-files',     'man',          'configfile=s', 'interleave',
-#	'byte-offsets',
+        'byte-offsets',
     );
     if ( !$rc ) {
         pod2usage( -exitstatus => "NOEXIT", -verbose => 0 );
@@ -75,18 +74,18 @@ sub run {
     my ( $start, $end, $error ) = ( 0, time() );
 
     if ( defined $options{'start'} ) {
-        ( $start ) = date_to_epoch( $options{'start'} );
-	if ( not defined $start ) {
-		( $start ) = date_to_epoch( $options{'start'}, $options{'format'} );
-	}
+        ($start) = date_to_epoch( $options{'start'} );
+        if ( not defined $start ) {
+            ($start) = date_to_epoch( $options{'start'}, $options{'format'} );
+        }
         return error("Illegal start time.") if not defined $start;
     }
 
     if ( defined $options{'end'} ) {
-        ( $end ) = date_to_epoch( $options{'end'} );
-	if ( not defined $end ) {
-		( $end ) = date_to_epoch( $options{'end'}, $options{'format'} );
-	}
+        ($end) = date_to_epoch( $options{'end'} );
+        if ( not defined $end ) {
+            ($end) = date_to_epoch( $options{'end'}, $options{'format'} );
+        }
         return error("Illegal end time.") if not defined $end;
     }
 
@@ -110,16 +109,16 @@ sub run {
 
     eval {
 
-#       if ( $options{'byte-offsets'} ) {
-# 	    if ( @ARGV == 1 and -f $ARGV[0] ) {
-# 		my ($fh, $byte_beg, $byte_end ) = normal_file_byte_offsets($ARGV[0], $start, $end, %options);
-# 		if ( not defined $byte_end ) {
-# 		    $byte_end = (stat($fh))[7];
-# 		}
-# 		print "$byte_beg $byte_end\n";
-# 		return 0;
-# 	    }
-#	}
+      if ( $options{'byte-offsets'} ) {
+	    if ( @ARGV == 1 and -f $ARGV[0] ) {
+		my ($fh, $byte_beg, $byte_end ) = normal_file_byte_offsets($ARGV[0], $start, $end, %options);
+		if ( not defined $byte_end ) {
+		    $byte_end = (stat($fh))[7];
+		}
+		print "$byte_beg $byte_end\n";
+		return 0;
+	    }
+	}
 
         my @iters = map { get_iterator( $_, $start, $end, %options ) } @ARGV;
 
@@ -216,11 +215,10 @@ sub normal_file_byte_offsets {
     open( my $fh, '<', $filename ) or die "Can't open $filename: $!\n";
     my $test_line = <$fh>;
     if ( defined($test_line) ) {
-        my ( $epoch, $error ) =
-          date_to_epoch( $test_line, $options{'format'} );
+        my ( $epoch, $error ) = date_to_epoch( $test_line, $options{'format'} );
         if ($error) {
             die "No date found in first line: $error\n";
-	}
+        }
         seek( $fh, 0, SEEK_SET );
 
         my $tell_beg = search(
@@ -237,8 +235,8 @@ sub normal_file_byte_offsets {
                 blocksize => $options{blocksize},
             );
 
-	    return $fh, $tell_beg, $tell_end;
-	}
+            return $fh, $tell_beg, $tell_end;
+        }
     }
     return;
 }
@@ -247,12 +245,12 @@ sub normal_file_iterator {
     my ( $filename, $start, $end, %options ) = @_;
     my ( $fh, $tell_beg, $tell_end ) = normal_file_byte_offsets(@_);
     if ( defined($tell_beg) ) {
-	seek( $fh, $tell_beg, SEEK_SET );
-	return sub {
-	    my $line = <$fh>;
-	    return if defined($tell_end) && ( tell() > $tell_end );
-	    return $line;
-	};
+        seek( $fh, $tell_beg, SEEK_SET );
+        return sub {
+            my $line = <$fh>;
+            return if defined($tell_end) && ( tell() > $tell_end );
+            return $line;
+        };
     }
     return;
 }
@@ -284,8 +282,7 @@ sub fh_iterator {
     my $last_epoch = 0;
     return sub {
       LINE: while ( my $line = <$fh> ) {
-            my ( $epoch, $error ) =
-              date_to_epoch( $line, $options{'format'} );
+            my ( $epoch, $error ) = date_to_epoch( $line, $options{'format'} );
             if ( !$epoch ) {
                 if ( $options{'multiline'} ) {
                     return $line if $last_epoch >= $start;
