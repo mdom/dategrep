@@ -8,22 +8,22 @@ use lib "$Bin/lib";
 use Test::Dategrep;
 
 test_dategrep([
-    '--format=rsyslog',
+    '--format=iso8601',
     '--byte-offsets',
-    '--start=2014-03-20 07:34',
-    '--end=2014-03-20 07:36',
+    '--start=2014-03-20T07:34Z',
+    '--end=2014-03-20T07:36Z',
     "$Bin/files/syslog01.log"
     ], <<'EOF','byte offsets');
-0 126
+0 136
 EOF
 
 test_dategrep([
-    '--format=rsyslog',
+    '--format=iso8601',
     '--byte-offsets',
-    '--start=2014-03-20 07:34',
+    '--start=2014-03-20T07:34Z',
     "$Bin/files/syslog01.log"
     ], <<'EOF','byte offsets');
-0 313
+0 338
 EOF
 
 done_testing();
