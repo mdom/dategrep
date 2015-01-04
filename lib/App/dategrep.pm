@@ -57,6 +57,7 @@ sub run {
     my %named_formats = (
         'rsyslog' => "%b %e %H:%M:%S",
         'apache'  => "%d/%b/%Y:%T %z",
+        'iso8601' => "%O%Z",
     );
 
     if ( exists $config->{formats} ) {
