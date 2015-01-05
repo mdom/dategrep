@@ -41,7 +41,7 @@ for a list of possible formats for DATESPEC.
 
 =item --end|--to DATESPEC
 
-Print all lines until DATESPEC exclusively. Default to the current time. See
+Print all lines until DATESPEC exclusively. Default to the current time at programm start. See
 L<VALID-DATE-FORMATS|https://metacpan.org/pod/distribution/Date-Manip/lib/Date/Manip/Date.pod#VALID-DATE-FORMATS>
 for a list of possible formats for DATESPEC.
 
@@ -138,6 +138,15 @@ Default for the I<--format> parameter. The syntax is described there.
 dategrep has only minimal support for compressed files. If any file in
 ARGV has an extension like I<.z>,I<.gz>,I<.bz2>,I<.bz>, dategrep will
 call I<zcat> or I<bzcat> respectively and read from it like from stdin.
+
+=head1 DELTAS FOR START AND END DATESPEC
+
+Besides the formats listed in
+L<VALID-DATE-FORMATS|https://metacpan.org/pod/distribution/Date-Manip/lib/Date/Manip/Date.pod#VALID-DATE-FORMATS>,
+dategrep can handle deltas from any date by using the format I<DELTA
+from DATE> as arguments to --start and --end:
+
+  --start "1 hour ago from -15:00"
 
 =head1 INSTALLATION
 
