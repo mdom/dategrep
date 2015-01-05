@@ -34,7 +34,9 @@ sub intervall_to_epoch {
     if ( $time =~ /^(.*) from (.*)$/ ) {
         my ( $delta, $date ) =
           ( Date::Manip::Delta->new($1), Date::Manip::Date->new($2) );
-        if ( $delta->is_delta() and $date->is_date() ) {
+        ## TODO: $date->is_date is missing in Date::Manip::Date
+        ## will be fixed in next major release
+        if ( $delta->is_delta() ) { ## and $date->is_date() ) {
             return $date->calc($delta)->secs_since_1970_GMT();
         }
     }
