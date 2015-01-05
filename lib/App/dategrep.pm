@@ -1,8 +1,11 @@
+# TODO Add warning for truncated dates!
+
 use strict;
 use warnings;
 
 package App::dategrep;
 use Date::Manip::Date;
+use Date::Manip::Delta;
 use Pod::Usage;
 use Getopt::Long;
 use Fcntl ":seek";
@@ -24,6 +27,18 @@ sub error {
     chomp($msg);
     warn "$app: $msg\n";
     return $rc;
+}
+
+sub intervall_to_epoch {
+    my ( $time, $format ) = @_;
+    if ( $time =~ /^(.*) from (.*)$/ ) {
+        my ( $delta, $date ) =
+          ( Date::Manip::Delta->new($1), Date::Manip::Date->new($2) );
+        if ( $delta->is_delta() and $date->is_date() ) {
+            return $date->calc($delta)->secs_since_1970_GMT();
+        }
+    }
+    return date_to_epoch( $time, $format );
 }
 
 sub run {
@@ -72,21 +87,15 @@ sub run {
         $options{'format'} = $named_formats{ $options{'format'} };
     }
 
-    my ( $start, $end, $error ) = ( 0, time() );
+    my ( $start, $end ) = ( 0, time() );
 
     if ( defined $options{'start'} ) {
-        ($start) = date_to_epoch( $options{'start'} );
-        if ( not defined $start ) {
-            ($start) = date_to_epoch( $options{'start'}, $options{'format'} );
-        }
+        ($start) = intervall_to_epoch( $options{'start'}, $options{'format'} );
         return error("Illegal start time.") if not defined $start;
     }
 
     if ( defined $options{'end'} ) {
-        ($end) = date_to_epoch( $options{'end'} );
-        if ( not defined $end ) {
-            ($end) = date_to_epoch( $options{'end'}, $options{'format'} );
-        }
+        ($end) = intervall_to_epoch( $options{'end'}, $options{'format'} );
         return error("Illegal end time.") if not defined $end;
     }
 
@@ -340,13 +349,17 @@ sub loadconfig {
         if ( !$date ) {
             $date = Date::Manip::Date->new();
         }
-        my $error =
-          defined($format)
-          ? $date->parse_format( $format, $str )
-          : $date->parse($str);
-        if ($error) {
-            return ( undef, $date->err );
+
+        my $error;
+        if ($format) {
+            $error = $date->parse_format( $format, $str );
         }
+
+        if ( !$format or $error ) {
+            $error = $date->parse($str);
+        }
+
+        return ( undef, $date->err ) if $error;
         return ( $date->secs_since_1970_GMT() );
     }
 }
