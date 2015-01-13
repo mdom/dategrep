@@ -53,7 +53,7 @@ sub run {
         \%options,        'start|from=s', 'end|to=s',     'format=s',
         'last-minutes=i', 'multiline!',   'blocksize=i',  'help|?',
         'sort-files',     'man',          'configfile=s', 'interleave',
-        'byte-offsets',
+        'byte-offsets',   'debug=s',
     );
     if ( !$rc ) {
         pod2usage( -exitstatus => "NOEXIT", -verbose => 0 );
@@ -113,6 +113,11 @@ sub run {
 
     if ( $end < $start ) {
         ( $start, $end ) = ( $end, $start );
+    }
+
+    if ( defined $options{'debug'} && $options{'debug'} eq 'time' ) {
+        print "Start: $start End: $end\n";
+        return 0;
     }
 
     if ( !@ARGV ) {
