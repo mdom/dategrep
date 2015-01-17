@@ -172,6 +172,17 @@ sub interleave_iterators {
         push @choices, [ $epoch, $line, $iter ];
     }
     @choices = sort { $a->[0] <=> $b->[0] } @choices;
+=pod
+
+=item interleave_iterators( $format, @iters )
+
+Take a list of iterators and checks every iterator for its next
+line. After sorting these lines according to their dates, print the
+earliest line. I<$format> is the date specification to find dates in
+lines and @iters a list of iterators produced by I<get_iterator()>.
+
+=cut
+
     while ( my $choice = shift @choices ) {
         my ( $epoch, $line, $iter ) = @$choice;
         print $line;
