@@ -160,18 +160,6 @@ sub run {
     return 0;
 }
 
-sub interleave_iterators {
-    my ( $format, @iters ) = @_;
-    ## TODO choices is a bad name, better ideas?  ## TODO my
-    ## TODO duplicate code
-    my @choices;
-    for my $iter (@iters) {
-        my $line = $iter->();
-        next if !$line;
-        my $epoch = date_to_epoch( $line, $format );
-        push @choices, [ $epoch, $line, $iter ];
-    }
-    @choices = sort { $a->[0] <=> $b->[0] } @choices;
 =pod
 
 =item interleave_iterators( $format, @iters )
@@ -183,15 +171,26 @@ lines and @iters a list of iterators produced by I<get_iterator()>.
 
 =cut
 
-    while ( my $choice = shift @choices ) {
-        my ( $epoch, $line, $iter ) = @$choice;
+sub interleave_iterators {
+    my ( $format, @iters ) = @_;
+    ## TODO duplicate code
+    my @next_lines;
+    for my $iter (@iters) {
+        my $line = $iter->();
+        next if !$line;
+        my $epoch = date_to_epoch( $line, $format );
+        push @next_lines, [ $epoch, $line, $iter ];
+    }
+    @next_lines = sort { $a->[0] <=> $b->[0] } @next_lines;
+    while ( my $next_line = shift @next_lines ) {
+        my ( $epoch, $line, $iter ) = @$next_line;
         print $line;
 
         $line = $iter->();
         next if !$line;
         $epoch = date_to_epoch( $line, $format );
-        @choices =
-          sort { $a->[0] <=> $b->[0] } @choices, [ $epoch, $line, $iter ];
+        @next_lines =
+          sort { $a->[0] <=> $b->[0] } @next_lines, [ $epoch, $line, $iter ];
     }
     return;
 }
