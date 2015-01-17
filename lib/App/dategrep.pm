@@ -136,19 +136,20 @@ sub run {
 		return 0;
 	    }
 	}
+        my @iterators =
+          map { get_iterator( $_, $start, $end, %options ) } @ARGV;
 
-        my @iters = map { get_iterator( $_, $start, $end, %options ) } @ARGV;
 
         if ( $options{'interleave'} ) {
-            interleave_iterators( $options{'format'}, @iters );
+            interleave_iterators( $options{'format'}, @iterators );
             return 0;
         }
 
         if ( $options{'sort-files'} ) {
-            @iters = sort_iterators( $options{'format'}, @iters );
+            @iterators = sort_iterators( $options{'format'}, @iterators );
         }
 
-        for my $iter (@iters) {
+        for my $iter (@iterators) {
             if ($iter) {
                 while ( my $line = $iter->() ) {
                     print $line;
@@ -162,20 +163,20 @@ sub run {
 
 =pod
 
-=item interleave_iterators( $format, @iters )
+=item interleave_iterators( $format, @iterators )
 
 Take a list of iterators and checks every iterator for its next
 line. After sorting these lines according to their dates, print the
 earliest line. I<$format> is the date specification to find dates in
-lines and @iters a list of iterators produced by I<get_iterator()>.
+lines and @iterators a list of iterators produced by I<get_iterator()>.
 
 =cut
 
 sub interleave_iterators {
-    my ( $format, @iters ) = @_;
+    my ( $format, @iterators ) = @_;
 
-    while ( @iters = sort_iterators( $format, @iters ) ) {
-        print $iters[0]->();
+    while ( @iterators = sort_iterators( $format, @iterators ) ) {
+        print $iterators[0]->();
     }
     return;
 }
