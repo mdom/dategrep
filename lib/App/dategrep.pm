@@ -173,24 +173,9 @@ lines and @iters a list of iterators produced by I<get_iterator()>.
 
 sub interleave_iterators {
     my ( $format, @iters ) = @_;
-    ## TODO duplicate code
-    my @next_lines;
-    for my $iter (@iters) {
-        my $line = $iter->();
-        next if !$line;
-        my $epoch = date_to_epoch( $line, $format );
-        push @next_lines, [ $epoch, $line, $iter ];
-    }
-    @next_lines = sort { $a->[0] <=> $b->[0] } @next_lines;
-    while ( my $next_line = shift @next_lines ) {
-        my ( $epoch, $line, $iter ) = @$next_line;
-        print $line;
 
-        $line = $iter->();
-        next if !$line;
-        $epoch = date_to_epoch( $line, $format );
-        @next_lines =
-          sort { $a->[0] <=> $b->[0] } @next_lines, [ $epoch, $line, $iter ];
+    while ( @iters = sort_iterators( $format, @iters ) ) {
+        print $iters[0]->();
     }
     return;
 }
