@@ -211,12 +211,13 @@ sub get_iterator {
 sub sort_iterators {
     my ( $format, @iterators ) = @_;
 
-        ## remove all iterators with eof
-        next if not defined $line;
-
     my @timestamps;
     for my $iterator (@iterators) {
         my $line = $iterator->( peek => 1 );
+        
+        ## remove all iterators with eof
+        next if not defined $line;
+
         my ( $epoch, $error ) = date_to_epoch( $line, $format );
         if ( !$epoch ) {
             die "No date found in first line: $error\n";
