@@ -259,6 +259,16 @@ sub normal_file_byte_offsets {
     return;
 }
 
+=pod 
+
+=item normal_file_iterator( $filename, $start, $end, %options )
+
+Return a iterator subroutine, that will return lines from I<$filename>
+starting at I<$start> to I<$end> every time it is called. I<$start>
+end <$end> are timevalues in epoch.
+
+=cut
+
 sub normal_file_iterator {
     my ( $filename, $start, $end, %options ) = @_;
     my ( $fh, $tell_beg, $tell_end ) = normal_file_byte_offsets(@_);
@@ -272,6 +282,18 @@ sub normal_file_iterator {
     }
     return;
 }
+
+=pod 
+
+=item uncompress_iterator( $filename, $start, $end, %options )
+
+Return a iterator subroutine, that will return lines from I<$filename>
+starting at I<$start> to I<$end> every time it is called. I<$start>
+end <$end> are timevalues in epoch. I<$filename> must be a gzip or
+bzip2 compressed file with a corresponding suffix of gz and z or bz
+and bzip2.
+
+=cut
 
 sub uncompress_iterator {
     my ( $filename, $start, $end, %options ) = @_;
