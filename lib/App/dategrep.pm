@@ -283,7 +283,7 @@ sub uncompress_iterator {
         @uncompress = qw(gzip -c -d);
     }
     else {
-        die "unknown ending for compressed file\n";
+        die "unknown ending for compressed file $filename\n";
     }
     open( my $pipe, '-|', @uncompress, $filename )
       or die "Can't open @uncompress: $!\n";
