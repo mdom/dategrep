@@ -320,8 +320,19 @@ sub stdin_iterator {
 sub fh_iterator {
     my ( $fh, $start, $end, %options ) = @_;
     my $last_epoch = 0;
+
+    ## when we find the first line that was logged at $end, we
+    ## just return undef and set $found_end to one. We check
+    ## $found_end directly at the beginning of the iterator
+    ## function. If its true, we just return undef without
+    ## checking the date of the line.
+
+    my $found_end;
+
     return sub {
-      LINE: while ( my $line = <$fh> ) {
+      LINE:
+        while ( my $line = <$fh> ) {
+            return if $found_end;
             my ( $epoch, $error ) = date_to_epoch( $line, $options{'format'} );
             if ( !$epoch ) {
                 if ( $options{'multiline'} and $last_epoch >= $start ) {
@@ -330,8 +341,15 @@ sub fh_iterator {
                 die "Unparsable line: $line\n";
             }
             next LINE if $epoch < $start;
+
             $last_epoch = $epoch;
-            return if $epoch >= $end;
+
+            if ( $epoch >= $end ) {
+                ## see comment above
+                $found_end = 1;
+                return;
+            }
+
             if ( $epoch >= $start ) {
                 return $line;
             }
