@@ -324,8 +324,8 @@ sub fh_iterator {
       LINE: while ( my $line = <$fh> ) {
             my ( $epoch, $error ) = date_to_epoch( $line, $options{'format'} );
             if ( !$epoch ) {
-                if ( $options{'multiline'} ) {
-                    return $line if $last_epoch >= $start;
+                if ( $options{'multiline'} and $last_epoch >= $start ) {
+                    return $line;
                 }
                 die "Unparsable line: $line\n";
             }
