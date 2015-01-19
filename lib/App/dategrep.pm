@@ -208,6 +208,16 @@ sub get_iterator {
     };
 }
 
+=pod
+
+=item sort_iterators( $format, @iterators )
+
+Take a date format and a list of iterators and return a list of
+iterators sorted by the date of their first lines. If an iterators
+returns no line, it is not included in the returned list.
+
+=cut
+
 sub sort_iterators {
     my ( $format, @iterators ) = @_;
 
