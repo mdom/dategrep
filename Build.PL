@@ -20,7 +20,7 @@ HEADER
     open( my $lib, '<', 'lib/App/dategrep.pm' )
       or die "Can't open lib: $!\n";
     while(<$lib>) {
-    	last if /=pod/;
+    	next if /^=pod/ .. /^=cut/;
 	print {$app} $_;
     }
     open( my $pod, '<', 'bin/dategrep' )
