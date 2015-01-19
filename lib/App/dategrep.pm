@@ -185,7 +185,7 @@ sub get_iterator {
     my ( $filename, $start, $end, %options ) = @_;
     my $iter;
     if ( $filename eq '-' ) {
-        $iter = stdin_iterator( $filename, $start, $end, %options );
+        $iter = stdin_iterator( $start, $end, %options );
     }
     elsif ( $filename =~ /\.(bz|bz2|gz|z)$/ ) {
         $iter = uncompress_iterator( $filename, $start, $end, %options );
@@ -313,7 +313,7 @@ sub uncompress_iterator {
 }
 
 sub stdin_iterator {
-    my ( $filename, $start, $end, %options ) = @_;
+    my ( $start, $end, %options ) = @_;
     return fh_iterator( \*STDIN, $start, $end, %options );
 }
 
