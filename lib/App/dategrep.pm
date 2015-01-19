@@ -126,16 +126,18 @@ sub run {
 
     eval {
 
-      if ( $options{'byte-offsets'} ) {
-	    if ( @ARGV == 1 and -f $ARGV[0] ) {
-		my ($fh, $byte_beg, $byte_end ) = normal_file_byte_offsets($ARGV[0], $start, $end, %options);
-		if ( not defined $byte_end ) {
-		    $byte_end = (stat($fh))[7];
-		}
-		print "$byte_beg $byte_end\n";
-		return 0;
-	    }
-	}
+        if ( $options{'byte-offsets'} ) {
+            if ( @ARGV == 1 and -f $ARGV[0] ) {
+                my ( $fh, $byte_beg, $byte_end ) =
+                  normal_file_byte_offsets( $ARGV[0], $start, $end, %options );
+                if ( not defined $byte_end ) {
+                    $byte_end = ( stat($fh) )[7];
+                }
+                print "$byte_beg $byte_end\n";
+                return 0;
+            }
+        }
+
         my @iterators =
           map { get_iterator( $_, $start, $end, %options ) } @ARGV;
 
