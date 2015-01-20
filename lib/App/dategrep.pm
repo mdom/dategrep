@@ -163,6 +163,29 @@ sub run {
     return 0;
 }
 
+=pod 
+
+=item guess_format( $formats, @iterators )
+
+Check all formats in the array reference $formats against the first
+line of all iterators. Return the first that matched.
+
+=cut
+
+sub guess_format {
+    my ($formats, @iterators) = @_;
+    for my $iterator (@iterators) {
+        my $line = $iterator->( peek => 1 );
+        for my $format ( @$formats ) {
+            my $epoch = date_to_epoch( $line, $format );
+            if ( defined $epoch ) {
+                return $format;
+            }
+        }
+    }
+    return;
+}
+
 =pod
 
 =item interleave_iterators( $format, @iterators )
