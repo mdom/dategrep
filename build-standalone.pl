@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -e
-
 PERL5LIB=./lib:$PERL5LIB
 
 fatten --overwrite --quiet --exclude-dist=Date-Manip -o dategrep-standalone-small bin/dategrep
