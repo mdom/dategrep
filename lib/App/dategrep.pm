@@ -1,4 +1,7 @@
 # TODO Add warning for truncated dates!
+# TODO test standalone script
+# TODO add random access for gzip
+# TODO interleave skip files until their first epoch is reached
 
 use strict;
 use warnings;
@@ -311,6 +314,7 @@ sub normal_file_iterator {
         seek( $fh, $tell_beg, SEEK_SET );
         return sub {
             my $line = <$fh>;
+            ## TODO can $tell_end be undefined?
             return if defined($tell_end) && ( tell() > $tell_end );
             return $line;
         };
