@@ -75,9 +75,9 @@ sub run {
     my $config = loadconfig( $options{configfile} );
 
     my %named_formats = (
+        'iso8601' => "%O%Z",
         'rsyslog' => "%b %e %H:%M:%S",
         'apache'  => "%d/%b/%Y:%T %z",
-        'iso8601' => "%O%Z",
     );
 
     if ( exists $config->{formats} ) {
