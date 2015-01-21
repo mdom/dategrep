@@ -116,7 +116,7 @@ The file consists of sections and variables. A section begins with the name of
 the section in square brackets and continues until the next section begins.
 Section names are not case sensitive. Empty lines and lines with comments are
 skipped. Comments are started with a hash character. dategrep recognizes
-only one sections: Under I<format> you can list additional named formats.
+only one sections: Under I<formats> you can list additional named formats.
 
 Example:
 
