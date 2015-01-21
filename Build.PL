@@ -7,7 +7,13 @@ my $class = Module::Build->subclass(
     class => "Module::Build::Custom",
     code  => q{
 sub ACTION_standalone {
-    qx(perl ./build-standalone.pl)
+    warn "This used to call ./build-standalone.sh, but it has now so many
+dependencies that it is probably easier for you to just download the
+standalone scripts at
+https://mdom.github.io/dategrep/dategrep-standalone-big.pl or
+https://mdom.github.io/dategrep/dategrep-standalone-small.pl. If you
+want to build it yourself, you have to install App::fatten.\n";
+    exit 0;
 }
     },
 );
