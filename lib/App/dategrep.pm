@@ -9,6 +9,7 @@ use warnings;
 package App::dategrep;
 use Date::Manip::Date;
 use Date::Manip::Delta;
+use Config::Tiny;
 use Pod::Usage;
 use Getopt::Long;
 use Fcntl ":seek";
@@ -406,26 +407,11 @@ sub loadconfig {
         return;
     }
 
-    my ( %config, $section );
-    open( my $cfg_fh, '<', $configfile )
-      or die "Can't open config file: $!\n";
-    while (<$cfg_fh>) {
-        next if /^\s*\#/ || /^\s*$/;
-        if (/^\[([^\]]*)\]\s*$/) {
-            $section = lc $1;
-        }
-        elsif (/^(\w+)\s*=\s*(.*)/) {
-            my ( $key, $val ) = ( $1, $2 );
-            if ( not defined $section ) {
-                die "parameter $key not in section\n";
-            }
-            $config{$section}->{$key} = $val;
-        }
-        else {
-            die "Parse error in configuration file\n";
-        }
+    my $config = Config::Tiny->read( $configfile );
+    if ( not defined $config ) {
+        die "Error while parsing configfile: " . Config::Tiny->errstr() . "\n";
     }
-    return \%config;
+    return $config;
 }
 
 {
