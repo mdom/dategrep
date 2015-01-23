@@ -27,6 +27,7 @@ my $builder = $class->new(
         'Date::Manip'  => 0,
         'Getopt::Long' => 0,
         'Pod::Usage'   => 0,
+        'Config::Tiny' => 0,
     },
     test_requires => {
         'Test::Output'   => 0,
