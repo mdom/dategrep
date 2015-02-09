@@ -270,33 +270,25 @@ sub normal_file_byte_offsets {
     my ( $filename, $start, $end, %options ) = @_;
 
     open( my $fh, '<', $filename ) or die "Can't open $filename: $!\n";
-    my $test_line = <$fh>;
-    if ( defined($test_line) ) {
-        my ( $epoch, $error ) = date_to_epoch( $test_line, $options{'format'} );
-        if ($error) {
-            die "No date found in first line: $error\n";
-        }
-        seek( $fh, 0, SEEK_SET );
+    my $tell_beg = search(
+        $fh, $start, $options{'format'},
+        multiline => $options{multiline},
+        blocksize => $options{blocksize},
+    );
 
-        my $tell_beg = search(
-            $fh, $start, $options{'format'},
+    if ( defined $tell_beg ) {
+        my $tell_end = search(
+            $fh, $end, $options{'format'},
+            min_byte  => $tell_beg,
             multiline => $options{multiline},
             blocksize => $options{blocksize},
         );
 
-        if ( defined $tell_beg ) {
-            my $tell_end = search(
-                $fh, $end, $options{'format'},
-                min_byte  => $tell_beg,
-                multiline => $options{multiline},
-                blocksize => $options{blocksize},
-            );
-
-            return $fh, $tell_beg, $tell_end;
-        }
+        return $fh, $tell_beg, $tell_end;
     }
     return;
 }
+
 
 =pod 
 
