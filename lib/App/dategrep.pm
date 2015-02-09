@@ -257,8 +257,10 @@ sub sort_iterators {
         ## remove all iterators with eof
         next if not defined $line;
 
+        ## TODO What should we do under --multiline?
         my ( $epoch, $error ) = date_to_epoch( $line, $format );
         if ( !$epoch ) {
+            ## TODO Which iterator produced the error?
             die "No date found in first line: $error\n";
         }
         push @timestamps, [ $epoch, $iterator ];
