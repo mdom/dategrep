@@ -52,11 +52,16 @@ sub run {
         \%options,        'start|from=s', 'end|to=s',     'format=s',
         'last-minutes=i', 'multiline!',   'blocksize=i',  'help|?',
         'sort-files',     'man',          'configfile=s', 'interleave',
-        'byte-offsets',   'debug=s',
+        'byte-offsets',   'debug=s', 'version!',
     );
     if ( !$rc ) {
         pod2usage( -exitstatus => "NOEXIT", -verbose => 0 );
         return 2;
+    }
+
+    if ( $options{version} ) {
+        print "$VERSION\n";
+        return 0;
     }
 
     if ( $options{help} ) {
