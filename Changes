@@ -1,3 +1,15 @@
+0.50 2015-02-21
+
+ - don't abort search without a date on first line
+ - added a lot of function documentation
+ - parse intervals in --start and --end
+ - new option --byte-offset to return start and end in byte offsets
+ - fixed uncompressing gzip files on Mac OS X
+
+0.14 2014-05-08
+
+ - removed file existance check for undefined config variable
+
 0.12 2014-05-06
 
  - runs on older perls
