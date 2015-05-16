@@ -163,13 +163,17 @@ It is possible to install this script via perl normal install routines.
   ./Build
   ./Build install
 
-Or you can use one of the two prebuild versions, which already include all or
-same of dategreps dependencies. Which to choose mainly depends on how hard it
-is for you to install Date::Manip. The small version is just 22.3KB big and
-includes all libraries except Date::Manip. The big one packs everything in a
-nice, neat package for you, but will cost you almost 10MB of disk space. Both
-are always included in the L<latest
-release|https://github.com/mdom/dategrep/releases/latest>.
+Or via CPAN:
+
+  cpan App::dategrep
+
+You can also install one of the two prebuild versions, which already
+include all or same of dategreps dependencies. Which to choose
+mainly depends on how hard it is for you to install Date::Manip. The
+small version is just 22.3KB big and includes all libraries except
+Date::Manip. The big one packs everything in a nice, neat package for you,
+but will cost you almost 10MB of disk space. Both are always included
+in the L<latest release|https://github.com/mdom/dategrep/releases/latest>.
 
 So, to install the big version you could just type:
 
