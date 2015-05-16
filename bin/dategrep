@@ -157,24 +157,23 @@ It is possible to install this script via perl normal install routines.
   ./Build
   ./Build install
 
-Or you can use one of the two prebuild versions, which already include
-all or same of dategreps dependencies. Which to choose mainly depends
-on how hard it is for you to install Date::Manip. The L<small
-version|https://mdom.github.io/dategrep/dategrep-standalone-small.pl>
-is just 22.3KB big and includes all libraries except Date::Manip. The
-L<big one|https://mdom.github.io/dategrep/dategrep-standalone-big.pl>
-packs everything in a nice, neat package for you, but will cost you
-almost 10MB of disk space.
+Or you can use one of the two prebuild versions, which already include all or
+same of dategreps dependencies. Which to choose mainly depends on how hard it
+is for you to install Date::Manip. The small version is just 22.3KB big and
+includes all libraries except Date::Manip. The big one packs everything in a
+nice, neat package for you, but will cost you almost 10MB of disk space. Both
+are always included in the L<latest
+release|https://github.com/mdom/dategrep/releases/latest>.
 
 So, to install the big version you could just type:
 
-  wget https://mdom.github.io/dategrep/dategrep-standalone-big.pl
+  wget https://github.com/mdom/dategrep/releases/download/$release/dategrep-standalone-big
   cp dategrep-standalone-big.pl ~/bin/dategrep
   chmod +x ~/bin/dategrep
 
 And for the small one (with the apt-get for Debian):
 
-  wget https://mdom.github.io/dategrep/dategrep-standalone-small.pl
+  wget https://github.com/mdom/dategrep/releases/download/$release/dategrep-standalone-small
   cp dategrep-standalone-small.pl ~/bin/dategrep
   chmod +x ~/bin/dategrep
   apt-get install libdate-manip-perl
