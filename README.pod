@@ -71,9 +71,11 @@ Additionally, dategrep supports named formats:
 
 =over 4
 
-=item * rsyslog "%b %d %H:%M:%S"
+=item * rsyslog "%b %e %H:%M:%S"
 
 =item * apache "%d/%b/%Y:%T %z"
+
+=item * iso8601 "%O%Z"
 
 =back
 
@@ -207,4 +209,3 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-=cut

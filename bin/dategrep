@@ -81,9 +81,11 @@ Additionally, dategrep supports named formats:
 
 =over 4
 
-=item * rsyslog "%b %d %H:%M:%S"
+=item * rsyslog "%b %e %H:%M:%S"
 
 =item * apache "%d/%b/%Y:%T %z"
+
+=item * iso8601 "%O%Z"
 
 =back
 
