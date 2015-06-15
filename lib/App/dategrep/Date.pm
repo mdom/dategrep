@@ -5,7 +5,7 @@ use parent 'Exporter';
 use Date::Manip::Delta;
 use Date::Manip::Date;
 
-our @EXPORT_OK = qw(intervall_to_epoch date_to_epoch);
+our @EXPORT_OK = qw(intervall_to_epoch date_to_epoch minutes_ago);
 
 sub intervall_to_epoch {
     my ( $time, $format ) = @_;
@@ -21,7 +21,14 @@ sub intervall_to_epoch {
     return date_to_epoch( $time, $format );
 }
 
-
+sub minutes_ago {
+    my $minutes = shift;
+    my $now     = Date::Manip::Date->new("now");
+    $now->set( 's', 0 );
+    my $ago = Date::Manip::Date->new("$minutes minutes ago");
+    $ago->set( 's', 0 );
+    return ( $ago->secs_since_1970_GMT(), $now->secs_since_1970_GMT() );
+}
 
 {
     my $date;

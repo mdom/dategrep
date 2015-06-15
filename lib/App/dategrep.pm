@@ -2,9 +2,7 @@ use strict;
 use warnings;
 
 package App::dategrep;
-use Date::Manip::Date;
-use Date::Manip::Delta;
-use App::dategrep::Date qw(intervall_to_epoch date_to_epoch);
+use App::dategrep::Date qw(intervall_to_epoch date_to_epoch minutes_ago);
 use Config::Tiny;
 use Pod::Usage;
 use Getopt::Long;
@@ -93,13 +91,7 @@ sub run {
     }
 
     if ( defined $options{'last-minutes'} ) {
-        my $now = Date::Manip::Date->new("now");
-        $now->set( 's', 0 );
-        my $ago =
-          Date::Manip::Date->new( $options{'last-minutes'} . "minutes ago" );
-        $ago->set( 's', 0 );
-        ( $start, $end ) =
-          ( $ago->secs_since_1970_GMT(), $now->secs_since_1970_GMT() );
+        ( $start, $end ) = minutes_ago( $options{'last-minutes'} );
     }
 
     if ( $end < $start ) {
