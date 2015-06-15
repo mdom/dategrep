@@ -4,6 +4,7 @@ use warnings;
 package App::dategrep;
 use Date::Manip::Date;
 use Date::Manip::Delta;
+use App::dategrep::Date qw(intervall_to_epoch date_to_epoch);
 use Config::Tiny;
 use Pod::Usage;
 use Getopt::Long;
@@ -26,20 +27,6 @@ sub error {
     chomp($msg);
     warn "$app: $msg\n";
     return $rc;
-}
-
-sub intervall_to_epoch {
-    my ( $time, $format ) = @_;
-    if ( $time =~ /^(.*) from (.*)$/ ) {
-        my ( $delta, $date ) =
-          ( Date::Manip::Delta->new($1), Date::Manip::Date->new($2) );
-        ## TODO: $date->is_date is missing in Date::Manip::Date
-        ## will be fixed in next major release
-        if ( $delta->is_delta() ) { ## and $date->is_date() ) {
-            return $date->calc($delta)->secs_since_1970_GMT();
-        }
-    }
-    return date_to_epoch( $time, $format );
 }
 
 sub run {
@@ -406,29 +393,6 @@ sub loadconfig {
         die "Error while parsing configfile: " . Config::Tiny->errstr() . "\n";
     }
     return $config;
-}
-
-{
-    my $date;
-
-    sub date_to_epoch {
-        my ( $str, $format ) = @_;
-        if ( !$date ) {
-            $date = Date::Manip::Date->new();
-        }
-
-        my $error;
-        if ($format) {
-            $error = $date->parse_format( $format, $str );
-        }
-
-        if ( !$format or $error ) {
-            $error = $date->parse($str);
-        }
-
-        return ( undef, $date->err ) if $error;
-        return ( $date->secs_since_1970_GMT() );
-    }
 }
 
 # Modified version of File::SortedSeek::_look
