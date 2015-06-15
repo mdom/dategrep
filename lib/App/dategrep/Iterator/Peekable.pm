@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Moo::Role;
 
-requires 'getentry';
+requires 'getline';
 
 has 'buffer' => (
     is      => 'rw',
@@ -18,7 +18,7 @@ sub peek {
     return $self->buffer;
 }
 
-around 'getentry' => sub {
+around 'getline' => sub {
     my $orig = shift;
     my ($self) = @_;
     my $buffer = $self->buffer();
