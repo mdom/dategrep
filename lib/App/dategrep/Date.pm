@@ -2,6 +2,8 @@ package App::dategrep::Date;
 use strict;
 use warnings;
 use parent 'Exporter';
+use Date::Manip::Delta;
+use Date::Manip::Date;
 
 our @EXPORT_OK = qw(intervall_to_epoch date_to_epoch);
 
