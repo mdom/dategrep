@@ -3,6 +3,9 @@ use warnings;
 
 package App::dategrep;
 use App::dategrep::Date qw(intervall_to_epoch date_to_epoch minutes_ago);
+use App::dategrep::Iterator::File;
+use App::dategrep::Iterator::Stdin;
+use App::dategrep::Iterator::Uncompress;
 use Config::Tiny;
 use Pod::Usage;
 use Getopt::Long;
@@ -111,8 +114,14 @@ sub run {
 
         if ( $options{'byte-offsets'} ) {
             if ( @ARGV == 1 and -f $ARGV[0] ) {
-                my ( $fh, $byte_beg, $byte_end ) =
-                  normal_file_byte_offsets( $ARGV[0], $start, $end, %options );
+                my $iter = App::dategrep::Iterator::File->new(
+                    filename  => $ARGV[0],
+                    start     => $start,
+                    end       => $end,
+                    multiline => $options{multiline},
+                    format    => $options{format},
+                );
+                my ( $fh, $byte_beg, $byte_end ) = $iter->byte_offsets();
                 if ( not defined $byte_end ) {
                     $byte_end = ( stat($fh) )[7];
                 }
@@ -136,7 +145,7 @@ sub run {
 
         for my $iter (@iterators) {
             if ($iter) {
-                while ( my $line = $iter->() ) {
+                while ( my $line = $iter->getline ) {
                     print $line;
                 }
             }
@@ -158,7 +167,7 @@ line of all iterators. Return the first that matched.
 sub guess_format {
     my ($formats, @iterators) = @_;
     for my $iterator (@iterators) {
-        my $line = $iterator->( peek => 1 );
+        my $line = $iterator->peek;
         for my $format ( @$formats ) {
             my $epoch = date_to_epoch( $line, $format );
             if ( defined $epoch ) {
@@ -184,36 +193,34 @@ sub interleave_iterators {
     my ( $format, @iterators ) = @_;
 
     while ( @iterators = sort_iterators( $format, @iterators ) ) {
-        print $iterators[0]->();
+        print $iterators[0]->getline;
     }
     return;
 }
 
 sub get_iterator {
     my ( $filename, $start, $end, %options ) = @_;
+    my ( $multiline, $format ) = @options{qw(multiline format)};
+    my @args = (
+        start     => $start,
+        end       => $end,
+        multiline => $multiline,
+        format    => $format
+    );
     my $iter;
     if ( $filename eq '-' ) {
-        $iter = stdin_iterator( $start, $end, %options );
+        $iter = App::dategrep::Iterator::Stdin->new(@args);
     }
     elsif ( $filename =~ /\.(bz|bz2|gz|z)$/ ) {
-        $iter = uncompress_iterator( $filename, $start, $end, %options );
+        $iter =
+          App::dategrep::Iterator::Uncompress->new( @args,
+            filename => $filename );
     }
     else {
-        $iter = normal_file_iterator( $filename, $start, $end, %options );
+        $iter =
+          App::dategrep::Iterator::File->new( @args, filename => $filename );
     }
-    return if !$iter;
-    my @buffer;
-    return sub {
-        my %options = @_;
-        if (@buffer) {
-            return $options{peek} ? $buffer[0] : shift @buffer;
-        }
-        my $line = $iter->();
-        if ( $options{peek} and $line ) {
-            push @buffer, $line;
-        }
-        return $line;
-    };
+    return $iter;
 }
 
 =pod
@@ -231,7 +238,7 @@ sub sort_iterators {
 
     my @timestamps;
     for my $iterator (@iterators) {
-        my $line = $iterator->( peek => 1 );
+        my $line = $iterator->peek;
         
         ## remove all iterators with eof
         next if not defined $line;
@@ -245,130 +252,6 @@ sub sort_iterators {
         push @timestamps, [ $epoch, $iterator ];
     }
     return map { $_->[1] } sort { $a->[0] <=> $b->[0] } @timestamps;
-}
-
-sub normal_file_byte_offsets {
-    my ( $filename, $start, $end, %options ) = @_;
-
-    open( my $fh, '<', $filename ) or die "Can't open $filename: $!\n";
-    my $tell_beg = search(
-        $fh, $start, $options{'format'},
-        multiline => $options{multiline},
-        blocksize => $options{blocksize},
-    );
-
-    if ( defined $tell_beg ) {
-        my $tell_end = search(
-            $fh, $end, $options{'format'},
-            min_byte  => $tell_beg,
-            multiline => $options{multiline},
-            blocksize => $options{blocksize},
-        );
-
-        return $fh, $tell_beg, $tell_end;
-    }
-    return;
-}
-
-
-=pod 
-
-=item normal_file_iterator( $filename, $start, $end, %options )
-
-Return a iterator subroutine, that will return lines from I<$filename>
-starting at I<$start> to I<$end> every time it is called. I<$start>
-end <$end> are timevalues in epoch.
-
-=cut
-
-sub normal_file_iterator {
-    my ( $filename, $start, $end, %options ) = @_;
-    my ( $fh, $tell_beg, $tell_end ) = normal_file_byte_offsets(@_);
-    if ( defined($tell_beg) ) {
-        seek( $fh, $tell_beg, SEEK_SET );
-        return sub {
-            my $line = <$fh>;
-            ## TODO can $tell_end be undefined?
-            return if defined($tell_end) && ( tell() > $tell_end );
-            return $line;
-        };
-    }
-    return;
-}
-
-=pod 
-
-=item uncompress_iterator( $filename, $start, $end, %options )
-
-Return a iterator subroutine, that will return lines from I<$filename>
-starting at I<$start> to I<$end> every time it is called. I<$start>
-end <$end> are timevalues in epoch. I<$filename> must be a gzip or
-bzip2 compressed file with a corresponding suffix of gz and z or bz
-and bzip2.
-
-=cut
-
-sub uncompress_iterator {
-    my ( $filename, $start, $end, %options ) = @_;
-    my @uncompress;
-    if ( $filename =~ /\.(bz|bz2)$/ ) {
-        @uncompress = qw(bzcat);
-    }
-    elsif ( $filename =~ /\.(gz|z)$/ ) {
-        @uncompress = qw(gzip -c -d);
-    }
-    else {
-        die "unknown ending for compressed file $filename\n";
-    }
-    open( my $pipe, '-|', @uncompress, $filename )
-      or die "Can't open @uncompress: $!\n";
-    return fh_iterator( $pipe, $start, $end, %options );
-}
-
-sub stdin_iterator {
-    my ( $start, $end, %options ) = @_;
-    return fh_iterator( \*STDIN, $start, $end, %options );
-}
-
-sub fh_iterator {
-    my ( $fh, $start, $end, %options ) = @_;
-    my $last_epoch = 0;
-
-    ## when we find the first line that was logged at $end, we
-    ## just return undef and set $found_end to one. We check
-    ## $found_end directly at the beginning of the iterator
-    ## function. If its true, we just return undef without
-    ## checking the date of the line.
-
-    my $found_end;
-
-    return sub {
-      LINE:
-        while ( my $line = <$fh> ) {
-            return if $found_end;
-            my ( $epoch, $error ) = date_to_epoch( $line, $options{'format'} );
-            if ( !$epoch ) {
-                if ( $options{'multiline'} and $last_epoch >= $start ) {
-                    return $line;
-                }
-                die "Unparsable line: $line\n";
-            }
-            next LINE if $epoch < $start;
-
-            $last_epoch = $epoch;
-
-            if ( $epoch >= $end ) {
-                ## see comment above
-                $found_end = 1;
-                return;
-            }
-
-            if ( $epoch >= $start ) {
-                return $line;
-            }
-        }
-        return;
-    };
 }
 
 sub loadconfig {
@@ -385,68 +268,6 @@ sub loadconfig {
         die "Error while parsing configfile: " . Config::Tiny->errstr() . "\n";
     }
     return $config;
-}
-
-# Modified version of File::SortedSeek::_look
-
-sub search {
-    my ( $fh, $key, $format, %options ) = @_;
-    return if not defined $key;
-    my @stat = stat($fh) or return;
-    my ( $size, $blksize ) = @stat[ 7, 11 ];
-    $blksize = $options{blocksize} || $blksize || 8192;
-    my $min_byte  = $options{min_byte};
-    my $multiline = $options{multiline};
-
-    # find the right block
-    my ( $min, $max, $mid ) = ( 0, int( $size / $blksize ) );
-
-    if ( defined $min_byte ) {
-        $min = int( $min_byte / $blksize );
-    }
-
-  BLOCK: while ( $max - $min > 1 ) {
-        $mid = int( ( $max + $min ) / 2 );
-        seek( $fh, $mid * $blksize, 0 ) or return;
-        <$fh> if $mid;    # probably a partial line
-      LINE: while ( my $line = <$fh> ) {
-            my ($epoch) = date_to_epoch( $line, $format );
-            if ( !$epoch ) {
-                next LINE if $multiline;
-
-                chomp($line);
-                die "Unparsable line: $line\n";
-            }
-            if ($multiline) {
-                my $byte = tell($fh);
-                $mid = int( $byte / $blksize );
-            }
-            $epoch < $key
-              ? $min = $mid
-              : $max = $mid;
-            next BLOCK;
-        }
-    }
-
-    # find the right line
-    $min *= $blksize;
-    seek( $fh, $min, 0 ) or return;
-    <$fh> if $min;    # probably a partial line
-    for ( ; ; ) {
-        $min = tell($fh);
-        defined( my $line = <$fh> ) or last;
-        my ($epoch) = date_to_epoch( $line, $format );
-        if ( !$epoch ) {
-            next if $multiline;
-            chomp($line);
-            die "Unparsable line: $line\n";
-        }
-        if ( $epoch >= $key ) {
-            seek( $fh, $min, 0 );
-            return $min;
-        }
-    }
-    return;
 }
 
 1;

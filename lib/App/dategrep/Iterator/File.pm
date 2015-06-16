@@ -110,6 +110,7 @@ sub search {
         defined( my $line = $fh->getline ) or last;
         my ($epoch) = date_to_epoch( $line, $self->format );
         if ( !$epoch ) {
+		$DB::single=1;
             next if $multiline;
             chomp($line);
             die "Unparsable line: $line\n";
