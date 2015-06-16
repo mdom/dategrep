@@ -9,7 +9,7 @@ last_tag=$(git describe --abbrev=0 --tags)
 github-release release --user mdom --repo dategrep --tag $last_tag
 
 _fatten () {
-	fatten --overwrite --quiet --exclude-dist=Class-XSAccessor "$@" bin/dategrep
+	fatten --overwrite --quiet --strip --exclude-dist=Class-XSAccessor "$@" bin/dategrep
 }
 
 _fatten --exclude-dist=Date-Manip -o dategrep-standalone-small
