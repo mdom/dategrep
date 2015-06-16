@@ -5,12 +5,11 @@ use App::dategrep::Date 'date_to_epoch';
 use Moo;
 use IO::Handle;
 extends 'App::dategrep::Iterator';
-with 'App::dategrep::Iterator::Peekable';
 
 has fh => ( is => 'ro', required => 1 );
 has eof => ( is => 'rw', default => sub { 0 } );
 
-sub getline {
+sub get_entry {
     my $self = shift;
 
     ## when we find the first line that was logged at $end, we
@@ -22,7 +21,7 @@ sub getline {
     return if $self->eof();
 
   LINE:
-    while ( my $line = $self->fh->getline ) {
+    while ( my $line = $self->getline ) {
         my ( $epoch, $error ) = date_to_epoch( $line, $self->format );
         if ( !$epoch ) {
             if ( $self->multiline ) {

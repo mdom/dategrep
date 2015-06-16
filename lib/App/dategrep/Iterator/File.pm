@@ -6,7 +6,6 @@ use Moo;
 use IO::Handle;
 use App::dategrep::Date qw(date_to_epoch);
 extends 'App::dategrep::Iterator';
-with 'App::dategrep::Iterator::Peekable';
 
 has 'filename' => ( is => 'ro', required => 1 );
 has 'blocksize' => ( is => 'lazy' );
@@ -29,11 +28,16 @@ sub _build_fh {
     return $fh;
 }
 
-sub getline {
+sub get_entry {
     my $self = shift;
-    my $line = $self->fh->getline();
+    my $line = $self->getline();
     ## TODO can $tell_end be undefined?
-    return if defined( $self->tell_end ) && ( $self->fh->tell > $self->tell_end );
+    return
+      if defined( $self->tell_end ) && ( $self->fh->tell > $self->tell_end );
+    if ( $self->multiline && ! $self->fh->eof && !$self->next_line_has_date ) {
+
+        $line .= $self->getline();
+    }
     return $line;
 }
 
@@ -110,7 +114,6 @@ sub search {
         defined( my $line = $fh->getline ) or last;
         my ($epoch) = date_to_epoch( $line, $self->format );
         if ( !$epoch ) {
-		$DB::single=1;
             next if $multiline;
             chomp($line);
             die "Unparsable line: $line\n";

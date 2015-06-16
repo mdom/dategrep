@@ -145,8 +145,8 @@ sub run {
 
         for my $iter (@iterators) {
             if ($iter) {
-                while ( my $line = $iter->getline ) {
-                    print $line;
+                while ( my $entry = $iter->get_entry ) {
+                    print $entry;
                 }
             }
         }
@@ -193,7 +193,7 @@ sub interleave_iterators {
     my ( $format, @iterators ) = @_;
 
     while ( @iterators = sort_iterators( $format, @iterators ) ) {
-        print $iterators[0]->getline;
+        print $iterators[0]->get_entry;
     }
     return;
 }
