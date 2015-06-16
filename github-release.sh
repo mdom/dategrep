@@ -8,8 +8,12 @@ last_tag=$(git describe --abbrev=0 --tags)
 
 github-release release --user mdom --repo dategrep --tag $last_tag
 
-fatten --overwrite --quiet --exclude-dist=Date-Manip -o dategrep-standalone-small bin/dategrep
-fatten --overwrite --quiet --include-dist=Date-Manip -o dategrep-standalone-big   bin/dategrep
+_fatten () {
+	fatten --overwrite --quiet --exclude-dist=Class-XSAccessor "$@" bin/dategrep
+}
+
+_fatten --exclude-dist=Date-Manip -o dategrep-standalone-small
+_fatten --include-dist=Date-Manip -o dategrep-standalone-big
 
 github-release upload --user mdom --repo dategrep --tag $last_tag --name dategrep-standalone-small --file dategrep-standalone-small
 github-release upload --user mdom --repo dategrep --tag $last_tag --name dategrep-standalone-big   --file dategrep-standalone-big
