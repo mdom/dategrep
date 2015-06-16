@@ -1,3 +1,23 @@
+0.51 2015-06-17
+
+ [frontend changes]
+ - better handling of multiline logs
+
+   Before this release lines with no date were printed if the last
+   line with a date was still in range. But when using --sort order
+   --interleave this would lead to strange sorting. dategrep now reads
+   a multiline log as single entry and prints it together.
+
+ - added --version
+ - smaller standalone scripts by striping them
+ - updated documention (thanks szepeviktor!)
+
+ [internal changes]
+
+ - switched to Dist::Zilla
+ - moved unmaintained emacs mode to contrib
+ - using oo based iterators with Moo
+
 0.50 2015-02-21
 
  - don't abort search without a date on first line
