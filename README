@@ -21,7 +21,7 @@ SUPPORT AND DOCUMENTATION
 After installing, you can find documentation for this module with the
 perldoc command.
 
-    perldoc Foo
+    perldoc dategrep
 
 You can also look for information at:
 
@@ -35,7 +35,7 @@ You can also look for information at:
         http://cpanratings.perl.org/dist/App-dategrep
 
     Search CPAN
-        http://search.cpan.org/dist/App.dategrep
+        http://search.cpan.org/dist/App-dategrep
 
 
 LICENSE AND COPYRIGHT
