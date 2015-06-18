@@ -155,19 +155,6 @@ sub run {
     return 0;
 }
 
-=pod 
-
-=over 
-
-=item guess_format( $formats, @iterators )
-
-Check all formats in the array reference $formats against the first
-line of all iterators. Return the first that matched.
-
-=back
-
-=cut
-
 sub guess_format {
     my ($formats, @iterators) = @_;
     for my $iterator (@iterators) {
@@ -181,21 +168,6 @@ sub guess_format {
     }
     return;
 }
-
-=pod
-
-=over
-
-=item interleave_iterators( $format, @iterators )
-
-Take a list of iterators and checks every iterator for its next
-line. After sorting these lines according to their dates, print the
-earliest line. I<$format> is the date specification to find dates in
-lines and @iterators a list of iterators produced by I<get_iterator()>.
-
-=back
-
-=cut
 
 sub interleave_iterators {
     my ( $format, @iterators ) = @_;
@@ -230,20 +202,6 @@ sub get_iterator {
     }
     return $iter;
 }
-
-=pod
-
-=over
-
-=item sort_iterators( $format, @iterators )
-
-Take a date format and a list of iterators and return a list of
-iterators sorted by the date of their first lines. If an iterators
-returns no line, it is not included in the returned list.
-
-=back
-
-=cut
 
 sub sort_iterators {
     my ( $format, @iterators ) = @_;
