@@ -1,3 +1,9 @@
+0.53 2015-06-20T20:33:29Z
+  - use IO::File to get seek on fh
+  - add dependency on Moo
+  - removed installation section from man page
+  - fixed errors in README
+
 0.52 2015-06-18T19:42:43Z
   - remove pod to document functions which cluttered the main documentation
     on CPAN

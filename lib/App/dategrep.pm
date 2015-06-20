@@ -14,7 +14,7 @@ use File::Basename qw(basename);
 use base 'Exporter';
 our @EXPORT_OK = qw(run);
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 our $app;
 
