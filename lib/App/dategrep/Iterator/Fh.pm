@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use App::dategrep::Date 'date_to_epoch';
 use Moo;
-use IO::Handle;
+use FileHandle;
 extends 'App::dategrep::Iterator';
 
 has fh => ( is => 'ro', required => 1 );

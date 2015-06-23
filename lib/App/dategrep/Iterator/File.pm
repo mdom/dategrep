@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Fcntl ":seek";
 use Moo;
-use IO::File;
+use FileHandle;
 use App::dategrep::Date qw(date_to_epoch);
 extends 'App::dategrep::Iterator';
 

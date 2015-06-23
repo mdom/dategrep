@@ -5,6 +5,8 @@ requires 'Getopt::Long' => 0;
 requires 'Pod::Usage'   => 0;
 requires 'Config::Tiny' => 0;
 requires 'Moo' => 0;
+requires 'FileHandle' => 0;
+requires 'Fcntl' => 0;
 
 # requires 'Some::Module', 'VERSION';
 
