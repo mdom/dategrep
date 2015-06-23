@@ -1,3 +1,6 @@
+0.54 2015-06-23T17:53:15Z
+  - use FileHandle instead of IO::File and IO::Handle
+
 0.53 2015-06-20T20:33:29Z
   - use IO::File to get seek on fh
   - add dependency on Moo

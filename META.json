@@ -39,6 +39,8 @@
          "requires" : {
             "Config::Tiny" : "0",
             "Date::Manip" : "0",
+            "Fcntl" : "0",
+            "FileHandle" : "0",
             "Getopt::Long" : "0",
             "Moo" : "0",
             "Pod::Usage" : "0",
@@ -68,7 +70,7 @@
          "web" : "https://github.com/mdom/dategrep"
       }
    },
-   "version" : "0.53",
+   "version" : "0.54",
    "x_contributors" : [
       "Mario Domgoergen <mario@domgoergen.com>",
       "Mario Domgoergen <mdom@taz.de>"
