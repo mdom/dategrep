@@ -40,7 +40,7 @@ sub run {
         \%options,        'start|from=s', 'end|to=s',     'format=s',
         'last-minutes=i', 'multiline!',   'blocksize=i',  'help|?',
         'sort-files',     'man',          'configfile=s', 'interleave',
-        'byte-offsets',   'debug=s', 'version!',
+        'byte-offsets',   'debug=s', 'version!', 'skip-unparsable!',
     );
     if ( !$rc ) {
         pod2usage( -exitstatus => "NOEXIT", -verbose => 0 );
@@ -79,6 +79,10 @@ sub run {
 
     if ( exists $named_formats{ $options{'format'} } ) {
         $options{'format'} = $named_formats{ $options{'format'} };
+    }
+
+    if ( $options{'skip-unparsable'} ) {
+	    $options{'multiline'} = 0;
     }
 
     my ( $start, $end ) = ( 0, time() );
@@ -182,10 +186,11 @@ sub get_iterator {
     my ( $filename, $start, $end, %options ) = @_;
     my ( $multiline, $format ) = @options{qw(multiline format)};
     my @args = (
-        start     => $start,
-        end       => $end,
-        multiline => $multiline,
-        format    => $format
+        start           => $start,
+        end             => $end,
+        multiline       => $multiline,
+        format          => $format,
+        skip_unparsable => $options{'skip-unparsable'},
     );
     my $iter;
     if ( $filename eq '-' ) {

@@ -9,6 +9,7 @@ has 'start' => ( is => 'rw', required => 1 );
 has 'end'   => ( is => 'rw', required => 1 );
 has 'format' => ( is => 'rw', required => 1 );
 has 'fh' => ( is => 'lazy' );
+has 'skip_unparsable' => ( is => 'ro', default => sub { 0 } );
 
 has 'buffer' => (
     is      => 'rw',

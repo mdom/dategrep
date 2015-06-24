@@ -90,7 +90,7 @@ sub search {
       LINE: while ( my $line = $fh->getline() ) {
             my ($epoch) = date_to_epoch( $line, $self->format );
             if ( !$epoch ) {
-                next LINE if $multiline;
+                next LINE if $multiline || $self->skip_unparsable;
 
                 chomp($line);
                 die "Unparsable line: $line\n";
@@ -115,7 +115,7 @@ sub search {
         defined( my $line = $fh->getline ) or last;
         my ($epoch) = date_to_epoch( $line, $self->format );
         if ( !$epoch ) {
-            next if $multiline;
+            next if $multiline || $self->skip_unparsable;
             chomp($line);
             die "Unparsable line: $line\n";
         }

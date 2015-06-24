@@ -93,6 +93,10 @@ Additionally, dategrep supports named formats:
 
 Print all lines between the start and end line even if they are not timestamped.
 
+=item --skip-unparsable
+
+Ignore all lines without timestamp. Disables I<--multiline>.
+
 =item --blocksize SIZE
 
 SIZE of the intervals used in the binary search. Defaults to the native

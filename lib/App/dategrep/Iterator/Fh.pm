@@ -27,6 +27,7 @@ sub get_entry {
         }
         my ( $epoch, $error ) = date_to_epoch( $entry, $self->format );
         if ( !$epoch ) {
+            next LINE if $self->skip_unparsable;
             die "Unparsable line: $entry\n";
         }
         if ( $epoch >= $self->end ) {
