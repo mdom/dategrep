@@ -7,38 +7,39 @@ use FileHandle;
 extends 'App::dategrep::Iterator';
 
 has fh => ( is => 'ro', required => 1 );
-has eof => ( is => 'rw', default => sub { 0 } );
+has end_passed => ( is => 'rw', default => sub { 0 } );
 
 sub get_entry {
     my $self = shift;
 
-    ## when we find the first line that was logged at $end, we
-    ## just return undef and set $found_end to one. We check
-    ## $found_end directly at the beginning of the iterator
-    ## function. If its true, we just return undef without
-    ## checking the date of the line.
-
-    return if $self->eof();
+    return if $self->end_passed || $self->fh->eof;
 
   LINE:
-    while ( my $line = $self->getline ) {
-        my ( $epoch, $error ) = date_to_epoch( $line, $self->format );
-        if ( !$epoch ) {
-            if ( $self->multiline ) {
-                return $line;
+    while ( my $entry = $self->getline() ) {
+
+        if ( $self->multiline ) {
+            while (!$self->fh->eof
+                && !$self->end_passed
+                && !$self->next_line_has_date )
+            {
+                $entry .= $self->getline();
             }
-            die "Unparsable line: $line\n";
+        }
+        my ( $epoch, $error ) = date_to_epoch( $entry, $self->format );
+        if ( !$epoch ) {
+            die "Unparsable line: $entry\n";
         }
         if ( $epoch >= $self->end ) {
-            $self->eof(1);
+            $self->end_passed(1);
             return;
         }
 
-        if ( $epoch >= $self->start ) {
-            return $line;
-        }
+        next LINE if $epoch < $self->start;
+
+        return $entry;
     }
     return;
+
 }
 
 1;
