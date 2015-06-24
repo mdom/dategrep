@@ -1,0 +1,193 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use App::dategrep;
+
+exit App::dategrep::run();
+
+__END__
+
+=pod
+
+=for stopwords dategrep DATESPEC datespec syslog apache blocksize zcat bzcat rsyslog timestamped logrotate ARGV Domgoergen merchantability configfile !syslog
+
+=for HTML <a href="https://travis-ci.org/mdom/dategrep"><img src="https://travis-ci.org/mdom/dategrep.svg?branch=master"></a>
+
+=for HTML <a href='https://coveralls.io/r/mdom/dategrep?branch=master'><img src='https://coveralls.io/repos/mdom/dategrep/badge.png?branch=master' alt='Coverage Status' /></a> 
+
+=head1 NAME
+
+dategrep - print lines matching a date range
+
+=head1 SYNOPSIS
+
+  dategrep --start "12:00" --end "12:15" --format "%b %d %H:%M:%S" syslog
+  dategrep --end "12:15" --format "%b %d %H:%M:%S" syslog
+  dategrep --last-minutes 5 --format "%b %d %H:%M:%S" syslog
+  dategrep --last-minutes 5 --format rsyslog syslog
+  cat syslog | dategrep --end "12:15"
+
+=head1 DESCRIPTION
+
+dategrep searches the named input files for lines matching a date range
+and prints them to stdout.
+
+If dategrep works on a seekable file, it can do a binary search to find
+the first and last line to print pretty efficiently. dategrep can also
+read from stdin and compressed files, but it has to parse every single
+line until the end of the range for those.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --start|--from DATESPEC
+
+Print all lines from DATESPEC inclusively. Defaults to Jan 1, 1970 00:00:00 GMT.
+See
+L<VALID-DATE-FORMATS|https://metacpan.org/pod/distribution/Date-Manip/lib/Date/Manip/Date.pod#VALID-DATE-FORMATS>
+for a list of possible formats for DATESPEC.
+
+Additional it's possible to express offsets against dates by using the special
+syntax I<$delta from $date>, for example
+
+  --from "1 hour ago from -17:00" --to "-17:00"
+
+would search entries from 16:17 to 17:17 if we had now 17:30.
+
+=item --end|--to DATESPEC
+
+Print all lines until DATESPEC exclusively. Default to the current time. See I<--start>
+for a list of possible formats for DATESPEC.
+
+=item --last-minutes MINUTES
+
+Print all lines from MINUTES minutes ago until the beginning of the current
+minute. So if we have 19:25:43 and MINUTES is five, dategrep will print all
+lines from 19:20:00 to 19:24:59.
+
+=item --format FORMAT
+
+Defines a strftime-based FORMAT that is used to parse the input
+lines for a date. The first date found on a line is used. The
+list of possible escape sequences can be found under L<PRINTF
+DIRECTIVES|https://metacpan.org/pod/distribution/Date-Manip/lib/Date/Manip/Date.pod#PRINTF-DIRECTIVES>.
+
+This is a required parameter. Alternatively you can supply the format
+via the environment variable I<DATEGREP_DEFAULT_FORMAT>.
+
+Additionally, dategrep supports named formats:
+
+=over 4
+
+=item * rsyslog "%b %e %H:%M:%S"
+
+=item * apache "%d/%b/%Y:%T %z"
+
+=item * iso8601 "%O%Z"
+
+=back
+
+=item --multiline
+
+Print all lines between the start and end line even if they are not timestamped.
+
+=item --skip-unparsable
+
+Ignore all lines without timestamp. Disables I<--multiline>.
+
+=item --blocksize SIZE
+
+SIZE of the intervals used in the binary search. Defaults to the native
+blocksize of the file's filesystem or 8129.
+
+=item --interleave
+
+Print lines sorted by timestamp even if the timestamps in the input files
+are overlapping.
+
+=item --sort-files
+
+Sort files in the order of the first line with a timestamp. For example:
+If you have a common logrotate configuration, you probably have files
+like syslog, syslog.1, syslog.2 etc. For dategrep to work we need those
+files in reverse order: syslog.2, syslog.1, syslog. This options handles
+that for you.
+
+=item --configfile FILE
+
+Reads configuration from FILE instead of I<~/.dategreprc>.
+
+=item --help 
+
+Shows a short help message
+
+=item --man
+
+Shows the complete man page in your pager.
+
+=back
+
+=head1 CONFIGURATION FILE
+
+On startup dategrep reads a configuration file from I<$HOME/.dategreprc> or the
+file specified by I<--configfile>. 
+
+The file consists of sections and variables. A section begins with the name of
+the section in square brackets and continues until the next section begins.
+Section names are not case sensitive. Empty lines and lines with comments are
+skipped. Comments are started with a hash character. dategrep recognizes
+only one sections: Under I<formats> you can list additional named formats.
+
+Example:
+
+  [formats]
+  time = %H:%M:%S
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item DATEGREP_DEFAULT_FORMAT
+
+Default for the I<--format> parameter. The syntax is described there.
+
+=back
+
+=head1 COMPRESSED FILES
+
+dategrep has only minimal support for compressed files. If any file in
+ARGV has an extension like I<.z>,I<.gz>,I<.bz2>,I<.bz>, dategrep will
+call I<zcat> or I<bzcat> respectively and read from it like from stdin.
+
+=head1 LIMITATION
+
+dategrep expects the files to be sorted. If the timestamps are not
+ascending, dategrep might be exiting before the last line in its date
+range is printed.
+
+Compressed files are just piped into dategrep via bzcat or zcat.
+
+=head1 SEE ALSO
+
+L<https://metacpan.org/pod/Date::Manip>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2014 Mario Domgoergen C<< <mario@domgoergen.com> >>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+=cut

@@ -1,0 +1,52 @@
+0.54 2015-06-23T17:53:15Z
+  - use FileHandle instead of IO::File and IO::Handle
+
+0.53 2015-06-20T20:33:29Z
+  - use IO::File to get seek on fh
+  - add dependency on Moo
+  - removed installation section from man page
+  - fixed errors in README
+
+0.52 2015-06-18T19:42:43Z
+  - remove pod to document functions which cluttered the main documentation
+    on CPAN
+
+0.51 2015-06-17
+  - better handling of multiline logs
+  - added --version
+  - smaller standalone scripts by striping them
+  - updated documention (thanks szepeviktor!)
+  - switched to Dist::Zilla
+  - moved unmaintained emacs mode to contrib
+  - using oo based iterators with Moo
+
+0.50 2015-02-21
+  - don't abort search without a date on first line
+  - added a lot of function documentation
+  - parse intervals in --start and --end
+  - new option --byte-offset to return start and end in byte offsets
+  - fixed uncompressing gzip files on Mac OS X
+
+0.14 2014-05-08
+  - removed file existance check for undefined config variable
+
+0.12 2014-05-06
+  - runs on older perls
+  - runs on windows
+  - use --format to parse --start and --end
+  - added links to github
+  - test_requires needs at least Module::Build 0.4004
+
+0.10 2014-05-03
+  - Swap end and start time if end < start
+  - New options --sort-files: sort input filesj
+  - New options --blocksize: specifiy blocksize for random access
+  - Optimization: cache date object
+  - Added minimal support for compressed files
+  - Read from stdin if no files are provided
+  - New option --interleave: sort overlapping input files
+  - convert dategrep to module
+  - improved coverage 
+
+0.01 2014-04-08
+  - Initial release

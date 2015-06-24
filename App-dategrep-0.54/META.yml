@@ -1,0 +1,45 @@
+---
+abstract: 'grep for dates'
+author:
+  - 'Mario Domgoergen C<< <mario@domgoergen.com> >>'
+build_requires:
+  FindBin: '0'
+  IPC::Cmd: '0'
+  POSIX: '0'
+  Test::MockTime: '0'
+  Test::More: '0'
+  Test::Output: '0'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.035, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-dategrep
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Config::Tiny: '0'
+  Date::Manip: '0'
+  Fcntl: '0'
+  FileHandle: '0'
+  Getopt::Long: '0'
+  Moo: '0'
+  Pod::Usage: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/mdom/dategrep/issues
+  homepage: https://github.com/mdom/dategrep
+  repository: https://github.com/mdom/dategrep.git
+version: '0.54'
+x_contributors:
+  - 'Mario Domgoergen <mario@domgoergen.com>'
+  - 'Mario Domgoergen <mdom@taz.de>'

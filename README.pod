@@ -1,0 +1,115 @@
+=pod
+
+=for stopwords dategrep DATESPEC datespec syslog apache blocksize zcat bzcat rsyslog timestamped logrotate ARGV Domgoergen merchantability configfile !syslog
+
+=for HTML <a href="https://travis-ci.org/mdom/dategrep"><img src="https://travis-ci.org/mdom/dategrep.svg?branch=master"></a>
+
+=for HTML <a href='https://coveralls.io/r/mdom/dategrep?branch=master'><img src='https://coveralls.io/repos/mdom/dategrep/badge.png?branch=master' alt='Coverage Status' /></a> 
+
+=head1 NAME
+
+dategrep - print lines matching a date range
+
+=head1 DESCRIPTION
+
+Do you even remember how often in your life you needed to find lines in a log
+file falling in a date range? And how often you build brittle regexs in grep to
+match entries spanning over a hour change?
+
+dategrep hopes to solve this problem once and for all.
+
+If dategrep works on a normal file, it can do a binary search to find the first
+and last line to print pretty efficiently. dategrep can also read from stdin
+and compressed files, but as it can't do any seeking in those files, we have to
+parse every line until we find the first falling in our date range. But at
+least we don't have to wait for the pipe to be closed. As soon as we find the
+first date not in the range, dategrep terminates.
+
+=head1 EXAMPLES
+
+But just let me show you a few examples. Take a look at the
+L<man|https://metacpan.org/pod/distribution/App-dategrep/bin/dategrep> page, if
+you want to skip those and directly see all the bells and whistles.
+
+The only parameter dategrep really needs is I<format> to tell it how to
+reckognize a timestamp. In this case dategrep matches all lines from epoch to
+the time dategrep started. In this case it's just a glorified cat that knows
+when to stop.
+
+  dategrep --format "%b %d %H:%M:%S" syslog
+
+Besides the format specifiers, which are very similar to the ones used
+by I<strptime>, dategrep knows about a few named formats like rsyslog
+or apache.
+
+  dategrep --format apache access.log
+
+But things start to get interesting if you add the I<start> and I<end> options.
+
+  dategrep --start 12:00 --end 12:15 --format rsyslog syslog
+
+If you leave one out it again either defaults to epoch or now.
+
+  dategrep --end 12:15 --format rsyslog syslog
+
+If your like me, you often need to call dategrep from cron and need to get all
+lines from the last five minutes. So there's an easy shortcut for that.
+
+  dategrep --last-minutes 5 --format rsyslog syslog
+
+Pipes or zipped files can also be handled, but those will be slower to filter. It's often more efficient to just search on an unzipped file or redirect the lines from the pipe to file first. But nothing is stopping you to just call dategrep directly.
+
+  cat syslog | dategrep --end 12:15
+  dategrep --end 12:15 syslog.gz
+
+=head1 INSTALLATION
+
+It is possible to install this script via perl normal install routines. 
+
+  perl Build.PL
+  ./Build
+  ./Build install
+
+Or via CPAN:
+
+  cpan App::dategrep
+
+You can also install one of the two prebuild versions, which already
+include all or same of dategreps dependencies. Which to choose
+mainly depends on how hard it is for you to install Date::Manip. The
+small version is just 22.3KB big and includes all libraries except
+Date::Manip. The big one packs everything in a nice, neat package for you,
+but will cost you almost 10MB of disk space. Both are always included
+in the L<latest release|https://github.com/mdom/dategrep/releases/latest>.
+
+So, to install the big version you could just type:
+
+  wget https://github.com/mdom/dategrep/releases/download/$release/dategrep-standalone-big
+  cp dategrep-standalone-big.pl ~/bin/dategrep
+  chmod +x ~/bin/dategrep
+
+And for the small one (with the apt-get for Debian):
+
+  wget https://github.com/mdom/dategrep/releases/download/$release/dategrep-standalone-small
+  cp dategrep-standalone-small.pl ~/bin/dategrep
+  chmod +x ~/bin/dategrep
+  apt-get install libdate-manip-perl
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2014 Mario Domgoergen C<< <mario@domgoergen.com> >>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+=cut

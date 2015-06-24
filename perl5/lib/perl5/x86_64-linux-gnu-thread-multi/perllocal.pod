@@ -1,0 +1,198 @@
+=head2 Tue Jun 23 15:00:30 2015: C<Module> L<Try::Tiny|Try::Tiny>
+
+=over 4
+
+=item *
+
+C<installed into: /home/devel/mdom/github/dategrep/perl5/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.22>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Jun 23 15:00:31 2015: C<Module> L<Test::Fatal|Test::Fatal>
+
+=over 4
+
+=item *
+
+C<installed into: /home/devel/mdom/github/dategrep/perl5/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.014>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Jun 23 15:00:35 2015: C<Module> L<Role::Tiny|Role::Tiny>
+
+=over 4
+
+=item *
+
+C<installed into: /home/devel/mdom/github/dategrep/perl5/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.000001>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Jun 23 15:02:05 2015: C<Module> L<ExtUtils::MakeMaker|ExtUtils::MakeMaker>
+
+=over 4
+
+=item *
+
+C<installed into: /home/devel/mdom/github/dategrep/perl5/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 7.04>
+
+=item *
+
+C<EXE_FILES: bin/instmodsh>
+
+=back
+
+=head2 Tue Jun 23 15:02:07 2015: C<Module> L<Test::Requires|Test::Requires>
+
+=over 4
+
+=item *
+
+C<installed into: /home/devel/mdom/github/dategrep/perl5/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.08>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Jun 23 15:02:12 2015: C<Module> L<Class::Method::Modifiers|Class::Method::Modifiers>
+
+=over 4
+
+=item *
+
+C<installed into: /home/devel/mdom/github/dategrep/perl5/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.11>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Jun 23 15:02:16 2015: C<Module> L<Sub::Exporter::Progressive|Sub::Exporter::Progressive>
+
+=over 4
+
+=item *
+
+C<installed into: /home/devel/mdom/github/dategrep/perl5/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.001011>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Jun 23 15:02:19 2015: C<Module> L<Devel::GlobalDestruction|Devel::GlobalDestruction>
+
+=over 4
+
+=item *
+
+C<installed into: /home/devel/mdom/github/dategrep/perl5/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.13>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Jun 23 15:02:29 2015: C<Module> L<Moo|Moo>
+
+=over 4
+
+=item *
+
+C<installed into: /home/devel/mdom/github/dategrep/perl5/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.000001>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+

@@ -1,0 +1,49 @@
+{
+   "abstract" : "Only use Sub::Exporter if you need it",
+   "author" : [
+      "frew - Arthur Axel Schmidt (cpan:FREW) <frioux+cpan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.8, CPAN::Meta::Converter version 2.132830, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sub-Exporter-Progressive",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Sub-Exporter-Progressive"
+      },
+      "homepage" : "http://search.cpan.org/dist/Sub-Exporter-Progressive/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.shadowcat.co.uk/p5sagit/Sub-Exporter-Progressive.git"
+      }
+   },
+   "version" : "0.001011"
+}

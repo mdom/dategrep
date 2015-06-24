@@ -1,0 +1,81 @@
+{
+   "abstract" : "Checks to see if the module can be loaded",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom @*(#RJKLFHFSDLJF gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Requires",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::Builder::Module" : "0",
+            "Test::More" : "0.61",
+            "perl" : "5.008_001"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Requires" : {
+         "file" : "lib/Test/Requires.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Test-Requires/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Test-Requires",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/Test-Requires.git",
+         "web" : "https://github.com/tokuhirom/Test-Requires"
+      }
+   },
+   "version" : "0.08",
+   "x_contributors" : [
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",
+      "gfx <gfuji@cpan.org>",
+      "Toby Inkster <mail@tobyinkster.co.uk>",
+      "Neil Bowers <neil@bowers.com>",
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>"
+   ]
+}
