@@ -34,8 +34,10 @@ sub get_entry {
     ## TODO can $tell_end be undefined?
     return
       if defined( $self->tell_end ) && ( $self->fh->tell > $self->tell_end );
-    if ( $self->multiline && !$self->fh->eof && !$self->next_line_has_date ) {
-        $line .= $self->getline();
+    if ( $self->multiline ) {
+	while ( !$self->fh->eof && !$self->next_line_has_date ) {
+		$line .= $self->getline();
+	}
     }
     return $line;
 }
