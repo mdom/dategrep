@@ -11,17 +11,17 @@ has 'format' => ( is => 'rw', required => 1 );
 has 'fh' => ( is => 'lazy' );
 has 'skip_unparsable' => ( is => 'ro', default => sub { 0 } );
 
-has 'buffer' => (
+has 'next_line' => (
     is      => 'rw',
     clearer => 1,
 );
 
 sub peek {
     my $self = shift;
-    if ( not defined $self->buffer ) {
-        $self->buffer( $self->fh->getline );
+    if ( not defined $self->next_line ) {
+        $self->next_line( $self->fh->getline );
     }
-    return $self->buffer;
+    return $self->next_line;
 }
 
 sub next_line_has_date {
@@ -32,10 +32,10 @@ sub next_line_has_date {
 
 sub getline {
     my $self = shift;
-    my $buffer = $self->buffer();
-    if ( defined $buffer ) {
-        $self->clear_buffer();
-        return $buffer;
+    my $next_line = $self->next_line();
+    if ( defined $next_line ) {
+        $self->clear_next_line();
+        return $next_line;
     }
     return $self->fh->getline;
 };
