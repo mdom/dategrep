@@ -9,7 +9,7 @@ extends 'App::dategrep::Iterator';
 has fh => ( is => 'ro', required => 1 );
 has end_passed => ( is => 'rw', default => sub { 0 } );
 
-sub get_entry {
+sub get_entry_unbuffered {
     my $self = shift;
 
     return if $self->end_passed || $self->fh->eof;

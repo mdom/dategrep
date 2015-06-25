@@ -28,7 +28,7 @@ sub _build_fh {
     return $fh;
 }
 
-sub get_entry {
+sub get_entry_unbuffered {
     my $self = shift;
     my $line = $self->getline();
     ## TODO can $tell_end be undefined?

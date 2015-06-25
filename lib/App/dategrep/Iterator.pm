@@ -16,7 +16,12 @@ has 'next_line' => (
     clearer => 1,
 );
 
-sub peek {
+has 'next_entry' => (
+    is      => 'rw',
+    clearer => 1,
+);
+
+sub peek_line {
     my $self = shift;
     if ( not defined $self->next_line ) {
         $self->next_line( $self->fh->getline );
@@ -24,10 +29,28 @@ sub peek {
     return $self->next_line;
 }
 
+sub peek_entry {
+    my $self = shift;
+    if ( not defined $self->next_entry ) {
+        $self->next_entry( $self->get_entry_unbuffered );
+    }
+    return $self->next_entry;
+}
+
 sub next_line_has_date {
     my $self = shift;
-    my ($epoch) = date_to_epoch( $self->peek, $self->format );
+    my ($epoch) = date_to_epoch( $self->peek_line, $self->format );
     return defined $epoch;
+}
+
+sub get_entry {
+    my $self = shift;
+    my $next_entry = $self->next_entry();
+    if ( defined $next_entry ) {
+        $self->clear_next_entry();
+        return $next_entry;
+    }
+    return $self->get_entry_unbuffered;
 }
 
 sub getline {

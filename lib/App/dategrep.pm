@@ -162,7 +162,7 @@ sub run {
 sub guess_format {
     my ($formats, @iterators) = @_;
     for my $iterator (@iterators) {
-        my $line = $iterator->peek;
+        my $line = $iterator->peek_line;
         for my $format ( @$formats ) {
             my $epoch = date_to_epoch( $line, $format );
             if ( defined $epoch ) {
@@ -213,13 +213,12 @@ sub sort_iterators {
 
     my @timestamps;
     for my $iterator (@iterators) {
-        my $line = $iterator->peek;
+        my $entry = $iterator->peek_entry;
         
         ## remove all iterators with eof
-        next if not defined $line;
+        next if not defined $entry;
 
-        ## TODO What should we do under --multiline?
-        my ( $epoch, $error ) = date_to_epoch( $line, $format );
+        my ( $epoch, $error ) = date_to_epoch( $entry, $format );
         if ( !$epoch ) {
             ## TODO Which iterator produced the error?
             die "No date found in first line: $error\n";
