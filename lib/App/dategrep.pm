@@ -3,9 +3,7 @@ use warnings;
 
 package App::dategrep;
 use App::dategrep::Date qw(intervall_to_epoch date_to_epoch minutes_ago);
-use App::dategrep::Iterator::File;
-use App::dategrep::Iterator::Stdin;
-use App::dategrep::Iterator::Uncompress;
+use App::dategrep::Iterators;
 use Config::Tiny;
 use Pod::Usage;
 use Getopt::Long;
@@ -134,20 +132,23 @@ sub run {
             }
         }
 
-        my @iterators =
-          map { get_iterator( $_, $start, $end, %options ) } @ARGV;
-
+        my $iterators = App::dategrep::Iterators->new(
+            %options,
+            filenames => \@ARGV,
+            start     => $start,
+            end       => $end,
+        );
 
         if ( $options{'interleave'} ) {
-            interleave_iterators( $options{'format'}, @iterators );
+            $iterators->interleave();
             return 0;
         }
 
         if ( $options{'sort-files'} ) {
-            @iterators = sort_iterators( $options{'format'}, @iterators );
+            $iterators->sort();
         }
 
-        for my $iter (@iterators) {
+        for my $iter ($iterators->as_array) {
             if ($iter) {
                 while ( my $entry = $iter->get_entry ) {
                     print $entry;
@@ -173,60 +174,6 @@ sub guess_format {
     return;
 }
 
-sub interleave_iterators {
-    my ( $format, @iterators ) = @_;
-
-    while ( @iterators = sort_iterators( $format, @iterators ) ) {
-        print $iterators[0]->get_entry;
-    }
-    return;
-}
-
-sub get_iterator {
-    my ( $filename, $start, $end, %options ) = @_;
-    my ( $multiline, $format ) = @options{qw(multiline format)};
-    my @args = (
-        start           => $start,
-        end             => $end,
-        multiline       => $multiline,
-        format          => $format,
-        skip_unparsable => $options{'skip-unparsable'},
-    );
-    my $iter;
-    if ( $filename eq '-' ) {
-        $iter = App::dategrep::Iterator::Stdin->new(@args);
-    }
-    elsif ( $filename =~ /\.(bz|bz2|gz|z)$/ ) {
-        $iter =
-          App::dategrep::Iterator::Uncompress->new( @args,
-            filename => $filename );
-    }
-    else {
-        $iter =
-          App::dategrep::Iterator::File->new( @args, filename => $filename );
-    }
-    return $iter;
-}
-
-sub sort_iterators {
-    my ( $format, @iterators ) = @_;
-
-    my @timestamps;
-    for my $iterator (@iterators) {
-        my $entry = $iterator->peek_entry;
-        
-        ## remove all iterators with eof
-        next if not defined $entry;
-
-        my ( $epoch, $error ) = date_to_epoch( $entry, $format );
-        if ( !$epoch ) {
-            ## TODO Which iterator produced the error?
-            die "No date found in first line: $error\n";
-        }
-        push @timestamps, [ $epoch, $iterator ];
-    }
-    return map { $_->[1] } sort { $a->[0] <=> $b->[0] } @timestamps;
-}
 
 sub loadconfig {
     my $configfile = shift;
