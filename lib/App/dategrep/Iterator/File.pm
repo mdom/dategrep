@@ -47,7 +47,7 @@ sub byte_offsets {
     open( my $fh, '<', $filename ) or die "Can't open $filename: $!\n";
     my $test_line = $fh->getline;
     if ( defined($test_line) ) {
-        my ( $epoch, $error ) = $self->date_to_epoch( $test_line );
+        my ( $epoch, $error ) = $self->to_epoch( $test_line );
         if ($error) {
             die "No date found in first line: $error\n";
         }
@@ -87,7 +87,7 @@ sub search {
         $fh->seek($mid * $blksize, 0 ) or return;
         $fh->getline if $mid;    # probably a partial line
       LINE: while ( my $line = $fh->getline() ) {
-            my ($epoch) = $self->date_to_epoch( $line );
+            my ($epoch) = $self->to_epoch( $line );
             if ( !$epoch ) {
                 next LINE if $multiline || $self->skip_unparsable;
 
@@ -112,7 +112,7 @@ sub search {
     for ( ; ; ) {
         $min = $fh->tell;
         defined( my $line = $fh->getline ) or last;
-        my ($epoch) = $self->date_to_epoch( $line );
+        my ($epoch) = $self->to_epoch( $line );
         if ( !$epoch ) {
             next if $multiline || $self->skip_unparsable;
             chomp($line);

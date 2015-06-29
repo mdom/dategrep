@@ -24,7 +24,7 @@ sub get_entry_unbuffered {
                 $entry .= $self->getline();
             }
         }
-        my ( $epoch, $error ) = $self->date_to_epoch( $entry );
+        my ( $epoch, $error ) = $self->to_epoch( $entry );
         if ( !$epoch ) {
             next LINE if $self->skip_unparsable;
             die "Unparsable line: $entry\n";
