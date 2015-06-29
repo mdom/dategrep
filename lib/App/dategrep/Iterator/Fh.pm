@@ -1,7 +1,6 @@
 package App::dategrep::Iterator::Fh;
 use strict;
 use warnings;
-use App::dategrep::Date 'date_to_epoch';
 use Moo;
 use FileHandle;
 extends 'App::dategrep::Iterator';
@@ -25,7 +24,7 @@ sub get_entry_unbuffered {
                 $entry .= $self->getline();
             }
         }
-        my ( $epoch, $error ) = date_to_epoch( $entry, $self->format );
+        my ( $epoch, $error ) = $self->date_to_epoch( $entry );
         if ( !$epoch ) {
             next LINE if $self->skip_unparsable;
             die "Unparsable line: $entry\n";

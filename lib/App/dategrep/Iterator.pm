@@ -39,8 +39,13 @@ sub peek_entry {
 
 sub next_line_has_date {
     my $self = shift;
-    my ($epoch) = date_to_epoch( $self->peek_line, $self->format );
+    my ($epoch) = $self->date_to_epoch( $self->peek_line );
     return defined $epoch;
+}
+
+sub date_to_epoch {
+    my ( $self, $line ) = @_;
+    return date_to_epoch( $line, $self->format );
 }
 
 sub get_entry {
