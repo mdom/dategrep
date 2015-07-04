@@ -21,9 +21,7 @@ sub _build_fh {
     my ( $fh, $tell_beg, $tell_end ) = $self->byte_offsets();
     $self->tell_beg($tell_beg);
     $self->tell_end($tell_end);
-    if ( defined($tell_beg) ) {
-        $fh->seek( $tell_beg, SEEK_SET );
-    }
+    $fh->seek( $tell_beg, SEEK_SET );
     return $fh;
 }
 
