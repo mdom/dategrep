@@ -31,6 +31,15 @@ test_dategrep([
     '--format=%Y-%m-%d %H:%M',
     '--start=2014-03-23 14:15',
     '--end=2014-03-23 14:17',
+    "$Bin/files/does_note_exists.log"
+    ], <<"EOF",'access missing file');
+dategrep: Can't open $Bin/files/does_note_exists.log: No such file or directory
+EOF
+
+test_dategrep([
+    '--format=%Y-%m-%d %H:%M',
+    '--start=2014-03-23 14:15',
+    '--end=2014-03-23 14:17',
     "$Bin/files/test03.log"
     ], <<"EOF",'Missing date on first line');
 dategrep: No date found in first line: [parse] Invalid date string
