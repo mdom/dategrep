@@ -27,6 +27,15 @@ test_dategrep([ '--end=32.13.2013', '--start=01.04.2014','--format=%Y-%m-%d %H:%
 dategrep: Illegal end time.
 EOF
 
+test_dategrep([
+    '--format=%Y-%m-%d %H:%M',
+    '--start=2014-03-23 14:15',
+    '--end=2014-03-23 14:17',
+    "$Bin/files/test03.log"
+    ], <<"EOF",'Missing date on first line');
+dategrep: No date found in first line: [parse] Invalid date string
+EOF
+
 # files with line before and after date range
 test_dategrep([
     '--format=%Y-%m-%d %H:%M',
