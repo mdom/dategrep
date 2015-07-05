@@ -66,9 +66,7 @@ Pipes or zipped files can also be handled, but those will be slower to filter. I
 
 It is possible to install this script via perl normal install routines. 
 
-  perl Build.PL
-  ./Build
-  ./Build install
+  perl Makefile.PL && make && make install
 
 Or via CPAN:
 

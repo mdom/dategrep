@@ -12,9 +12,9 @@ INSTALLATION
 
 It is possible to install this script via perl normal install routines. 
 
-  perl Build.PL
-  ./Build
-  ./Build install
+  perl Makefile.PL
+  make
+  make install
 
 SUPPORT AND DOCUMENTATION
 
