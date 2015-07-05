@@ -155,7 +155,7 @@ test_dategrep([
     '--debug=time',
     "$Bin/files/test01.log"
     ], <<'EOF','debug time');
-Start: 1395580500 End: 1395580620
+Start: 1395584100 End: 1395584220
 EOF
 
 {
