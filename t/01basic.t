@@ -150,8 +150,8 @@ test_dategrep([
 EOF
 
 test_dategrep([
-    '--end=2014-03-23 14:15',
-    '--start=2014-03-23 14:17',
+    '--end=2014-03-23T14:15Z',
+    '--start=2014-03-23T14:17Z',
     '--debug=time',
     "$Bin/files/test01.log"
     ], <<'EOF','debug time');
