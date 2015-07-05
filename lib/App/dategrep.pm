@@ -160,21 +160,6 @@ sub run {
     return 0;
 }
 
-sub guess_format {
-    my ($formats, @iterators) = @_;
-    for my $iterator (@iterators) {
-        my $line = $iterator->peek_line;
-        for my $format ( @$formats ) {
-            my $epoch = date_to_epoch( $line, $format );
-            if ( defined $epoch ) {
-                return $format;
-            }
-        }
-    }
-    return;
-}
-
-
 sub loadconfig {
     my $configfile = shift;
     if ( not $configfile and $ENV{HOME} ) {
