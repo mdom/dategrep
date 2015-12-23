@@ -13,7 +13,9 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "App-dategrep",
-  "EXE_FILES" => [],
+  "EXE_FILES" => [
+    "bin/dategrep"
+  ],
   "LICENSE" => "artistic_2",
   "MIN_PERL_VERSION" => "5.008005",
   "NAME" => "App::dategrep",
