@@ -16,8 +16,6 @@ tzset;
 
 set_absolute_time(1395584450);
 
-diag scalar gmtime();
-
 $ENV{DATEGREP_DEFAULT_FORMAT} = '%Y-%m-%d %H:%M';
 
 ## this should be a test for --start "14:15" --end "14:20"
