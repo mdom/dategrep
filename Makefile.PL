@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008005;
+
 
 use ExtUtils::MakeMaker;
 
@@ -12,32 +12,40 @@ my %WriteMakefileArgs = (
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
-  "DISTNAME" => "App-dategrep",
+  "DISTNAME" => "dategrep",
   "EXE_FILES" => [
     "bin/dategrep"
   ],
-  "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.008005",
-  "NAME" => "App::dategrep",
+  "LICENSE" => "gpl",
+  "NAME" => "dategrep",
   "PREREQ_PM" => {
     "Config::Tiny" => 0,
-    "Date::Manip" => 0,
+    "Date::Manip::Date" => 0,
+    "Date::Manip::Delta" => 0,
+    "Exporter" => 0,
     "Fcntl" => 0,
+    "File::Basename" => 0,
     "FileHandle" => 0,
     "Getopt::Long" => 0,
+    "IO::Uncompress::Bunzip2" => 0,
+    "IO::Uncompress::Gunzip" => 0,
     "IPC::Cmd" => 0,
     "Moo" => 0,
-    "Pod::Usage" => 0
+    "Pod::Usage" => 0,
+    "base" => 0,
+    "parent" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "FindBin" => 0,
-    "IPC::Cmd" => 0,
     "POSIX" => 0,
     "Test::MockTime" => 0,
     "Test::More" => 0,
-    "Test::Output" => 0
+    "Test::Output" => 0,
+    "lib" => 0
   },
-  "VERSION" => "0.55",
+  "VERSION" => "0.54",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,19 +54,29 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Config::Tiny" => 0,
-  "Date::Manip" => 0,
+  "Date::Manip::Date" => 0,
+  "Date::Manip::Delta" => 0,
+  "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "Fcntl" => 0,
+  "File::Basename" => 0,
   "FileHandle" => 0,
   "FindBin" => 0,
   "Getopt::Long" => 0,
+  "IO::Uncompress::Bunzip2" => 0,
+  "IO::Uncompress::Gunzip" => 0,
   "IPC::Cmd" => 0,
   "Moo" => 0,
   "POSIX" => 0,
   "Pod::Usage" => 0,
   "Test::MockTime" => 0,
   "Test::More" => 0,
-  "Test::Output" => 0
+  "Test::Output" => 0,
+  "base" => 0,
+  "lib" => 0,
+  "parent" => 0,
+  "strict" => 0,
+  "warnings" => 0
 );
 
 

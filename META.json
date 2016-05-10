@@ -4,57 +4,61 @@
       "Mario Domgoergen C<< <mario@domgoergen.com> >>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.035, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 5.035, CPAN::Meta::Converter version 2.150001",
    "license" : [
-      "artistic_2"
+      "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : 2
    },
-   "name" : "App-dategrep",
+   "name" : "dategrep",
    "no_index" : {
       "directory" : [
          "t",
-         "xt",
-         "inc",
-         "share",
-         "eg",
-         "examples"
+         "xt"
       ]
    },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.039"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.15",
             "Test::Pod" : "1.41"
          }
       },
       "runtime" : {
          "requires" : {
             "Config::Tiny" : "0",
-            "Date::Manip" : "0",
+            "Date::Manip::Date" : "0",
+            "Date::Manip::Delta" : "0",
+            "Exporter" : "0",
             "Fcntl" : "0",
+            "File::Basename" : "0",
             "FileHandle" : "0",
             "Getopt::Long" : "0",
+            "IO::Uncompress::Bunzip2" : "0",
+            "IO::Uncompress::Gunzip" : "0",
+            "IPC::Cmd" : "0",
             "Moo" : "0",
             "Pod::Usage" : "0",
-            "perl" : "5.008005"
+            "base" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
             "FindBin" : "0",
-            "IPC::Cmd" : "0",
             "POSIX" : "0",
             "Test::MockTime" : "0",
             "Test::More" : "0",
-            "Test::Output" : "0"
+            "Test::Output" : "0",
+            "lib" : "0"
          }
       }
    },
@@ -73,7 +77,8 @@
    "version" : "0.54",
    "x_contributors" : [
       "Mario Domgoergen <mario@domgoergen.com>",
-      "Mario Domgoergen <mdom@taz.de>"
+      "Mario Domgoergen <mdom@taz.de>",
+      "Viktor Szépe <viktor@szepe.net>"
    ]
 }
 
