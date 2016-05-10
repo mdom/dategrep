@@ -1,3 +1,14 @@
+Revision history for Perl module App::dategrep
+
+{{$NEXT}}
+
+0.55  2016-05-10 15:52:41 CEST
+
+  - use IO::Uncompress for systems without bzip or gzip
+  - remove spurios empty lines
+  - added --skip-unparsable
+  - switch to plain dzil
+
 0.54 2015-06-23T17:53:15Z
   - use FileHandle instead of IO::File and IO::Handle
 
