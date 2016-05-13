@@ -2,6 +2,8 @@ Revision history for Perl module App::dategrep
 
 {{$NEXT}}
 
+  - Set LC_ALL=C to reliable test $!
+
 0.55  2016-05-10 15:52:41 CEST
 
   - use IO::Uncompress for systems without bzip or gzip

@@ -7,6 +7,9 @@ use Test::More;
 use FindBin qw($Bin);
 use lib "$Bin/lib";
 use Test::Dategrep;
+use POSIX qw(setlocale LC_ALL);
+
+setlocale( LC_ALL, 'C' );
 
 test_dategrep( [ '--format=%Y', "$Bin/files/empty" ], <<'EOF', "Empty files");
 EOF
