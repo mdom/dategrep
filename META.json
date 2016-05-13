@@ -74,7 +74,7 @@
          "web" : "https://github.com/mdom/dategrep"
       }
    },
-   "version" : "0.55",
+   "version" : "0.56",
    "x_contributors" : [
       "Mario Domgoergen <mario@domgoergen.com>",
       "Mario Domgoergen <mdom@taz.de>",

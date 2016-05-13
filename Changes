@@ -2,6 +2,8 @@ Revision history for Perl module App::dategrep
 
 {{$NEXT}}
 
+0.56  2016-05-13 12:40:03 CEST
+
   - Set LC_ALL=C to reliable test $!
 
 0.55  2016-05-10 15:52:41 CEST
