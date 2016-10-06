@@ -92,13 +92,11 @@ sub search {
                 chomp($line);
                 die "Unparsable line: $line\n";
             }
-            if ($multiline) {
-                my $byte = $fh->tell;
-                $mid = int( $byte / $blksize );
-            }
+
             $epoch < $key
-              ? $min = $mid
+              ? $min = int( ( $fh->tell - length($line) ) / $blksize )
               : $max = $mid;
+
             next BLOCK;
         }
     }
