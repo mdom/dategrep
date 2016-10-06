@@ -7,7 +7,6 @@ use App::dategrep::Iterators;
 use Config::Tiny;
 use Pod::Usage;
 use Getopt::Long;
-use Fcntl ":seek";
 use File::Basename qw(basename);
 use base 'Exporter';
 our @EXPORT_OK = qw(run);
