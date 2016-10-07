@@ -142,12 +142,12 @@ sub run {
             end       => $end,
         );
 
-        if ( $options{'interleave'} ) {
+        if ( $options{'interleave'} && @ARGV > 1 ) {
             $iterators->interleave();
             return 0;
         }
 
-        if ( $options{'sort-files'} ) {
+        if ( $options{'sort-files'} && @ARGV > 1 ) {
             $iterators->sort();
         }
 
