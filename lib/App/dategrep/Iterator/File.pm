@@ -82,7 +82,7 @@ sub search {
 
   BLOCK: while ( $max - $min > 1 ) {
         $mid = int( ( $max + $min ) / 2 );
-        $fh->seek($mid * $blksize, 0 ) or return;
+        $fh->seek($mid * $blksize, SEEK_SET ) or return;
         $fh->getline if $mid;    # probably a partial line
       LINE: while ( my $line = $fh->getline() ) {
             my ($epoch) = $self->to_epoch( $line );
@@ -103,7 +103,7 @@ sub search {
 
     # find the right line
     $min *= $blksize;
-    $fh->seek( $min, 0 ) or return;
+    $fh->seek( $min, SEEK_SET ) or return;
     $fh->getline if $min;    # probably a partial line
     for ( ; ; ) {
         $min = $fh->tell;
@@ -115,7 +115,7 @@ sub search {
             die "Unparsable line: $line\n";
         }
         if ( $epoch >= $key ) {
-            $fh->seek($min, 0 );
+            $fh->seek($min, SEEK_SET );
             return $min;
         }
     }
