@@ -2,6 +2,8 @@ Revision history for Perl module App::dategrep
 
 {{$NEXT}}
 
+0.57  2016-10-07 17:18:32 CEST
+
   - fixed bug with --multiline that resulted in an infinite loop with
     lines longer than block_size
   - use App::depak to generate standalone scripts

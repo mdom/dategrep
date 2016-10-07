@@ -4,15 +4,15 @@
       "Mario Domgoergen C<< <mario@domgoergen.com> >>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.035, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "gpl_3"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : 2
    },
-   "name" : "dategrep",
+   "name" : "App-dategrep",
    "no_index" : {
       "directory" : [
          "t",
@@ -23,10 +23,16 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
          }
       },
       "develop" : {
          "requires" : {
+            "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::PerlTidy" : "0",
             "Test::Pod" : "1.41"
          }
       },
@@ -74,11 +80,12 @@
          "web" : "https://github.com/mdom/dategrep"
       }
    },
-   "version" : "0.56",
+   "version" : "0.57",
    "x_contributors" : [
       "Mario Domgoergen <mario@domgoergen.com>",
       "Mario Domgoergen <mdom@taz.de>",
-      "Viktor Szépe <viktor@szepe.net>"
-   ]
+      "Viktor Sz\u00e9pe <viktor@szepe.net>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 
