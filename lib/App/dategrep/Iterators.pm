@@ -60,14 +60,15 @@ sub sort {
         }
         push @timestamps, [ $epoch, $iterator ];
     }
-    $self->iterators([ map { $_->[1] } sort { $a->[0] <=> $b->[0] } @timestamps ]);
+    $self->iterators(
+        [ map { $_->[1] } sort { $a->[0] <=> $b->[0] } @timestamps ] );
     return;
 }
 
 sub interleave {
     my $self = shift;
     while ( $self->sort, $self->iterators->[0] ) {
-	print $self->iterators->[0]->get_entry;
+        print $self->iterators->[0]->get_entry;
     }
     return;
 }

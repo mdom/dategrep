@@ -34,10 +34,14 @@ sub run {
     }
 
     my $rc = GetOptions(
-        \%options,        'start|from=s', 'end|to=s',     'format=s',
-        'last-minutes=i', 'multiline!',   'blocksize=i',  'help|?',
-        'sort-files',     'man',          'configfile=s', 'interleave',
-        'byte-offsets',   'debug=s', 'version!', 'skip-unparsable!',
+        \%options,        'start|from=s',
+        'end|to=s',       'format=s',
+        'last-minutes=i', 'multiline!',
+        'blocksize=i',    'help|?',
+        'sort-files',     'man',
+        'configfile=s',   'interleave',
+        'byte-offsets',   'debug=s',
+        'version!',       'skip-unparsable!',
     );
     if ( !$rc ) {
         pod2usage( -exitstatus => "NOEXIT", -verbose => 0 );
@@ -79,7 +83,7 @@ sub run {
     }
 
     if ( $options{'skip-unparsable'} ) {
-	    $options{'multiline'} = 0;
+        $options{'multiline'} = 0;
     }
 
     my ( $start, $end ) = ( 0, time() );
@@ -147,7 +151,7 @@ sub run {
             $iterators->sort();
         }
 
-        for my $iter ($iterators->as_array) {
+        for my $iter ( $iterators->as_array ) {
             if ($iter) {
                 while ( my $entry = $iter->get_entry ) {
                     print $entry;
@@ -168,7 +172,7 @@ sub loadconfig {
         return;
     }
 
-    my $config = Config::Tiny->read( $configfile );
+    my $config = Config::Tiny->read($configfile);
     if ( not defined $config ) {
         die "Error while parsing configfile: " . Config::Tiny->errstr() . "\n";
     }

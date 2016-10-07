@@ -20,7 +20,8 @@ EOF
 
 delete $ENV{HOME};
 
-test_dategrep(['--format=%Y-%m-%d %H:%M', "$Bin/files/test01.log"],<<'EOF','no configfile and empty $HOME');
+test_dategrep( [ '--format=%Y-%m-%d %H:%M', "$Bin/files/test01.log" ],
+    <<'EOF', 'no configfile and empty $HOME' );
 2014-03-23 14:14 line 1
 2014-03-23 14:15 line 1
 2014-03-23 14:16 line 1

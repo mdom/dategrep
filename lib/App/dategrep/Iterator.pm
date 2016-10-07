@@ -5,10 +5,10 @@ use Moo;
 use App::dategrep::Date qw(date_to_epoch);
 
 has 'multiline' => ( is => 'ro', default => sub { 0 } );
-has 'start' => ( is => 'rw', required => 1 );
-has 'end'   => ( is => 'rw', required => 1 );
+has 'start'  => ( is => 'rw', required => 1 );
+has 'end'    => ( is => 'rw', required => 1 );
 has 'format' => ( is => 'rw', required => 1 );
-has 'fh' => ( is => 'lazy' );
+has 'fh'     => ( is => 'lazy' );
 has 'skip_unparsable' => ( is => 'ro', default => sub { 0 } );
 
 has 'next_line' => (
@@ -49,7 +49,7 @@ sub to_epoch {
 }
 
 sub get_entry {
-    my $self = shift;
+    my $self       = shift;
     my $next_entry = $self->next_entry();
     if ( defined $next_entry ) {
         $self->clear_next_entry();
@@ -59,13 +59,13 @@ sub get_entry {
 }
 
 sub getline {
-    my $self = shift;
+    my $self      = shift;
     my $next_line = $self->next_line();
     if ( defined $next_line ) {
         $self->clear_next_line();
         return $next_line;
     }
     return $self->fh->getline;
-};
+}
 
 1;
