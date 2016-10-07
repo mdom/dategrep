@@ -226,16 +226,14 @@ in the L<latest release|https://github.com/mdom/dategrep/releases/latest>.
 
 So, to install the big version you could just type:
 
-  wget https://github.com/mdom/dategrep/releases/download/$release/dategrep-standalone-big
-  cp dategrep-standalone-big.pl ~/bin/dategrep
-  chmod +x ~/bin/dategrep
+  wget -O /usr/local/bin/dategrep https://github.com/mdom/dategrep/releases/download/v0.57/dategrep-standalone-big
+  chmod +x /usr/local/bin/dategrep
 
 And for the small one (with the apt-get for Debian):
 
-  wget https://github.com/mdom/dategrep/releases/download/$release/dategrep-standalone-small
-  cp dategrep-standalone-small.pl ~/bin/dategrep
-  chmod +x ~/bin/dategrep
   apt-get install libdate-manip-perl
+  wget -O /usr/local/bin/dategrep https://github.com/mdom/dategrep/releases/download/v0.57/dategrep-standalone-small
+  chmod +x /usr/local/bin/dategrep
 
 =head1 COPYRIGHT AND LICENSE
 
