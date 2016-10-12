@@ -142,20 +142,22 @@ sub run {
             end       => $end,
         );
 
+        for my $iter ( $iterators->as_array ) {
+            $iter->scan;
+        }
+
         if ( $options{'interleave'} && @ARGV > 1 ) {
             $iterators->interleave();
             return 0;
         }
 
         if ( $options{'sort-files'} && @ARGV > 1 ) {
-            $iterators->sort();
+            $iterators->sort;
         }
 
         for my $iter ( $iterators->as_array ) {
             if ($iter) {
-                while ( my $entry = $iter->get_entry ) {
-                    print $entry;
-                }
+                $iter->print;
             }
         }
     };

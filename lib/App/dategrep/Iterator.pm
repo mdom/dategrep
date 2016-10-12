@@ -4,68 +4,102 @@ use warnings;
 use Moo;
 use App::dategrep::Date qw(date_to_epoch);
 
-has 'multiline' => ( is => 'ro', default => sub { 0 } );
-has 'start'  => ( is => 'rw', required => 1 );
-has 'end'    => ( is => 'rw', required => 1 );
-has 'format' => ( is => 'rw', required => 1 );
-has 'fh'     => ( is => 'lazy' );
-has 'skip_unparsable' => ( is => 'ro', default => sub { 0 } );
+has multiline => ( is => 'ro', default => sub { 0 } );
+has start     => ( is => 'rw', required => 1 );
+has end       => ( is => 'rw', required => 1 );
+has format    => ( is => 'rw', required => 1 );
+has fh        => ( is => 'lazy' );
+has next_line => ( is => 'rw', clearer  => 1, );
+has next_date => ( is => 'rw' );
 
-has 'next_line' => (
-    is      => 'rw',
-    clearer => 1,
-);
+has skip_unparsable => ( is => 'ro', default => sub { 0 } );
 
-has 'next_entry' => (
-    is      => 'rw',
-    clearer => 1,
-);
+has eof => ( is => 'rw', default => 0 );
 
-sub peek_line {
-    my $self = shift;
-    if ( not defined $self->next_line ) {
-        $self->next_line( $self->fh->getline );
+sub print {
+    my ( $self, $until ) = @_;
+
+    $until ||= $self->end;
+    my $ignore = $self->multiline || $self->skip_unparsable;
+
+    if ( $self->next_line ) {
+        print $self->next_line;
     }
-    return $self->next_line;
+
+    while (1) {
+        my $line = $self->fh->getline;
+        if ( !$line ) {
+            $self->eof(1);
+            return;
+        }
+        my ( $date, $error ) = $self->to_epoch($line);
+        if ($date) {
+
+            $self->next_line($line);
+            $self->next_date($date);
+
+            if ( $date >= $self->end ) {
+                $self->eof(1);
+                return;
+            }
+            elsif ( $date >= $until ) {
+                return;
+            }
+            elsif ( $date < $self->start ) {
+                next;
+            }
+            else {
+                print $line;
+            }
+        }
+        elsif ( $self->multiline ) {
+            print $line;
+        }
+        elsif ( $self->skip_unparsable ) {
+            next;
+        }
+        else {
+            die "Can't find date on $line\n";
+        }
+    }
+    return;
 }
 
-sub peek_entry {
+sub scan {
     my $self = shift;
-    if ( not defined $self->next_entry ) {
-        $self->next_entry( $self->get_entry_unbuffered );
-    }
-    return $self->next_entry;
-}
+    my $ignore = $self->multiline || $self->skip_unparsable;
+    while (1) {
+        my $line = $self->fh->getline;
+        if ( !$line ) {
+            $self->eof(1);
+            return;
+        }
+        my ( $date, $error ) = $self->to_epoch($line);
 
-sub next_line_has_date {
-    my $self = shift;
-    my ($epoch) = $self->to_epoch( $self->peek_line );
-    return defined $epoch;
+        if ( !$date && $ignore ) {
+            next;
+        }
+        elsif ( !$date ) {
+            die "Can't find date on $line\n";
+        }
+        elsif ( $date < $self->start ) {
+            next;
+        }
+        elsif ( $date >= $self->start && $date < $self->end ) {
+            $self->next_line($line);
+            $self->next_date($date);
+            return;
+        }
+        else {
+            $self->eof(1);
+            return;
+        }
+    }
 }
 
 sub to_epoch {
     my ( $self, $line ) = @_;
     return date_to_epoch( $line, $self->format );
-}
-
-sub get_entry {
-    my $self       = shift;
-    my $next_entry = $self->next_entry();
-    if ( defined $next_entry ) {
-        $self->clear_next_entry();
-        return $next_entry;
-    }
-    return $self->get_entry_unbuffered;
-}
-
-sub getline {
-    my $self      = shift;
-    my $next_line = $self->next_line();
-    if ( defined $next_line ) {
-        $self->clear_next_line();
-        return $next_line;
-    }
-    return $self->fh->getline;
 }
 
 1;

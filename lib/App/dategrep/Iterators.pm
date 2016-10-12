@@ -46,29 +46,32 @@ sub BUILDARGS {
 sub sort {
     my $self = shift;
 
-    my @timestamps;
-    for my $iterator ( $self->as_array ) {
-        my $entry = $iterator->peek_entry;
+    my @iterators = @{ $self->iterators };
 
-        ## remove all iterators with eof
-        next if not defined $entry;
+    @iterators =
+      sort { $a->next_date <=> $b->next_date }
+      grep { !$_->eof } @iterators;
 
-        my ( $epoch, $error ) = date_to_epoch( $entry, $iterator->format );
-        if ( !$epoch ) {
-            ## TODO Which iterator produced the error?
-            die "No date found in first line: $error\n";
-        }
-        push @timestamps, [ $epoch, $iterator ];
-    }
-    $self->iterators(
-        [ map { $_->[1] } sort { $a->[0] <=> $b->[0] } @timestamps ] );
+    $self->iterators( \@iterators );
+
     return;
 }
 
 sub interleave {
     my $self = shift;
+
+    ## TODO
+    ## 1. read a file from each iterator and set next_line and next_time
+    ## 2. sort by next_time
+    ## 3. print lines from lowest iterator until it's next time is higer than the second lowest iterator.
+    ## 4. goto 2
+
     while ( $self->sort, $self->iterators->[0] ) {
-        print $self->iterators->[0]->get_entry;
+        my $until;
+        if ( $self->iterators->[1] ) {
+            $until = $self->iterators->[1]->next_date;
+        }
+        $self->iterators->[0]->print($until);
     }
     return;
 }

@@ -25,20 +25,6 @@ sub _build_fh {
     return $fh;
 }
 
-sub get_entry_unbuffered {
-    my $self = shift;
-    my $line = $self->getline();
-    ## TODO can $tell_end be undefined?
-    return
-      if defined( $self->tell_end ) && ( $self->fh->tell > $self->tell_end );
-    if ( $self->multiline ) {
-        while ( !$self->fh->eof && !$self->next_line_has_date ) {
-            $line .= $self->getline();
-        }
-    }
-    return $line;
-}
-
 sub byte_offsets {
     my $self     = shift;
     my $filename = $self->filename;

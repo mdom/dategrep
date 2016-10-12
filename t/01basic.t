@@ -118,7 +118,6 @@ EOF
 test_dategrep [ '--format=iso8601', '--skip-unparsable',
     "$Bin/files/syslog02.log", ], <<'EOF', 'Unparsable line';
 2014-03-20T07:35:05Z balin anacron[1091]: Normal exit (1 job run)
-2014-03-200T07:35:05Z balin anacron[1091]: Job `cron.daily' terminated
 EOF
 
 # files with every line in date range
