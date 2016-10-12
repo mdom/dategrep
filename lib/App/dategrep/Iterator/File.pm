@@ -74,7 +74,12 @@ sub search {
         $mid = int( ( $max + $min ) / 2 );
         $fh->seek( $mid * $blksize, SEEK_SET ) or return;
         $fh->getline if $mid;    # probably a partial line
-      LINE: while ( my $line = $fh->getline() ) {
+      LINE: while (1) {
+            my $line = $fh->getline();
+            if ( !$line ) {
+                ## This can happen if line size is way biffer than blocksize
+                last BLOCK;
+            }
             my ($epoch) = $self->to_epoch($line);
             if ( !$epoch ) {
                 next LINE if $multiline || $self->skip_unparsable;
