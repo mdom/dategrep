@@ -2,6 +2,7 @@ package App::dategrep::Iterator::File;
 use strict;
 use warnings;
 use Fcntl ":seek";
+use File::stat;
 use Moo;
 use FileHandle;
 extends 'App::dategrep::Iterator';
@@ -11,7 +12,7 @@ has blocksize => ( is => 'lazy' );
 
 sub _build_blocksize {
     my $self = shift;
-    return ( stat( $self->filename ) )[11] || 8192;
+    return stat( $self->fh )->blksize || 8192;
 }
 
 sub _build_fh {
@@ -57,8 +58,7 @@ sub search {
     my ( $key, $min_byte ) = @_;
     my $fh = $self->fh;
 
-    my @stat      = $fh->stat or return;
-    my $size      = $stat[7];
+    my $size      = stat($fh)->size;
     my $blksize   = $self->blocksize;
     my $multiline = $self->multiline;
 
