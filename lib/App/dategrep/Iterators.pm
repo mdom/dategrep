@@ -60,12 +60,6 @@ sub sort {
 sub interleave {
     my $self = shift;
 
-    ## TODO
-    ## 1. read a file from each iterator and set next_line and next_time
-    ## 2. sort by next_time
-    ## 3. print lines from lowest iterator until it's next time is higer than the second lowest iterator.
-    ## 4. goto 2
-
     while ( $self->sort, $self->iterators->[0] ) {
         my $until;
         if ( $self->iterators->[1] ) {
