@@ -5,6 +5,8 @@ use Moo;
 use FileHandle;
 extends 'App::dategrep::Iterator';
 
+sub can_seek { 0 }
+
 sub seek {
     my $self = shift;
     my $ignore = $self->multiline || $self->skip_unparsable;

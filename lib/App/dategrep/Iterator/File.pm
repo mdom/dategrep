@@ -10,6 +10,8 @@ extends 'App::dategrep::Iterator';
 has filename => ( is => 'ro', required => 1 );
 has blocksize => ( is => 'lazy' );
 
+sub can_seek { 1 }
+
 sub _build_blocksize {
     my $self = shift;
     return stat( $self->fh )->blksize || 8192;
@@ -45,7 +47,6 @@ sub byte_offsets {
 
     if ( defined $tell_beg ) {
         my $tell_end = $self->search( $self->end, $tell_beg );
-
         return $tell_beg, $tell_end;
     }
 
