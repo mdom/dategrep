@@ -6,8 +6,8 @@ use Moo;
 use FileHandle;
 extends 'App::dategrep::Iterator';
 
-has 'filename' => ( is => 'ro', required => 1 );
-has 'blocksize' => ( is => 'lazy' );
+has filename => ( is => 'ro', required => 1 );
+has blocksize => ( is => 'lazy' );
 
 sub _build_blocksize {
     my $self = shift;
