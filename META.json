@@ -44,6 +44,7 @@
             "Exporter" : "0",
             "Fcntl" : "0",
             "File::Basename" : "0",
+            "File::stat" : "0",
             "FileHandle" : "0",
             "Getopt::Long" : "0",
             "IO::Uncompress::Bunzip2" : "0",
@@ -80,7 +81,7 @@
          "web" : "https://github.com/mdom/dategrep"
       }
    },
-   "version" : "0.57",
+   "version" : "0.58",
    "x_contributors" : [
       "Mario Domgoergen <mario@domgoergen.com>",
       "Mario Domgoergen <mdom@taz.de>",

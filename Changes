@@ -2,7 +2,10 @@ Revision history for Perl module App::dategrep
 
 {{$NEXT}}
 
+0.58  2016-10-12 12:52:20 CEST
+
   - Directly link to standalone scripts (fixes #19)
+  - Rewrite logic for --interleave, should be much faster now
 
 0.57  2016-10-07 17:18:32 CEST
 
