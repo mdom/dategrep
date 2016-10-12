@@ -24,6 +24,8 @@ sub BUILDARGS {
         format          => $options{format},
         skip_unparsable => $options{'skip-unparsable'},
     );
+    push @args, blocksize => $options{blocksize} if defined $options{blocksize};
+
     my @iterators;
     for my $filename (@filenames) {
         if ( $filename eq '-' ) {
