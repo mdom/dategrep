@@ -128,7 +128,7 @@ sub run {
                 );
                 my ( $byte_beg, $byte_end ) = $iter->byte_offsets();
                 if ( not defined $byte_end ) {
-                    $byte_end = ( stat($iter->fh) )[7];
+                    $byte_end = ( stat( $iter->fh ) )[7];
                 }
                 print "$byte_beg $byte_end\n";
                 return 0;
