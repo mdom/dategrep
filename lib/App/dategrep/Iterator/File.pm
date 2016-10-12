@@ -77,7 +77,7 @@ sub search {
       LINE: while (1) {
             my $line = $fh->getline();
             if ( !$line ) {
-                ## This can happen if line size is way biffer than blocksize
+                ## This can happen if line size is way bigger than blocksize
                 last BLOCK;
             }
             my ($epoch) = $self->to_epoch($line);
