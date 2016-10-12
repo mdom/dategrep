@@ -36,6 +36,12 @@ sub seek {
 
     my $line = $self->fh->getline;
     my ( $date, $error ) = $self->to_epoch($line);
+
+    if ( $date >= $self->end ) {
+        $self->eof(1);
+        return;
+    }
+
     $self->next_line($line);
     $self->next_date($date);
     return;
