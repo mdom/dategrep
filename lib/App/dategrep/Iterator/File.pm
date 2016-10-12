@@ -17,52 +17,51 @@ sub _build_blocksize {
 }
 
 sub _build_fh {
-    my $self = shift;
-    my ( $fh, $tell_beg, $tell_end ) = $self->byte_offsets();
-    $self->tell_beg($tell_beg);
-    $self->tell_end($tell_end);
-    $fh->seek( $tell_beg, SEEK_SET );
+    my $self     = shift;
+    my $filename = $self->filename;
+    open( my $fh, '<', $filename ) or die "Can't open $filename: $!\n";
     return $fh;
+}
+
+sub seek {
+    my $self = shift;
+
+    my $min = $self->search( $self->start );
+
+    if ( not defined $min ) {
+        $self->eof(1);
+        return;
+    }
+
+    my $line = $self->fh->getline;
+    my ( $date, $error ) = $self->to_epoch($line);
+    $self->next_line($line);
+    $self->next_date($date);
+    return;
 }
 
 sub byte_offsets {
     my $self     = shift;
-    my $filename = $self->filename;
-    open( my $fh, '<', $filename ) or die "Can't open $filename: $!\n";
-    my $test_line = $fh->getline;
-    if ( defined($test_line) ) {
-        my ( $epoch, $error ) = $self->to_epoch($test_line);
-        if ($error) {
-            die "No date found in first line: $error\n";
-        }
-        $fh->seek( 0, SEEK_SET );
+    my $tell_beg = $self->search( $self->start );
 
-        my $tell_beg =
-          $self->search( $fh, $self->start, format => $self->format, );
+    if ( defined $tell_beg ) {
+        my $tell_end = $self->search( $self->end, $tell_beg );
 
-        if ( defined $tell_beg ) {
-            my $tell_end = $self->search(
-                $fh, $self->end,
-                min_byte => $tell_beg,
-                format   => $self->format
-            );
-
-            return $fh, $tell_beg, $tell_end;
-        }
+        return $tell_beg, $tell_end;
     }
 
     # return for empty file
-    return $fh, 0, -1;
+    return 0, -1;
 }
 
 sub search {
     my $self = shift;
-    my ( $fh, $key, %options ) = @_;
-    my @stat    = $fh->stat or return;
-    my $size    = $stat[7];
-    my $blksize = $self->blocksize;
+    my ( $key, $min_byte ) = @_;
+    my $fh = $self->fh;
 
-    my $min_byte  = $options{min_byte};
+    my @stat      = $fh->stat or return;
+    my $size      = $stat[7];
+    my $blksize   = $self->blocksize;
     my $multiline = $self->multiline;
 
     # find the right block
@@ -80,9 +79,7 @@ sub search {
             my ($epoch) = $self->to_epoch($line);
             if ( !$epoch ) {
                 next LINE if $multiline || $self->skip_unparsable;
-
-                chomp($line);
-                die "Unparsable line: $line\n";
+                die "No date found in line $line";
             }
 
             $epoch < $key
@@ -103,8 +100,7 @@ sub search {
         my ($epoch) = $self->to_epoch($line);
         if ( !$epoch ) {
             next if $multiline || $self->skip_unparsable;
-            chomp($line);
-            die "Unparsable line: $line\n";
+            die "No date found in line $line";
         }
         if ( $epoch >= $key ) {
             $fh->seek( $min, SEEK_SET );

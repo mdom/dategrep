@@ -59,13 +59,17 @@ sub print {
             next;
         }
         else {
-            die "Can't find date on $line\n";
+            die "No date found in line $line";
         }
     }
     return;
 }
 
 sub BUILD {
+	shift->seek;
+}
+
+sub seek {
     my $self = shift;
     my $ignore = $self->multiline || $self->skip_unparsable;
     while (1) {
@@ -80,7 +84,7 @@ sub BUILD {
             next;
         }
         elsif ( !$date ) {
-            die "Can't find date on $line\n";
+            die "No date found in line $line";
         }
         elsif ( $date < $self->start ) {
             next;

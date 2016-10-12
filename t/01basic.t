@@ -62,7 +62,7 @@ test_dategrep(
         "$Bin/files/test03.log"
     ],
     <<"EOF", 'Missing date on first line' );
-dategrep: No date found in first line: [parse] Invalid date string
+dategrep: No date found in line lalalalalalalalalalala
 EOF
 
 # files with line before and after date range
@@ -112,7 +112,8 @@ EOF
 
 test_dategrep [ '--format=iso8601', "$Bin/files/syslog02.log", ],
   <<'EOF', 'Unparsable line';
-dategrep: Unparsable line: 2014-03-200T07:35:05Z balin anacron[1091]: Job `cron.daily' terminated
+2014-03-20T07:35:05Z balin anacron[1091]: Normal exit (1 job run)
+dategrep: No date found in line 2014-03-200T07:35:05Z balin anacron[1091]: Job `cron.daily' terminated
 EOF
 
 test_dategrep [ '--format=iso8601', '--skip-unparsable',
