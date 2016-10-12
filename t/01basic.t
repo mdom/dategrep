@@ -11,6 +11,8 @@ use POSIX qw(setlocale LC_ALL);
 
 setlocale( LC_ALL, 'C' );
 
+delete $ENV{DATEGREP_DEFAULT_FORMAT};
+
 test_dategrep( [ '--format=%Y', "$Bin/files/empty" ], <<'EOF', "Empty files" );
 EOF
 
