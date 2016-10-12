@@ -120,11 +120,10 @@ sub run {
         if ( $options{'byte-offsets'} ) {
             if ( @ARGV == 1 and -f $ARGV[0] ) {
                 my $iter = App::dategrep::Iterator::File->new(
-                    filename  => $ARGV[0],
-                    start     => $start,
-                    end       => $end,
-                    multiline => $options{multiline},
-                    format    => $options{format},
+                    %options,
+                    filename => $ARGV[0],
+                    start    => $start,
+                    end      => $end,
                 );
                 my ( $byte_beg, $byte_end ) = $iter->byte_offsets();
                 if ( not defined $byte_end ) {
