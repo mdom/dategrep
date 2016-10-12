@@ -21,10 +21,6 @@ test_dategrep( [ '--unknown=%Y', "$Bin/files/empty" ],
 Unknown option: unknown
 EOF
 
-test_dategrep( ["$Bin/files/empty"], <<'EOF', 'missing paramter --format' );
-dategrep: --format is a required parameter
-EOF
-
 test_dategrep(
     [
         '--start=32.13.2013',      '--end=01.04.2014',

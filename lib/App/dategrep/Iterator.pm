@@ -4,7 +4,7 @@ use warnings;
 use Moo;
 use Fcntl ':seek';
 use File::stat;
-use App::dategrep::Date qw(date_to_epoch);
+use App::dategrep::Date qw(date_to_epoch %formats);
 
 has multiline => ( is => 'ro', default => sub { 0 } );
 has start     => ( is => 'rw', required => 1 );
@@ -93,8 +93,23 @@ sub BUILD {
     shift->seek;
 }
 
+sub guess_format {
+    my ( $self, $line ) = @_;
+    for my $format ( values %formats ) {
+        my ($date) = date_to_epoch( $line, $format );
+        if ($date) {
+            $self->format($format);
+            last;
+        }
+    }
+    return;
+}
+
 sub to_epoch {
     my ( $self, $line ) = @_;
+    if ( !$self->format ) {
+        $self->guess_format($line);
+    }
     return date_to_epoch( $line, $self->format );
 }
 

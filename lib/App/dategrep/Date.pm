@@ -5,7 +5,13 @@ use parent 'Exporter';
 use Date::Manip::Delta;
 use Date::Manip::Date;
 
-our @EXPORT_OK = qw(intervall_to_epoch date_to_epoch minutes_ago);
+our @EXPORT_OK = qw(intervall_to_epoch date_to_epoch minutes_ago %formats);
+
+our %formats = (
+    'iso8601' => "%O%Z",
+    'rsyslog' => "%b %e %H:%M:%S",
+    'apache'  => "%d/%b/%Y:%T %z",
+);
 
 sub intervall_to_epoch {
     my ( $time, $format ) = @_;

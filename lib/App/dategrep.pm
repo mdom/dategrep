@@ -2,7 +2,8 @@ use strict;
 use warnings;
 
 package App::dategrep;
-use App::dategrep::Date qw(intervall_to_epoch date_to_epoch minutes_ago);
+use App::dategrep::Date
+  qw(intervall_to_epoch date_to_epoch minutes_ago %formats);
 use App::dategrep::Iterators;
 use Config::Tiny;
 use Pod::Usage;
@@ -64,22 +65,12 @@ sub run {
 
     my $config = loadconfig( $options{configfile} );
 
-    my %named_formats = (
-        'iso8601' => "%O%Z",
-        'rsyslog' => "%b %e %H:%M:%S",
-        'apache'  => "%d/%b/%Y:%T %z",
-    );
-
     if ( exists $config->{formats} ) {
-        %named_formats = ( %named_formats, %{ $config->{formats} } );
+        %formats = ( %formats, %{ $config->{formats} } );
     }
 
-    if ( not defined $options{'format'} ) {
-        return error("--format is a required parameter");
-    }
-
-    if ( exists $named_formats{ $options{'format'} } ) {
-        $options{'format'} = $named_formats{ $options{'format'} };
+    if ( $options{'format'} && exists $formats{ $options{'format'} } ) {
+        $options{'format'} = $formats{ $options{'format'} };
     }
 
     if ( $options{'skip-unparsable'} ) {
