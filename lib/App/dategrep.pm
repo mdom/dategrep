@@ -142,10 +142,6 @@ sub run {
             end       => $end,
         );
 
-        for my $iter ( $iterators->as_array ) {
-            $iter->scan;
-        }
-
         if ( $options{'interleave'} && @ARGV > 1 ) {
             $iterators->interleave();
             return 0;

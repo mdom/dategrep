@@ -65,7 +65,7 @@ sub print {
     return;
 }
 
-sub scan {
+sub BUILD {
     my $self = shift;
     my $ignore = $self->multiline || $self->skip_unparsable;
     while (1) {
