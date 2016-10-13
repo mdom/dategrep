@@ -15,6 +15,8 @@ _fatten () {
 _fatten --exclude-dist=Date-Manip -o dategrep-standalone-small
 _fatten --include-dist=Date-Manip -o dategrep-standalone-big
 
+./dategrep-standalone-small t/files/syslog01.log > /dev/null
+./dategrep-standalone-big   t/files/syslog01.log > /dev/null
 
 github-release upload --user mdom --repo dategrep --tag $last_tag --name dategrep-standalone-small --file dategrep-standalone-small
 github-release upload --user mdom --repo dategrep --tag $last_tag --name dategrep-standalone-big   --file dategrep-standalone-big
