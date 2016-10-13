@@ -12,9 +12,9 @@ __END__
 
 =for stopwords dategrep DATESPEC datespec syslog apache blocksize zcat bzcat rsyslog timestamped logrotate ARGV Domgoergen merchantability configfile !syslog
 
-=for HTML <a href="https://travis-ci.org/mdom/dategrep"><img src="https://travis-ci.org/mdom/dategrep.svg?branch=master"></a>
+=for markdown <a href="https://travis-ci.org/mdom/dategrep"><img src="https://travis-ci.org/mdom/dategrep.svg?branch=master"></a>
 
-=for HTML <a href='https://coveralls.io/r/mdom/dategrep?branch=master'><img src='https://coveralls.io/repos/mdom/dategrep/badge.png?branch=master' alt='Coverage Status' /></a> 
+=for markdown <a href='https://coveralls.io/r/mdom/dategrep?branch=master'><img src='https://coveralls.io/repos/mdom/dategrep/badge.png?branch=master' alt='Coverage Status' /></a>
 
 =head1 NAME
 
@@ -162,7 +162,7 @@ that for you.
 
 Reads configuration from FILE instead of I<~/.dategreprc>.
 
-=item --help 
+=item --help
 
 Shows a short help message
 
@@ -175,7 +175,7 @@ Shows the complete man page in your pager.
 =head1 CONFIGURATION FILE
 
 On startup dategrep reads a configuration file from I<$HOME/.dategreprc> or the
-file specified by I<--configfile>. 
+file specified by I<--configfile>.
 
 The file consists of sections and variables. A section begins with the name of
 the section in square brackets and continues until the next section begins.
@@ -218,7 +218,7 @@ L<https://metacpan.org/pod/Date::Manip>
 
 =head1 INSTALLATION
 
-It is possible to install this script via perl normal install routines. 
+It is possible to install this script via perl normal install routines.
 
   perl Makefile.PL && make && make install
 
