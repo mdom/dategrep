@@ -27,6 +27,6 @@ export NAME="Mario Domgoergen"
 dch -v ${last_tag#v} -u low
 dch -r
 
-sbuild -d stable
+sbuild -d stable --run-lintian
 
 github-release upload --user mdom --repo dategrep --tag $last_tag --name dategrep_${last_tag#v}-1_all.deb --file ../dategrep_${last_tag#v}-1_all.deb
