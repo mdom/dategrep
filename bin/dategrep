@@ -12,9 +12,7 @@ __END__
 
 =for stopwords dategrep DATESPEC datespec syslog apache blocksize zcat bzcat rsyslog timestamped logrotate ARGV Domgoergen merchantability configfile !syslog
 
-=for markdown <a href="https://travis-ci.org/mdom/dategrep"><img src="https://travis-ci.org/mdom/dategrep.svg?branch=master"></a>
-
-=for markdown <a href='https://coveralls.io/r/mdom/dategrep?branch=master'><img src='https://coveralls.io/repos/mdom/dategrep/badge.png?branch=master' alt='Coverage Status' /></a>
+=for markdown <a href="https://travis-ci.org/mdom/dategrep"><img src="https://travis-ci.org/mdom/dategrep.svg?branch=master"></a>  <a href='https://coveralls.io/r/mdom/dategrep?branch=master'><img src='https://coveralls.io/repos/mdom/dategrep/badge.png?branch=master' alt='Coverage Status' /></a>
 
 =head1 NAME
 
