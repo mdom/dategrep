@@ -119,8 +119,6 @@ Without a user supplied format, dategrep tries all time formats it knows about.
 Alternatively you can supply the format via the environment variable
 I<DATEGREP_DEFAULT_FORMAT>.
 
-=back
-
 =item --multiline
 
 Print all lines between the start and end line even if they are not timestamped.
