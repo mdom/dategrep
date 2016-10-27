@@ -6,10 +6,9 @@ dategrep - print lines matching a date range
 
 # SYNOPSIS
 
-    dategrep --start "12:00" --end "12:15" --format "%b %d %H:%M:%S" syslog
+    dategrep --start "12:00" --end "12:15" syslog
     dategrep --end "12:15" --format "%b %d %H:%M:%S" syslog
-    dategrep --last-minutes 5 --format "%b %d %H:%M:%S" syslog
-    dategrep --last-minutes 5 --format rsyslog syslog
+    dategrep --last-minutes 5 syslog
     cat syslog | dategrep --end "12:15"
 
 # DESCRIPTION
@@ -31,31 +30,29 @@ first date not in the range, dategrep terminates.
 
 But just let me show you a few examples.
 
-The only parameter dategrep really needs is _format_ to tell it how to
-reckognize a timestamp. In this case dategrep matches all lines from epoch to
-the time dategrep started. In this case it's just a glorified cat that knows
-when to stop.
+Without any parameter dategrep matches all lines from epoch to the time it
+started. In this case it's just a glorified cat that knows when to stop.
 
-    dategrep --format "%b %d %H:%M:%S" syslog
-
-Besides the format specifiers, which are very similar to the ones used
-by _strptime_, dategrep knows about a few named formats like rsyslog
-or apache.
-
-    dategrep --format apache access.log
+    dategrep syslog
 
 But things start to get interesting if you add the _start_ and _end_ options.
 
-    dategrep --start 12:00 --end 12:15 --format rsyslog syslog
+    dategrep --start 12:00 --end 12:15 syslog
 
 If you leave one out it again either defaults to epoch or now.
 
-    dategrep --end 12:15 --format rsyslog syslog
+    dategrep --end 12:15 syslog
+
+Dategrep knows how to handle common time formats like apaches standard
+english format and rsyslog. If you need to handle a new format, you can
+use _--format_:
+
+    dategrep --format "%b %d %H:%M:%S" syslog
 
 If your like me, you often need to call dategrep from cron and need to get all
 lines from the last five minutes. So there's an easy shortcut for that.
 
-    dategrep --last-minutes 5 --format rsyslog syslog
+    dategrep --last-minutes 5 syslog
 
 Pipes or zipped files can also be handled, but those will be slower to filter.
 It's often more efficient to just search on an unzipped file or redirect the
@@ -94,19 +91,17 @@ dategrep directly.
 
 - --format FORMAT
 
-    Defines a strftime-based FORMAT that is used to parse the input
-    lines for a date. The first date found on a line is used. The
-    list of possible escape sequences can be found under [PRINTF
+    Defines a strftime-based FORMAT that is used to parse the input lines for
+    a date. The list of possible escape sequences can be found under [PRINTF
     DIRECTIVES](https://metacpan.org/pod/distribution/Date-Manip/lib/Date/Manip/Date.pod#PRINTF-DIRECTIVES).
 
-    This is a required parameter. Alternatively you can supply the format
-    via the environment variable _DATEGREP\_DEFAULT\_FORMAT_.
+    This option can be given multiple times. In this case dategrep tries
+    every format in the order given until it can match a line.
 
-    Additionally, dategrep supports named formats:
+    Without a user supplied format, dategrep tries all time formats it knows about.
 
-    - rsyslog "%b %e %H:%M:%S"
-    - apache "%d/%b/%Y:%T %z"
-    - iso8601 "%O%Z"
+    Alternatively you can supply the format via the environment variable
+    _DATEGREP\_DEFAULT\_FORMAT_.
 
 - --multiline
 
@@ -155,7 +150,7 @@ The file consists of sections and variables. A section begins with the name of
 the section in square brackets and continues until the next section begins.
 Section names are not case sensitive. Empty lines and lines with comments are
 skipped. Comments are started with a hash character. dategrep recognizes
-only one sections: Under _formats_ you can list additional named formats.
+only one sections: Under _formats_ you can list additional formats.
 
 Example:
 
@@ -231,3 +226,11 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see &lt;http://www.gnu.org/licenses/>.
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 114:
+
+    '=item' outside of any '=over'
