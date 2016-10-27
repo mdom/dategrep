@@ -8,7 +8,7 @@ sub test_dategrep {
     no warnings 'once';
     local $App::dategrep::app = 'dategrep';
     local @ARGV = @$argv if $argv;
-    combined_is { App::dategrep::run() } $output, $name;
+    combined_is { App::dategrep->new->run } $output, $name;
 }
 
 1;

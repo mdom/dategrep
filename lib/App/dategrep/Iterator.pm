@@ -4,15 +4,15 @@ use warnings;
 use Moo;
 use Fcntl ':seek';
 use File::stat;
-use App::dategrep::Date qw(date_to_epoch %formats);
 
 has multiline => ( is => 'ro', default => sub { 0 } );
+has format    => ( is => 'rw' );
+has fh        => ( is => 'lazy' );
 has start     => ( is => 'rw', required => 1 );
 has end       => ( is => 'rw', required => 1 );
-has format    => ( is => 'rw', required => 1 );
-has fh        => ( is => 'lazy' );
 has next_line => ( is => 'rw', clearer  => 1, );
 has next_date => ( is => 'rw' );
+has date      => ( is => 'rw' );
 
 has skip_unparsable => ( is => 'ro', default => sub { 0 } );
 
@@ -56,7 +56,7 @@ sub print {
             $self->eof(1);
             return;
         }
-        my ( $date, $error ) = $self->to_epoch($line);
+        my ( $date, $error ) = $self->date->to_epoch($line);
         if ($date) {
 
             $self->next_line($line);
@@ -93,24 +93,13 @@ sub BUILD {
     shift->seek;
 }
 
-sub guess_format {
-    my ( $self, $line ) = @_;
-    for my $format ( values %formats ) {
-        my ($date) = date_to_epoch( $line, $format );
-        if ($date) {
-            $self->format($format);
-            last;
-        }
-    }
-    return;
-}
-
 sub to_epoch {
     my ( $self, $line ) = @_;
     if ( !$self->format ) {
-        $self->guess_format($line);
+        my $format = $self->date->guess_format($line);
+        $self->format($format) if $format;
     }
-    return date_to_epoch( $line, $self->format );
+    return $self->date->to_epoch( $line, $self->format );
 }
 
 1;

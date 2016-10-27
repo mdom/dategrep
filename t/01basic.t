@@ -13,7 +13,7 @@ setlocale( LC_ALL, 'C' );
 
 delete $ENV{DATEGREP_DEFAULT_FORMAT};
 
-test_dategrep( [ '--format=%Y', "$Bin/files/empty" ], <<'EOF', "Empty files" );
+test_dategrep( ["$Bin/files/empty"], <<'EOF', "Empty files" );
 EOF
 
 test_dategrep( [ '--unknown=%Y', "$Bin/files/empty" ],

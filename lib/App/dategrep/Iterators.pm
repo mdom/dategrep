@@ -20,8 +20,8 @@ sub BUILDARGS {
     my @args = (
         start           => $options{start},
         end             => $options{end},
+        date            => $options{date},
         multiline       => $options{multiline},
-        format          => $options{format},
         skip_unparsable => $options{'skip-unparsable'},
     );
     push @args, blocksize => $options{blocksize} if defined $options{blocksize};

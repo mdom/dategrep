@@ -41,7 +41,6 @@
             "Config::Tiny" : "0",
             "Date::Manip::Date" : "0",
             "Date::Manip::Delta" : "0",
-            "Exporter" : "0",
             "Fcntl" : "0",
             "File::Basename" : "0",
             "File::stat" : "0",
@@ -52,8 +51,6 @@
             "IPC::Cmd" : "0",
             "Moo" : "0",
             "Pod::Usage" : "0",
-            "base" : "0",
-            "parent" : "0",
             "strict" : "0",
             "warnings" : "0"
          }

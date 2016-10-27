@@ -1,16 +1,14 @@
-use strict;
+package App::dategrep;
+
+use Moo;
 use warnings;
 
-package App::dategrep;
-use App::dategrep::Date
-  qw(intervall_to_epoch date_to_epoch minutes_ago %formats);
 use App::dategrep::Iterators;
+use App::dategrep::Date;
 use Config::Tiny;
 use Pod::Usage;
 use Getopt::Long;
 use File::Basename qw(basename);
-use base 'Exporter';
-our @EXPORT_OK = qw(run);
 
 our $VERSION = '0.58';
 
@@ -28,15 +26,15 @@ sub error {
     return $rc;
 }
 
+has 'date' => ( is => 'rw', default => sub { App::dategrep::Date->new } );
+
 sub run {
+    my $self = shift;
     my %options;
-    if ( $ENV{DATEGREP_DEFAULT_FORMAT} ) {
-        $options{format} = $ENV{DATEGREP_DEFAULT_FORMAT};
-    }
 
     my $rc = GetOptions(
         \%options,        'start|from=s',
-        'end|to=s',       'format=s',
+        'end|to=s',       'format=s@',
         'last-minutes=i', 'multiline!',
         'blocksize=i',    'help|?',
         'sort-files',     'man',
@@ -66,12 +64,16 @@ sub run {
     my $config = loadconfig( $options{configfile} );
 
     if ( exists $config->{formats} ) {
-        %formats = ( %formats, %{ $config->{formats} } );
+        $self->date->add_format( values %{ $config->{formats} } );
     }
 
-    if ( $options{'format'} && exists $formats{ $options{'format'} } ) {
-        $options{'format'} = $formats{ $options{'format'} };
+    if ( $ENV{DATEGREP_DEFAULT_FORMAT} ) {
+        $self->date->add_format( $ENV{DATEGREP_DEFAULT_FORMAT} );
     }
+
+    $self->date->add_format( grep { /%/ } @{ $options{'format'} } );
+
+    delete $options{'format'};    # Don't call new on iterators with format
 
     if ( $options{'skip-unparsable'} ) {
         $options{'multiline'} = 0;
@@ -80,17 +82,17 @@ sub run {
     my ( $start, $end ) = ( 0, time() );
 
     if ( defined $options{'start'} ) {
-        ($start) = intervall_to_epoch( $options{'start'}, $options{'format'} );
+        ($start) = $self->date->intervall_to_epoch( $options{'start'} );
         return error("Illegal start time.") if not defined $start;
     }
 
     if ( defined $options{'end'} ) {
-        ($end) = intervall_to_epoch( $options{'end'}, $options{'format'} );
+        ($end) = $self->date->intervall_to_epoch( $options{'end'} );
         return error("Illegal end time.") if not defined $end;
     }
 
     if ( defined $options{'last-minutes'} ) {
-        ( $start, $end ) = minutes_ago( $options{'last-minutes'} );
+        ( $start, $end ) = $self->date->minutes_ago( $options{'last-minutes'} );
     }
 
     if ( $end < $start ) {
@@ -115,6 +117,7 @@ sub run {
                     filename => $ARGV[0],
                     start    => $start,
                     end      => $end,
+                    date     => $self->date,
                 );
                 my ( $byte_beg, $byte_end ) = $iter->byte_offsets();
                 if ( not defined $byte_end ) {
@@ -130,6 +133,7 @@ sub run {
             filenames => \@ARGV,
             start     => $start,
             end       => $end,
+            date      => $self->date,
         );
 
         if ( $options{'interleave'} && @ARGV > 1 ) {
