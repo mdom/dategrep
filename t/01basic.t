@@ -98,7 +98,7 @@ test_dategrep(
 EOF
 
 test_dategrep [ '--format=iso8601', "$Bin/files/syslog01.log", ],
-  <<'EOF', 'named formats';
+  <<'EOF', 'handle old named formats';
 2014-03-20T07:35:05Z balin anacron[1091]: Job `cron.daily' terminated
 2014-03-20T07:35:05Z balin anacron[1091]: Normal exit (1 job run)
 2014-03-20T07:38:05Z balin anacron[1091]: Job `cron.daily' terminated
@@ -106,14 +106,13 @@ test_dategrep [ '--format=iso8601', "$Bin/files/syslog01.log", ],
 2014-03-20T08:42:05Z balin anacron[1091]: Normal exit (1 job run)
 EOF
 
-test_dategrep [ '--format=iso8601', "$Bin/files/syslog02.log", ],
-  <<'EOF', 'Unparsable line';
+test_dategrep [ "$Bin/files/syslog02.log", ], <<'EOF', 'Unparsable line';
 2014-03-20T07:35:05Z balin anacron[1091]: Normal exit (1 job run)
 dategrep: No date found in line 2014-03-200T07:35:05Z balin anacron[1091]: Job `cron.daily' terminated
 EOF
 
-test_dategrep [ '--format=iso8601', '--skip-unparsable',
-    "$Bin/files/syslog02.log", ], <<'EOF', 'Unparsable line';
+test_dategrep [ '--skip-unparsable', "$Bin/files/syslog02.log", ],
+  <<'EOF', 'Unparsable line';
 2014-03-20T07:35:05Z balin anacron[1091]: Normal exit (1 job run)
 EOF
 
