@@ -2,7 +2,6 @@ package App::dategrep::Iterators;
 use strict;
 use warnings;
 use Moo;
-use App::dategrep::Date qw(date_to_epoch);
 use App::dategrep::Iterator::File;
 use App::dategrep::Iterator::Stdin;
 use App::dategrep::Iterator::Uncompress;
