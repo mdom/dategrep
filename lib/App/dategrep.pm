@@ -1,7 +1,5 @@
 package App::dategrep;
-
 use Moo;
-use warnings;
 
 use App::dategrep::Iterators;
 use App::dategrep::Date;

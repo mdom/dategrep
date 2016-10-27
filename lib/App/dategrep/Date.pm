@@ -1,6 +1,5 @@
 package App::dategrep::Date;
 use Moo;
-use warnings;
 use Date::Manip::Delta;
 use Date::Manip::Date;
 

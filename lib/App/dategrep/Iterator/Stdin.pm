@@ -1,6 +1,4 @@
 package App::dategrep::Iterator::Stdin;
-use strict;
-use warnings;
 use Moo;
 extends 'App::dategrep::Iterator::Fh';
 

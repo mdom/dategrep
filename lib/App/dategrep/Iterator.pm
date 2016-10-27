@@ -1,6 +1,4 @@
 package App::dategrep::Iterator;
-use strict;
-use warnings;
 use Moo;
 use Fcntl ':seek';
 use File::stat;

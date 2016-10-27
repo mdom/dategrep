@@ -1,6 +1,4 @@
 package App::dategrep::Iterator::Uncompress;
-use strict;
-use warnings;
 use Moo;
 use IPC::Cmd 'can_run';
 extends 'App::dategrep::Iterator::Fh';
