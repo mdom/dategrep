@@ -34,8 +34,8 @@ sub intervall_to_epoch {
           ( Date::Manip::Delta->new($1), Date::Manip::Date->new($2) );
         ## TODO: $date->is_date is missing in Date::Manip::Date
         ## will be fixed in next major release
-        if ( $delta->is_delta() ) {    ## and $date->is_date() ) {
-            return $date->calc($delta)->secs_since_1970_GMT();
+        if ( $delta->is_delta ) {    ## and $date->is_date ) {
+            return $date->calc($delta)->secs_since_1970_GMT;
         }
     }
     return $self->to_epoch($time);
@@ -47,7 +47,7 @@ sub minutes_ago {
     $now->set( 's', 0 );
     my $ago = Date::Manip::Date->new("$minutes minutes ago");
     $ago->set( 's', 0 );
-    return ( $ago->secs_since_1970_GMT(), $now->secs_since_1970_GMT() );
+    return ( $ago->secs_since_1970_GMT, $now->secs_since_1970_GMT );
 }
 
 sub guess_format {
@@ -76,7 +76,7 @@ sub to_epoch {
     }
 
     return ( undef, $self->_date_object->err ) if $error;
-    return ( $self->_date_object->secs_since_1970_GMT() );
+    return ( $self->_date_object->secs_since_1970_GMT );
 }
 
 1;

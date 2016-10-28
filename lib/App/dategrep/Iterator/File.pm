@@ -79,7 +79,7 @@ sub search {
         $fh->seek( $mid * $blksize, SEEK_SET ) or return;
         $fh->getline if $mid;    # probably a partial line
       LINE: while (1) {
-            my $line = $fh->getline();
+            my $line = $fh->getline;
             if ( !$line ) {
                 ## This can happen if line size is way bigger than blocksize
                 last BLOCK;

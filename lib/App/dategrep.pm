@@ -77,7 +77,7 @@ sub run {
         $options{'multiline'} = 0;
     }
 
-    my ( $start, $end ) = ( 0, time() );
+    my ( $start, $end ) = ( 0, time );
 
     if ( defined $options{'start'} ) {
         ($start) = $self->date->intervall_to_epoch( $options{'start'} );
@@ -117,7 +117,7 @@ sub run {
                     end      => $end,
                     date     => $self->date,
                 );
-                my ( $byte_beg, $byte_end ) = $iter->byte_offsets();
+                my ( $byte_beg, $byte_end ) = $iter->byte_offsets;
                 if ( not defined $byte_end ) {
                     $byte_end = ( stat( $iter->fh ) )[7];
                 }
@@ -135,7 +135,7 @@ sub run {
         );
 
         if ( $options{'interleave'} && @ARGV > 1 ) {
-            $iterators->interleave();
+            $iterators->interleave;
             return 0;
         }
 
@@ -164,7 +164,7 @@ sub loadconfig {
 
     my $config = Config::Tiny->read($configfile);
     if ( not defined $config ) {
-        die "Error while parsing configfile: " . Config::Tiny->errstr() . "\n";
+        die "Error while parsing configfile: " . Config::Tiny->errstr . "\n";
     }
     return $config;
 }
