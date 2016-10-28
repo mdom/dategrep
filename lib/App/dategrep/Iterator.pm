@@ -2,6 +2,7 @@ package App::dategrep::Iterator;
 use Moo;
 use Fcntl ':seek';
 use File::stat;
+use App::dategrep::Date;
 
 has multiline => ( is => 'ro', default => sub { 0 } );
 has format    => ( is => 'rw' );
@@ -10,7 +11,7 @@ has start     => ( is => 'rw', default => sub { 0 } );
 has end       => ( is => 'rw', default => sub { time } );
 has next_line => ( is => 'rw', clearer => 1, );
 has next_date => ( is => 'rw' );
-has date      => ( is => 'rw' );
+has date => ( is => 'rw', default => sub { App::dategrep::Date->new } );
 
 has skip_unparsable => ( is => 'ro', default => sub { 0 } );
 
