@@ -6,9 +6,9 @@ use File::stat;
 has multiline => ( is => 'ro', default => sub { 0 } );
 has format    => ( is => 'rw' );
 has fh        => ( is => 'lazy' );
-has start     => ( is => 'rw', required => 1 );
-has end       => ( is => 'rw', required => 1 );
-has next_line => ( is => 'rw', clearer  => 1, );
+has start     => ( is => 'rw', default => sub { 0 } );
+has end       => ( is => 'rw', default => sub { time } );
+has next_line => ( is => 'rw', clearer => 1, );
 has next_date => ( is => 'rw' );
 has date      => ( is => 'rw' );
 
