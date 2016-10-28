@@ -7,9 +7,10 @@ has _formats => (
     is      => 'rw',
     default => sub {
         [
-            "%O%Z",              # iso8601
-            "%b %e %H:%M:%S",    # rsyslog
-            "%d/%b/%Y:%T %z",    # apache
+            '%O%Z',                          # iso8601
+            '%b %e %H:%M:%S',                # rsyslog
+            '%d/%b/%Y:%T %z',                # apache
+            '%Y-%m-%d_%H:%M:%S(\\.\\d+)',    # svlogd -tt
         ];
     },
 );
