@@ -71,8 +71,7 @@ sub to_epoch {
     if ($format) {
         $error = $self->_date_object->parse_format( $format, $str );
     }
-
-    if ( !$format or $error ) {
+    else {
         $error = $self->_date_object->parse($str);
     }
 
