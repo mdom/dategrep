@@ -7,10 +7,10 @@ has _formats => (
     is      => 'rw',
     default => sub {
         [
-            '%O%Z',                          # iso8601
-            '%b %e %H:%M:%S',                # rsyslog
-            '%d/%b/%Y:%T %z',                # apache
-            '%Y-%m-%d_%H:%M:%S(\\.\\d+)',    # svlogd -tt
+            '%b %e %H:%M:%S',                      # rsyslog
+            '%d/%b/%Y:%T %z',                      # apache
+            '%Y-%m-%d([T ])%H:%M:%S%Z',            # iso8601
+            '%Y-%m-%d([T_])%H:%M:%S(\\.\\d+)?',    # svlogd -tt
         ];
     },
 );
@@ -39,7 +39,17 @@ sub intervall_to_epoch {
             return $date->calc($delta)->secs_since_1970_GMT;
         }
     }
-    return $self->to_epoch($time);
+
+    # First try our internal formats
+    my ($date) = $self->to_epoch($time);
+    return $date if $date;
+
+    # Then check if Date::Manip can guess
+    $date = Date::Manip::Date->new($time);
+    if ( $date->err ) {
+        return ( undef, $date->err );
+    }
+    return $date->secs_since_1970_GMT;
 }
 
 sub minutes_ago {
@@ -63,19 +73,17 @@ sub guess_format {
 sub to_epoch {
     my ( $self, $str, $format ) = @_;
 
+    $format ||= $self->guess_format($str);
+
     if ( !$format ) {
-        $format = $self->guess_format($str);
+        return ( undef, "No date found in line $str" );
     }
 
-    my $error;
-    if ($format) {
-        $error = $self->_date_object->parse_format( $format, $str );
-    }
-    else {
-        $error = $self->_date_object->parse($str);
+    my $error = $self->_date_object->parse_format( $format, $str );
+    if ($error) {
+        return ( undef, $self->_date_object->err );
     }
 
-    return ( undef, $self->_date_object->err ) if $error;
     return ( $self->_date_object->secs_since_1970_GMT );
 }
 

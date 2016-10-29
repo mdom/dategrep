@@ -96,7 +96,12 @@ sub to_epoch {
     my ( $self, $line ) = @_;
     if ( !$self->format ) {
         my $format = $self->date->guess_format($line);
-        $self->format($format) if $format;
+        if ($format) {
+            $self->format($format);
+        }
+        else {
+            return;
+        }
     }
     return $self->date->to_epoch( $line, $self->format );
 }
