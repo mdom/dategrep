@@ -41,7 +41,6 @@ EOF
 
 test_dategrep(
     [
-        '--format=%Y-%m-%d %H:%M',
         '--start=2014-03-23 14:15',
         '--end=2014-03-23 14:17',
         "$Bin/files/does_note_exists.log"
@@ -52,7 +51,6 @@ EOF
 
 test_dategrep(
     [
-        '--format=%Y-%m-%d %H:%M',
         '--start=2014-03-23 14:15',
         '--end=2014-03-23 14:17',
         "$Bin/files/test03.log"
