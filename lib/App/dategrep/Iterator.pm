@@ -15,7 +15,7 @@ has date => ( is => 'rw', default => sub { App::dategrep::Date->new } );
 
 has skip_unparsable => ( is => 'ro', default => sub { 0 } );
 
-has eof => ( is => 'rw', default => 0 );
+has eof => ( is => 'rw', default => sub { 0 } );
 
 sub print_all {
     my $self = shift;
