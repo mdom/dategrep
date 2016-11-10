@@ -1,4 +1,4 @@
-!/bin/bsah
+#!/bin/bash
 #
 # Install or update to the latest dategrep "small" release.
 #
