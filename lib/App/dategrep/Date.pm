@@ -16,6 +16,7 @@ has _formats => (
 );
 
 has _date_object => ( is => 'rw', default => sub { Date::Manip::Date->new } );
+has now => ( is => 'rw', default => sub { Date::Manip::Date->new("now") } );
 
 sub add_format {
     my $self    = shift;
@@ -71,7 +72,7 @@ sub guess_format {
 }
 
 sub to_epoch {
-    my ( $self, $str, $format ) = @_;
+    my ( $self, $str, $format, %options ) = @_;
 
     $format ||= $self->guess_format($str);
 
@@ -79,9 +80,18 @@ sub to_epoch {
         return ( undef, "No date found in line $str" );
     }
 
-    my $error = $self->_date_object->parse_format( $format, $str );
+    my ( $error, %match ) = $self->_date_object->parse_format( $format, $str );
     if ($error) {
         return ( undef, $self->_date_object->err );
+    }
+
+    ## check if date is in future
+    if ( $self->_date_object->cmp( $self->now ) == 1 && $options{prefer_past} )
+    {
+        if ( !exists $match{y} ) {
+            my $delta = Date::Manip::Delta->new('-1y');
+            $self->_date_object( $self->_date_object->calc($delta) );
+        }
     }
 
     return ( $self->_date_object->secs_since_1970_GMT );

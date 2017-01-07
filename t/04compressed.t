@@ -5,8 +5,17 @@ use warnings;
 use Test::More;
 use FindBin qw($Bin);
 use lib "$Bin/lib";
-use Test::Dategrep;
 use IPC::Cmd qw(can_run);
+use POSIX qw(tzset);
+use Test::MockTime qw(set_absolute_time);
+
+BEGIN {
+    plan( skip_all => 'skip tests using tzset windows' ) if $^O eq 'MSWin32';
+    $ENV{TZ} = 'GMT';
+    tzset;
+    set_absolute_time(1477661846);    # 28-10-2016
+}
+use Test::Dategrep;
 
 $ENV{DATEGREP_DEFAULT_FORMAT} = 'rsyslog';
 

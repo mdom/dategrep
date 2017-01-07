@@ -103,7 +103,7 @@ sub to_epoch {
             return;
         }
     }
-    return $self->date->to_epoch( $line, $self->format );
+    return $self->date->to_epoch( $line, $self->format, prefer_past => 1 );
 }
 
 1;

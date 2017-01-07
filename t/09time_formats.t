@@ -3,16 +3,18 @@
 use strict;
 use warnings;
 use Test::More;
-use App::dategrep::Date;
 use POSIX qw(tzset);
 use Test::MockTime qw(set_absolute_time);
 
-plan( skip_all => 'skip tests using tzset windows' ) if $^O eq 'MSWin32';
+BEGIN {
+    plan( skip_all => 'skip tests using tzset windows' ) if $^O eq 'MSWin32';
 
-$ENV{TZ} = 'GMT';
-tzset;
+    $ENV{TZ} = 'GMT';
+    tzset;
 
-set_absolute_time(1477656653);
+    set_absolute_time(1477656653);
+}
+use App::dategrep::Date;
 
 my $date = App::dategrep::Date->new;
 
