@@ -3,7 +3,6 @@ use Moo;
 
 use App::dategrep::Iterators;
 use App::dategrep::Date;
-use Config::Tiny;
 use Pod::Usage;
 use Getopt::Long;
 use File::Basename qw(basename);
@@ -161,12 +160,25 @@ sub loadconfig {
     if ( not defined $configfile or not -e $configfile ) {
         return;
     }
-
-    my $config = Config::Tiny->read($configfile);
-    if ( not defined $config ) {
-        die "Error while parsing configfile: " . Config::Tiny->errstr . "\n";
+    open( my $config_fh, '<', $configfile )
+      or die "Can't read $configfile: $!\n";
+    my %config;
+    my $section = '_';
+    while (<$config_fh>) {
+        chomp;
+        s/#.*$//;
+        next if /^\s*$/;
+        if (/^\s*\[(\w+)\]\s*$/) {
+            $section = $1;
+        }
+        elsif (/^(\w+)\s*=\s*(.*)$/) {
+            $config{$section}->{$1} = $2;
+        }
+        else {
+            die "Can't parse $_\n";
+        }
     }
-    return $config;
+    return \%config;
 }
 
 1;
