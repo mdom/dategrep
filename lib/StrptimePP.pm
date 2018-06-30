@@ -35,12 +35,15 @@ my %patterns = (
     H   => '(?<hours>(?:[01][0-9])|(?:2[0-3]))',
     M   => '(?<minutes>[0-5][0-9])',
     S   => '(?<seconds>[0-5][0-9])',
-
-    d => '(?<day> 0[1-9] | [12][0-9] | 3[01] )',
-
-    m => '(?<month>(?:0[1-9])|(?:1[012]))',
-    Y => '(?<year>\d{4})',
+    d   => '(?<day> 0[1-9] | [12][0-9] | 3[01] )',
+    m   => '(?<month>(?:0[1-9])|(?:1[012]))',
+    Y   => '(?<year>\d{4})',
+    t   => '\s+',
 );
+
+$patterns{R} = "$patterns{H}:$patterns{M}";
+$patterns{F} = "$patterns{Y}-$patterns{m}-$patterns{d}";
+$patterns{T} = "$patterns{H}:$patterns{M}:$patterns{S}";
 
 sub compile {
     my ($format) = @_;
