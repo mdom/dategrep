@@ -4,6 +4,7 @@ use warnings;
 use parent 'Exporter';
 use Time::Local 'timelocal', 'timegm';
 use Carp 'croak';
+our @EXPORT_OK = qw(strptime);
 use POSIX 'locale_h';
 use I18N::Langinfo qw(langinfo
     ABDAY_1 ABDAY_2 ABDAY_3 ABDAY_4 ABDAY_5 ABDAY_6 ABDAY_7
@@ -31,7 +32,6 @@ $i = 1;
 my %months = map { langinfo($_) => $i++ }
   MON_1, MON_2, MON_3, MON_4, MON_5, MON_6, MON_7, MON_8, MON_9, MON_10, MON_11, MON_12;
 
-our @EXPORT_OK = qw(compile strptime);
 my $weekday_name_re = join( '|', keys %abbrevated_weekdays, keys %weekdays );
 my $month_name_re   = join( '|', keys %abbrevated_months,   keys %months );
 
