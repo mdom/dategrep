@@ -18,10 +18,6 @@ use App::dategrep::Date;
 
 my $date = App::dategrep::Date->new;
 
-is( $date->to_epoch('2016-10-28_13:13 foo'),
-    1477660380, 'parse svlogd -tt' );
-is( $date->to_epoch('2016-10-28T13:13 foo'),
-    1477660380, 'parse svlogd -ttt' );
 is( $date->to_epoch('2016-10-28T13:13:00Z'), 1477660380, 'parse rfc3999' );
 is( $date->to_epoch('28/Oct/2016:13:13:00 +0000'), 1477660380, 'parse apache' );
 is( $date->to_epoch('Oct 28 13:13:00'), 1477660380, 'parse rsyslogd format' );
