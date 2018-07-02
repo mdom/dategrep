@@ -30,20 +30,26 @@ sub strptime {
     return;
 }
 
-my %patterns = (
-    '%' => '%',
-    H   => '(?<hours>(?:[01][0-9])|(?:2[0-3]))',
-    M   => '(?<minutes>[0-5][0-9])',
-    S   => '(?<seconds>[0-5][0-9])',
-    d   => '(?<day> 0[1-9] | [12][0-9] | 3[01] )',
-    m   => '(?<month>(?:0[1-9])|(?:1[012]))',
-    Y   => '(?<year>\d{4})',
-    t   => '\s+',
-);
+my $hours     = "0[0-9] | 1[0-9] | 2[0-3]";
+my $minutes   = "0[0-9] | [1-5][0-9]";
+my $seconds   = "0[0-9] | [1-5][0-9]";
+my $year      = "\\d{4}";
+my $month     = "0[1-9] | 1[012]";
+my $day       = "0?[1-9] | [12][0-9] | 3[01]";
 
-$patterns{R} = "$patterns{H}:$patterns{M}";
-$patterns{F} = "$patterns{Y}-$patterns{m}-$patterns{d}";
-$patterns{T} = "$patterns{H}:$patterns{M}:$patterns{S}";
+my %patterns = (
+    H   => "(?<hours> $hours)",
+    M   => "(?<minutes> $minutes)",
+    S   => "(?<seconds> $seconds)",
+    d   => "(?<day> $day )",
+    m   => "(?<month> $month)",
+    Y   => "(?<year> $year)",
+    t   => "\\s+",
+    R   => "(?<hours>$hours):(?<minutes>$minutes)",
+    T   => "(?<hours>$hours):(?<minutes>$minutes):(?<seconds>$seconds)",
+    F   => "(?<year>$year)-(?<month>$month)-(?<day>$day)",
+    '%' => '%',
+);
 
 sub compile {
     my ($format) = @_;
