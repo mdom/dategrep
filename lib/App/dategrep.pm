@@ -79,12 +79,12 @@ sub run {
     my ( $start, $end ) = ( 0, time );
 
     if ( defined $options{'start'} ) {
-        ($start) = $self->date->intervall_to_epoch( $options{'start'} );
+        ($start) = $self->date->to_epoch_with_modifiers( $options{'start'} );
         return error("Illegal start time.") if not defined $start;
     }
 
     if ( defined $options{'end'} ) {
-        ($end) = $self->date->intervall_to_epoch( $options{'end'} );
+        ($end) = $self->date->to_epoch_with_modifiers( $options{'end'} );
         return error("Illegal end time.") if not defined $end;
     }
 

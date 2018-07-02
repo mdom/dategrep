@@ -123,7 +123,7 @@ my %patterns = (
 my %likes = ( A => 'a', B => 'b', e => 'd', h => 'b', k => 'H' );
 
 for my $like ( keys %likes ) {
-    $patterns{$like} = $patterns{%likes{$like}};
+    $patterns{$like} = $patterns{$likes{$like}};
 }
 
 sub compile {

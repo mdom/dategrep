@@ -1,56 +1,63 @@
 package App::dategrep::Date;
 use Moo;
-use Date::Manip::Delta;
-use Date::Manip::Date;
+use App::dategrep::Strptime qw(strptime);
 
-has _formats => (
+has formats => (
     is      => 'rw',
     default => sub {
         [
-            '%b %e %H:%M:%S',                      # rsyslog
-            '%d/%b/%Y:%T %z',                      # apache
-            '%Y-%m-%d([T ])%H:%M:%S%Z',            # iso8601
-            '%Y-%m-%d([T_])%H:%M:%S(\\.\\d+)?',    # svlogd -tt
+            '%b %e %H:%M:%S',         # rsyslog
+            '%b %e %H:%M',         # rsyslog
+            '%d/%b/%Y:%T %z',         # apache
+            '%Y-%m-%dT%H:%M:%S%Z',    # iso8601
+            '%Y-%m-%d %H:%M:%S%Z',    # iso8601
+            '%Y-%m-%dT%H:%M%Z',    # iso8601
+            '%Y-%m-%d %H:%M%Z',    # iso8601
+            '%Y-%m-%d_%H:%M%Z',    # iso8601
+            '%d.%m.%Y',
+            '%FT%T%Z',
         ];
     },
 );
 
-has _date_object => ( is => 'rw', default => sub { Date::Manip::Date->new } );
-has now => ( is => 'rw', default => sub { Date::Manip::Date->new("now") } );
+has now => ( is => 'rw', default => sub { time } );
 
 sub add_format {
     my $self    = shift;
-    my %formats = map { $_ => 1 } @{ $self->_formats };
+    my %formats = map { $_ => 1 } @{ $self->formats };
     my @new     = grep { !$formats{$_} } @_;
-    unshift @{ $self->_formats }, @new;
+    unshift @{ $self->formats }, @new;
 }
 
-sub formats {
-    @{ shift->_formats };
+sub duration_to_seconds {
+    my ( $self, $duration ) = @_;
+    if ( $duration =~ m{ ([+-])?  (?:(\d+)h)?  (?:(\d+)m)?  (?:(\d+)s)?  }x) {
+        my ( $op, $hours, $minutes, $seconds ) = ( $1 || '+', $2 || 0, $3 || 0, $4 || 0 ); 
+        return ($hours * 3600 + $minutes * 60 + $seconds ) * ( $op eq '+' ? 1 : -1 );
+    }
+    die "Error parsing duration $duration\n";
 }
 
-sub intervall_to_epoch {
-    my ( $self, $time ) = @_;
-    if ( $time =~ /^(.*) from (.*)$/ ) {
-        my ( $delta, $date ) =
-          ( Date::Manip::Delta->new($1), Date::Manip::Date->new($2) );
-        ## TODO: $date->is_date is missing in Date::Manip::Date
-        ## will be fixed in next major release
-        if ( $delta->is_delta ) {    ## and $date->is_date ) {
-            return $date->calc($delta)->secs_since_1970_GMT;
-        }
+sub to_epoch_with_modifiers {
+    my ( $self, $spec ) = @_;
+    $spec =~ /^\s*(?<time>.*?)( \s+ truncate \s+ (?<truncate>\S+?))?( \s+ add \s+ (?<add>\S+))?\s*$/x;
+    my ($time, $truncate, $add ) = @+{qw(time truncate add)};
+    my $epoch;
+    for ( @{ $self->formats}, '%T' ) {
+        $epoch = strptime($time, $_);
+        last if $epoch;
     }
 
-    # First try our internal formats
-    my ($date) = $self->to_epoch($time);
-    return $date if $date;
+    return if !$epoch;
 
-    # Then check if Date::Manip can guess
-    $date = Date::Manip::Date->new($time);
-    if ( $date->err ) {
-        return ( undef, $date->err );
+    if ( $truncate ) {
+        my $duration = $self->duration_to_seconds( $truncate );
+        $epoch -= $epoch % $duration; 
     }
-    return $date->secs_since_1970_GMT;
+    if ( $add ) {
+        $epoch += $self->duration_to_seconds( $add );
+    }
+    return $epoch;
 }
 
 sub minutes_ago {
@@ -63,37 +70,29 @@ sub minutes_ago {
 
 sub guess_format {
     my ( $self, $line ) = @_;
-    for my $format ( $self->formats ) {
-        my ($date) = $self->to_epoch( $line, $format );
+    for my $format ( @{ $self->formats } ) {
+        my $date = eval { strptime( $line, $format ) };
         return $format if $date;
     }
     return;
 }
 
 sub to_epoch {
-    my ( $self, $str, $format, %options ) = @_;
+    my ( $self, $line, $format, %options ) = @_;
 
-    $format ||= $self->guess_format($str);
+    $format ||= $self->guess_format($line);
 
     if ( !$format ) {
-        return ( undef, "No date found in line $str" );
+        return ( undef, "No date found in line $line" );
     }
 
-    my ( $error, %match ) = $self->_date_object->parse_format( $format, $str );
-    if ($error) {
-        return ( undef, $self->_date_object->err );
+    my $t = eval { strptime( $line, $format ) };
+
+    if (!$t) {
+        return ( undef, $@ );
     }
 
-    ## check if date is in future
-    if ( $self->_date_object->cmp( $self->now ) == 1 && $options{prefer_past} )
-    {
-        if ( !exists $match{y} ) {
-            my $delta = Date::Manip::Delta->new('-1y');
-            $self->_date_object( $self->_date_object->calc($delta) );
-        }
-    }
-
-    return ( $self->_date_object->secs_since_1970_GMT );
+    return $t;
 }
 
 1;
