@@ -102,14 +102,8 @@ my $time_zone = qq{
 };
 
 my %patterns = (
-
     a => "(?<weekday> $weekday_name_re )",
-    A => "(?<weekday> $weekday_name_re )",
-
     b => "(?<month_name> $month_name_re )",
-    B => "(?<month_name> $month_name_re )",
-    h => "(?<month_name> $month_name_re )",
-
     H   => "(?<hours> $hours)",
     M   => "(?<minutes> $minutes)",
     S   => "(?<seconds> $seconds)",
@@ -124,6 +118,12 @@ my %patterns = (
     F   => "(?<year>$year)-(?<month>$month)-(?<day>$day)",
     '%' => '%',
 );
+
+my %likes = ( A => 'a', B => 'b', e => 'd', h => 'b', k => 'H' );
+
+for my $like ( keys %likes ) {
+    $patterns{$like} = $patterns{%likes{$like}};
+}
 
 sub compile {
     my ($format) = @_;
