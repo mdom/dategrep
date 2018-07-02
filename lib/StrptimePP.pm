@@ -4,8 +4,36 @@ use warnings;
 use parent 'Exporter';
 use Time::Local 'timelocal', 'timegm';
 use Carp 'croak';
+use POSIX 'locale_h';
+use I18N::Langinfo qw(langinfo
+    ABDAY_1 ABDAY_2 ABDAY_3 ABDAY_4 ABDAY_5 ABDAY_6 ABDAY_7
+    ABMON_1 ABMON_2 ABMON_3 ABMON_4 ABMON_5 ABMON_6 ABMON_7 ABMON_8 ABMON_9 ABMON_10 ABMON_11 ABMON_12
+    DAY_1 DAY_2 DAY_3 DAY_4 DAY_5 DAY_6 DAY_7
+    MON_1 MON_2 MON_3 MON_4 MON_5 MON_6 MON_7 MON_8 MON_9 MON_10 MON_11 MON_12
+);
+
+setlocale(LC_TIME, "" );
+
+my $i = 1;
+my %abbrevated_weekdays =
+  map { langinfo($_) => $i++  } ABDAY_1, ABDAY_2, ABDAY_3, ABDAY_4, ABDAY_5, ABDAY_6, ABDAY_7;
+
+$i = 1;
+my %abbrevated_months =
+  map { langinfo($_) => $i++ }
+  ABMON_1, ABMON_2, ABMON_3, ABMON_4, ABMON_5, ABMON_6, ABMON_7, ABMON_8, ABMON_9,
+  ABMON_10, ABMON_11, ABMON_12;
+
+$i = 1;
+my %weekdays = map { langinfo($_) => $i++ } DAY_1, DAY_2, DAY_3, DAY_4, DAY_5, DAY_6, DAY_7;
+
+$i = 1;
+my %months = map { langinfo($_) => $i++ }
+  MON_1, MON_2, MON_3, MON_4, MON_5, MON_6, MON_7, MON_8, MON_9, MON_10, MON_11, MON_12;
 
 our @EXPORT_OK = qw(compile strptime);
+my $weekday_name_re = join( '|', keys %abbrevated_weekdays, keys %weekdays );
+my $month_name_re   = join( '|', keys %abbrevated_months,   keys %months );
 
 ## TODO prefer past
 
@@ -15,6 +43,13 @@ sub strptime {
     my $re  = compile($format);
     if ( $string =~ $re ) {
         my %match = %+;
+
+        if ( my $month_name = $match{month_name} ) {
+            $match{month} = $months{$month_name} || $abbrevated_months{ $month_name };
+            if ( ! $match{month} ) {
+                croak "Illegal month name $month_name\n";
+            }
+        }
         if ( $match{month} ) {
             $match{month}--;
         }
@@ -67,6 +102,14 @@ my $time_zone = qq{
 };
 
 my %patterns = (
+
+    a => "(?<weekday> $weekday_name_re )",
+    A => "(?<weekday> $weekday_name_re )",
+
+    b => "(?<month_name> $month_name_re )",
+    B => "(?<month_name> $month_name_re )",
+    h => "(?<month_name> $month_name_re )",
+
     H   => "(?<hours> $hours)",
     M   => "(?<minutes> $minutes)",
     S   => "(?<seconds> $seconds)",
