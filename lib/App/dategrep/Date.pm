@@ -54,12 +54,11 @@ sub intervall_to_epoch {
 }
 
 sub minutes_ago {
-    my ( $self, $minutes ) = (@_);
-    my $now = Date::Manip::Date->new("now");
-    $now->set( 's', 0 );
-    my $ago = Date::Manip::Date->new("$minutes minutes ago");
-    $ago->set( 's', 0 );
-    return ( $ago->secs_since_1970_GMT, $now->secs_since_1970_GMT );
+    my ( $self, $minutes ) = @_;
+    my $to = $self->now;
+    $to -= $to % 60;
+    my $from = $to - $minutes * 60;
+    return ($from, $to);
 }
 
 sub guess_format {
