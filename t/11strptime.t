@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Test::More;
-use StrptimePP qw(strptime);
+use App::dategrep::Strptime qw(strptime);
 
 $ENV{TZ} = 'GMT';
 
