@@ -1,4 +1,5 @@
-package StrptimePP;
+package App::dategrep::Strptime;
+
 use strict;
 use warnings;
 use parent 'Exporter';
