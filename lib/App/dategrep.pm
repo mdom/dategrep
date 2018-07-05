@@ -1,6 +1,4 @@
 package App::dategrep;
-use Moo;
-
 use App::dategrep::Iterators;
 use App::dategrep::Date;
 use Pod::Usage;
@@ -23,7 +21,10 @@ sub error {
     return $rc;
 }
 
-has 'date' => ( is => 'rw', default => sub { App::dategrep::Date->new } );
+sub new {
+    my ( $class, @args ) = @_;
+    bless { date => App::dategrep::Date->new }, $class;
+}
 
 sub run {
     my $self = shift;
@@ -36,8 +37,8 @@ sub run {
         'blocksize=i',    'help|?',
         'sort-files',     'man',
         'configfile=s',   'interleave',
-        'byte-offsets',   'debug=s',
-        'version!',       'skip-unparsable!',
+        'debug=s',        'version!',
+        'skip-unparsable!',
     );
     if ( !$rc ) {
         pod2usage( -exitstatus => "NOEXIT", -verbose => 0 );
@@ -61,35 +62,38 @@ sub run {
     my $config = loadconfig( $options{configfile} );
 
     if ( exists $config->{formats} ) {
-        $self->date->add_format( values %{ $config->{formats} } );
+        $self->{date}->add_format( values %{ $config->{formats} } );
     }
 
     if ( $ENV{DATEGREP_DEFAULT_FORMAT} ) {
-        $self->date->add_format( $ENV{DATEGREP_DEFAULT_FORMAT} );
+        $self->{date}->add_format( $ENV{DATEGREP_DEFAULT_FORMAT} );
     }
 
-    $self->date->add_format( grep { /%/ } @{ $options{'format'} } );
+    $self->{date}->add_format( grep { /%/ } @{ $options{'format'} } );
 
     delete $options{'format'};    # Don't call new on iterators with format
 
-    if ( $options{'skip-unparsable'} ) {
-        $options{'multiline'} = 0;
+    $options{skip_unparsable} = delete $options{'skip-unparsable'};
+
+    if ( $options{skip_unparsable} ) {
+        $options{multiline} = 0;
     }
 
     my ( $start, $end ) = ( 0, time );
 
-    if ( defined $options{'start'} ) {
-        ($start) = $self->date->to_epoch_with_modifiers( $options{'start'} );
+    if ( defined $options{start} ) {
+        ($start) = $self->{date}->to_epoch_with_modifiers( $options{start} );
         return error("Illegal start time.") if not defined $start;
     }
 
     if ( defined $options{'end'} ) {
-        ($end) = $self->date->to_epoch_with_modifiers( $options{'end'} );
+        ($end) = $self->{date}->to_epoch_with_modifiers( $options{'end'} );
         return error("Illegal end time.") if not defined $end;
     }
 
     if ( defined $options{'last-minutes'} ) {
-        ( $start, $end ) = $self->date->minutes_ago( $options{'last-minutes'} );
+        ( $start, $end ) =
+          $self->{date}->minutes_ago( $options{'last-minutes'} );
     }
 
     if ( $end < $start ) {
@@ -107,30 +111,12 @@ sub run {
 
     eval {
 
-        if ( $options{'byte-offsets'} ) {
-            if ( @ARGV == 1 and -f $ARGV[0] ) {
-                my $iter = App::dategrep::Iterator::File->new(
-                    %options,
-                    filename => $ARGV[0],
-                    start    => $start,
-                    end      => $end,
-                    date     => $self->date,
-                );
-                my ( $byte_beg, $byte_end ) = $iter->byte_offsets;
-                if ( not defined $byte_end ) {
-                    $byte_end = ( stat( $iter->fh ) )[7];
-                }
-                print "$byte_beg $byte_end\n";
-                return 0;
-            }
-        }
-
         my $iterators = App::dategrep::Iterators->new(
             %options,
             filenames => \@ARGV,
             start     => $start,
             end       => $end,
-            date      => $self->date,
+            date      => $self->{date},
         );
 
         if ( $options{'interleave'} && @ARGV > 1 ) {

@@ -1,70 +1,46 @@
 package App::dategrep::Iterators;
-use Moo;
-use App::dategrep::Iterator::File;
-use App::dategrep::Iterator::Stdin;
-use App::dategrep::Iterator::Uncompress;
-
-has iterators => ( is => 'rw', default => sub { [] } );
+use strict;
+use warnings;
+use App::dategrep::Iterator;
 
 sub as_array {
-    return @{ shift->iterators };
+    return @{ shift->{iterators} };
 }
 
-sub BUILDARGS {
+sub new {
     my ( $class, %options ) = @_;
-    my @filenames =
-      ref $options{filenames} ? @{ $options{filenames} } : $options{filenames};
-    my @args = (
-        start           => $options{start},
-        end             => $options{end},
-        date            => $options{date},
-        multiline       => $options{multiline},
-        skip_unparsable => $options{'skip-unparsable'},
-    );
-    push @args, blocksize => $options{blocksize} if defined $options{blocksize};
+
+    my $filenames = delete $options{filenames};
+    my @filenames = ref $filenames ? @$filenames : $filenames;
 
     my @iterators;
     for my $filename (@filenames) {
-        if ( $filename eq '-' ) {
-            push @iterators, App::dategrep::Iterator::Stdin->new(@args);
-        }
-        elsif ( $filename =~ /\.(bz|bz2|gz|z)$/ ) {
-            push @iterators,
-              App::dategrep::Iterator::Uncompress->new( @args,
-                filename => $filename );
-        }
-        else {
-            push @iterators,
-              App::dategrep::Iterator::File->new( @args,
-                filename => $filename );
-        }
+        push @iterators,
+          App::dategrep::Iterator->new( %options, filename => $filename );
     }
-    return { iterators => \@iterators };
+
+    return bless { iterators => \@iterators }, $class;
 }
 
 sub sort {
-    my $self = shift;
-
-    my @iterators = @{ $self->iterators };
-
-    @iterators =
-      sort { $a->next_date <=> $b->next_date }
-      grep { !$_->eof } @iterators;
-
-    $self->iterators( \@iterators );
-
+    my $self      = shift;
+    my @iterators = @{ $self->{iterators} };
+    $self->{iterators} = [
+        sort { $a->{next_date} <=> $b->{next_date} }
+        grep { !$_->{eof} } @{ $self->{iterators} }
+    ];
     return;
 }
 
 sub interleave {
     my $self = shift;
 
-    while ( $self->sort, $self->iterators->[0] ) {
+    while ( $self->sort, $self->{iterators}->[0] ) {
         my $until;
-        if ( $self->iterators->[1] ) {
-            $until = $self->iterators->[1]->next_date;
+        if ( $self->{iterators}->[1] ) {
+            $until = $self->{iterators}->[1]->{next_date};
         }
-        $self->iterators->[0]->print($until);
+        $self->{iterators}->[0]->print($until);
     }
     return;
 }
