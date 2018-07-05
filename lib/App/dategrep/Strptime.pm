@@ -7,31 +7,24 @@ use Time::Local 'timelocal', 'timegm';
 use Carp 'croak';
 our @EXPORT_OK = qw(strptime);
 use POSIX 'locale_h';
-use I18N::Langinfo qw(langinfo
-    ABDAY_1 ABDAY_2 ABDAY_3 ABDAY_4 ABDAY_5 ABDAY_6 ABDAY_7
-    ABMON_1 ABMON_2 ABMON_3 ABMON_4 ABMON_5 ABMON_6 ABMON_7 ABMON_8 ABMON_9 ABMON_10 ABMON_11 ABMON_12
-    DAY_1 DAY_2 DAY_3 DAY_4 DAY_5 DAY_6 DAY_7
-    MON_1 MON_2 MON_3 MON_4 MON_5 MON_6 MON_7 MON_8 MON_9 MON_10 MON_11 MON_12
-);
+use POSIX 'strftime';
 
 setlocale(LC_TIME, "" );
 
-my $i = 1;
-my %abbrevated_weekdays =
-  map { langinfo($_) => $i++  } ABDAY_1, ABDAY_2, ABDAY_3, ABDAY_4, ABDAY_5, ABDAY_6, ABDAY_7;
+my @date = localtime;
+$date[3] -= $date[6];
 
-$i = 1;
+my ( %abbrevated_weekdays, %weekdays );
+
+for ( 0 .. 6 ) {
+    $date[3]++;
+    $abbrevated_weekdays{ strftime( "%a", @date ) } = $_;
+    $weekdays{ strftime( "%A", @date ) } = $_;
+}
+
 my %abbrevated_months =
-  map { langinfo($_) => $i++ }
-  ABMON_1, ABMON_2, ABMON_3, ABMON_4, ABMON_5, ABMON_6, ABMON_7, ABMON_8, ABMON_9,
-  ABMON_10, ABMON_11, ABMON_12;
-
-$i = 1;
-my %weekdays = map { langinfo($_) => $i++ } DAY_1, DAY_2, DAY_3, DAY_4, DAY_5, DAY_6, DAY_7;
-
-$i = 1;
-my %months = map { langinfo($_) => $i++ }
-  MON_1, MON_2, MON_3, MON_4, MON_5, MON_6, MON_7, MON_8, MON_9, MON_10, MON_11, MON_12;
+  map { strftime( "%b", 0, 0, 0, 0, $_, 0, 0 ) => $_ } 1 .. 12;
+my %months = map { strftime( "%B", 0, 0, 0, 0, $_, 0, 0 ) => $_ } 1 .. 12;
 
 my $weekday_name_re = join( '|', keys %abbrevated_weekdays, keys %weekdays );
 my $month_name_re   = join( '|', keys %abbrevated_months,   keys %months );
