@@ -126,8 +126,13 @@ for my $like ( keys %likes ) {
     $patterns{$like} = $patterns{$likes{$like}};
 }
 
+my %cache;
+
 sub compile {
     my ($format) = @_;
+    if ( $cache{$format} ) {
+        return $cache{$format};
+    }
     my $re = '';
     while (1) {
         if ( $format =~ /\G%(.)/gcx ) {
@@ -148,7 +153,7 @@ sub compile {
             last;
         }
     }
-    return qr($re)x;
+    return $cache{$format} = qr($re)x;
 }
 
 1;
