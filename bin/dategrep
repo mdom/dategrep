@@ -145,10 +145,6 @@ like syslog, syslog.1, syslog.2 etc. For dategrep to work we need those
 files in reverse order: syslog.2, syslog.1, syslog. This options handles
 that for you.
 
-=item --configfile FILE
-
-Reads configuration from FILE instead of I<~/.dategreprc>.
-
 =item --help
 
 Shows a short help message
@@ -158,22 +154,6 @@ Shows a short help message
 Shows the complete man page in your pager.
 
 =back
-
-=head1 CONFIGURATION FILE
-
-On startup dategrep reads a configuration file from I<$HOME/.dategreprc> or the
-file specified by I<--configfile>.
-
-The file consists of sections and variables. A section begins with the name of
-the section in square brackets and continues until the next section begins.
-Section names are not case sensitive. Empty lines and lines with comments are
-skipped. Comments are started with a hash character. dategrep recognizes
-only one sections: Under I<formats> you can list additional formats.
-
-Example:
-
-  [formats]
-  time = %H:%M:%S
 
 =head1 ENVIRONMENT
 

@@ -36,10 +36,10 @@ sub run {
         'last-minutes=i', 'multiline!',
         'blocksize=i',    'help|?',
         'sort-files',     'man',
-        'configfile=s',   'interleave',
-        'debug=s',        'version!',
-        'skip-unparsable!',
+        'interleave',     'debug=s',
+        'version!',       'skip-unparsable!',
     );
+
     if ( !$rc ) {
         pod2usage( -exitstatus => "NOEXIT", -verbose => 0 );
         return 2;
@@ -57,12 +57,6 @@ sub run {
     if ( $options{man} ) {
         pod2usage( -exitstatus => "NOEXIT", -verbose => 2 );
         return 0;
-    }
-
-    my $config = loadconfig( $options{configfile} );
-
-    if ( exists $config->{formats} ) {
-        $self->{date}->add_format( values %{ $config->{formats} } );
     }
 
     if ( $ENV{DATEGREP_DEFAULT_FORMAT} ) {
@@ -136,35 +130,6 @@ sub run {
     };
     return error($@) if $@;
     return 0;
-}
-
-sub loadconfig {
-    my $configfile = shift;
-    if ( not $configfile and $ENV{HOME} ) {
-        $configfile = "$ENV{HOME}/.dategreprc";
-    }
-    if ( not defined $configfile or not -e $configfile ) {
-        return;
-    }
-    open( my $config_fh, '<', $configfile )
-      or die "Can't read $configfile: $!\n";
-    my %config;
-    my $section = '_';
-    while (<$config_fh>) {
-        chomp;
-        s/#.*$//;
-        next if /^\s*$/;
-        if (/^\s*\[(\w+)\]\s*$/) {
-            $section = $1;
-        }
-        elsif (/^(\w+)\s*=\s*(.*)$/) {
-            $config{$section}->{$1} = $2;
-        }
-        else {
-            die "Can't parse $_\n";
-        }
-    }
-    return \%config;
 }
 
 1;
