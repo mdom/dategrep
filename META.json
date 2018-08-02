@@ -40,6 +40,12 @@
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::MockTime" : "0",
+            "Test::Output" : "0"
+         }
       }
    },
    "release_status" : "unstable",
