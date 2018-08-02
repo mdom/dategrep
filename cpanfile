@@ -3,6 +3,11 @@ on configure => sub {
     requires 'perl', '5.008_001';
 };
 
+on test => sub {
+    requires 'Test::MockTime';
+    requires 'Test::Output';
+};
+
 on develop => sub {
     requires 'Test::CPAN::Meta';
     requires 'Test::MinimumVersion::Fast', '0.04';
