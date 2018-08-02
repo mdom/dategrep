@@ -8,32 +8,38 @@ use Carp 'croak';
 our @EXPORT_OK = qw(strptime);
 use POSIX 'locale_h';
 use POSIX 'strftime';
+use I18N::Langinfo qw(langinfo
+  ABDAY_1 ABDAY_2 ABDAY_3 ABDAY_4 ABDAY_5 ABDAY_6 ABDAY_7
+  ABMON_1 ABMON_2 ABMON_3 ABMON_4 ABMON_5 ABMON_6 ABMON_7 ABMON_8 ABMON_9 ABMON_10 ABMON_11 ABMON_12
+  DAY_1 DAY_2 DAY_3 DAY_4 DAY_5 DAY_6 DAY_7
+  MON_1 MON_2 MON_3 MON_4 MON_5 MON_6 MON_7 MON_8 MON_9 MON_10 MON_11 MON_12
+);
 
-setlocale(LC_TIME, "" );
+setlocale( LC_TIME, "" );
 
-my @date = localtime;
-$date[3] -= $date[6];
+my $i = 1;
+my %abbrevated_weekdays =
+  map { langinfo($_) => $i++ } ABDAY_1, ABDAY_2, ABDAY_3, ABDAY_4, ABDAY_5,
+  ABDAY_6, ABDAY_7;
 
-my ( %abbrevated_weekdays, %weekdays );
-
-for ( 0 .. 6 ) {
-    $date[3]++;
-    $abbrevated_weekdays{ strftime( "%a", @date ) } = $_;
-    $weekdays{ strftime( "%A", @date ) } = $_;
-}
-
+$i = 1;
 my %abbrevated_months =
-  map { strftime( "%b", 0, 0, 0, 0, $_, 0, 0 ) => $_ } 1 .. 12;
-my %months = map { strftime( "%B", 0, 0, 0, 0, $_, 0, 0 ) => $_ } 1 .. 12;
+  map { langinfo($_) => $i++ } ABMON_1, ABMON_2, ABMON_3, ABMON_4, ABMON_5,
+  ABMON_6, ABMON_7, ABMON_8, ABMON_9,
+  ABMON_10, ABMON_11, ABMON_12;
+
+$i = 1;
+my %weekdays = map { langinfo($_) => $i++ } DAY_1, DAY_2, DAY_3, DAY_4, DAY_5,
+  DAY_6, DAY_7;
+
+$i = 1;
+my %months = map { langinfo($_) => $i++ } MON_1, MON_2, MON_3, MON_4, MON_5,
+  MON_6, MON_7, MON_8, MON_9, MON_10, MON_11, MON_12;
 
 my $weekday_name_re = join( '|', keys %abbrevated_weekdays, keys %weekdays );
 my $month_name_re   = join( '|', keys %abbrevated_months,   keys %months );
 
 ## TODO prefer past
-
-use Test::More;
-diag $weekday_name_re;
-diag $month_name_re;
 
 sub strptime {
     my ( $string, $format ) = @_;
@@ -43,8 +49,9 @@ sub strptime {
         my %match = %+;
 
         if ( my $month_name = $match{month_name} ) {
-            $match{month} = $months{$month_name} || $abbrevated_months{ $month_name };
-            if ( ! $match{month} ) {
+            $match{month} =
+              $months{$month_name} || $abbrevated_months{$month_name};
+            if ( !$match{month} ) {
                 croak "Illegal month name $month_name\n";
             }
         }
@@ -56,10 +63,10 @@ sub strptime {
         my @args = (
             $match{seconds} // 0,
             $match{minutes} // 0,
-            $match{hours}   // 0,
-            $match{day}     // $now[3],
-            $match{month}   // $now[4],
-            $match{year}    // $now[5],
+            $match{hours} // 0,
+            $match{day} // $now[3],
+            $match{month} // $now[4],
+            $match{year} // $now[5],
         );
         my $tz = $match{time_zone};
         if ($tz) {
@@ -100,8 +107,8 @@ my $time_zone = qq{
 };
 
 my %patterns = (
-    a => "(?<weekday> $weekday_name_re )",
-    b => "(?<month_name> $month_name_re )",
+    a   => "(?<weekday> $weekday_name_re )",
+    b   => "(?<month_name> $month_name_re )",
     H   => "(?<hours> $hours)",
     M   => "(?<minutes> $minutes)",
     S   => "(?<seconds> $seconds)",
@@ -120,7 +127,7 @@ my %patterns = (
 my %likes = ( A => 'a', B => 'b', e => 'd', h => 'b', k => 'H' );
 
 for my $like ( keys %likes ) {
-    $patterns{$like} = $patterns{$likes{$like}};
+    $patterns{$like} = $patterns{ $likes{$like} };
 }
 
 my %cache;
