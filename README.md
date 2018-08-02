@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/mdom/dategrep.svg?branch=master)](https://travis-ci.org/mdom/dategrep)
 <a href="https://travis-ci.org/mdom/dategrep"><img src="https://travis-ci.org/mdom/dategrep.svg?branch=master"></a>  <a href='https://coveralls.io/r/mdom/dategrep?branch=master'><img src='https://coveralls.io/repos/mdom/dategrep/badge.png?branch=master' alt='Coverage Status' /></a> <a href="http://cpants.charsbar.org/dist/overview/App-dategrep"><img src="http://cpants.cpanauthors.org/dist/App-dategrep.png" alt="Kwalitee status"></a>
 
 # NAME
@@ -67,14 +68,18 @@ dategrep directly.
 - --start|--from DATESPEC
 
     Print all lines from DATESPEC inclusively. Defaults to Jan 1, 1970 00:00:00 GMT.
-    See
-    [VALID-DATE-FORMATS](https://metacpan.org/pod/distribution/Date-Manip/lib/Date/Manip/Date.pod#VALID-DATE-FORMATS)
-    for a list of possible formats for DATESPEC.
+
+    The following time formats are understood:
+
+    - %H:%M
+    - %H:%M:%S
+    - %Y-%m-%dT%H:%M:%S
+    - %Y-%m-%dT%H:%M:%S%Z
 
     Additional it's possible to express offsets against dates by using the special
-    syntax _$delta from $date_, for example
+    syntax _$date truncate ... add ..._, for example
 
-        --from "1 hour ago from -17:00" --to "-17:00"
+        --from "now truncate 1h add 17m" --to "now truncate 1h add 1h17m"
 
     would search entries from 16:17 to 17:17 if we had now 17:30.
 
@@ -91,9 +96,10 @@ dategrep directly.
 
 - --format FORMAT
 
-    Defines a strftime-based FORMAT that is used to parse the input lines for
-    a date. The list of possible escape sequences can be found under [PRINTF
-    DIRECTIVES](https://metacpan.org/pod/distribution/Date-Manip/lib/Date/Manip/Date.pod#PRINTF-DIRECTIVES).
+    Defines a time format that is used to parse the input lines for a date.  The
+    time format string can contain the conversion specifications described in the
+    _strptime(3)_ manual page. Currently only the specifiers
+    "AaBbHMSdmYzZRTFehk%" are supported.
 
     This option can be given multiple times. In this case dategrep tries
     every format in the order given until it can match a line.
@@ -129,10 +135,6 @@ dategrep directly.
     files in reverse order: syslog.2, syslog.1, syslog. This options handles
     that for you.
 
-- --configfile FILE
-
-    Reads configuration from FILE instead of _~/.dategreprc_.
-
 - --help
 
     Shows a short help message
@@ -140,22 +142,6 @@ dategrep directly.
 - --man
 
     Shows the complete man page in your pager.
-
-# CONFIGURATION FILE
-
-On startup dategrep reads a configuration file from _$HOME/.dategreprc_ or the
-file specified by _--configfile_.
-
-The file consists of sections and variables. A section begins with the name of
-the section in square brackets and continues until the next section begins.
-Section names are not case sensitive. Empty lines and lines with comments are
-skipped. Comments are started with a hash character. dategrep recognizes
-only one sections: Under _formats_ you can list additional formats.
-
-Example:
-
-    [formats]
-    time = %H:%M:%S
 
 # ENVIRONMENT
 
@@ -185,30 +171,11 @@ Compressed files are just piped into dategrep via bzcat or zcat.
 
 It is possible to install this script via perl normal install routines.
 
-    perl Makefile.PL && make && make install
+    perl Build.PL && make && make install
 
 Or via CPAN:
 
     cpan App::dategrep
-
-You can also install one of the two prebuild versions, which already
-include all or some of dategrep's dependencies. Which to choose
-mainly depends on how hard it is for you to install Date::Manip. The
-small version is just 22.3KB big and includes all libraries except
-Date::Manip. The big one packs everything in a nice, neat package for you,
-but will cost you almost 10MB of disk space. Both are always included
-in the [latest release](https://github.com/mdom/dategrep/releases/latest).
-
-So, to install the big version you could just type:
-
-    wget -O /usr/local/bin/dategrep https://github.com/mdom/dategrep/releases/download/v0.58/dategrep-standalone-big
-    chmod +x /usr/local/bin/dategrep
-
-And for the small one (with the apt-get for Debian):
-
-    apt-get install libdate-manip-perl
-    wget -O /usr/local/bin/dategrep https://github.com/mdom/dategrep/releases/download/v0.58/dategrep-standalone-small
-    chmod +x /usr/local/bin/dategrep
 
 # COPYRIGHT AND LICENSE
 
