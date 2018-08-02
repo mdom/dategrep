@@ -3,18 +3,22 @@
 use strict;
 use warnings;
 use Test::More;
-use App::dategrep::Strptime qw(strptime);
 
-$ENV{TZ} = 'GMT';
-$ENV{LC_TIME} = 'C';
+BEGIN {
+    $ENV{LC_TIME} = 'C';
+    $ENV{TZ}      = 'GMT';
+}
+
+use App::dategrep::Strptime qw(strptime);
 
 eval { strptime( '2018-06-30T12:12:12', '%1' ) };
 like( $@, qr(^Unknown conversion specification 1) );
 
 while (<DATA>) {
     chomp;
-    my ($string, $format, $epoch) = map { s/^\s*//; s/\s*$//; $_ } split(/\|/, $_);
-    is ( strptime( $string, $format ), $epoch, "$string -> $format");
+    my ( $string, $format, $epoch ) =
+      map { s/^\s*//; s/\s*$//; $_ } split( /\|/, $_ );
+    is( strptime( $string, $format ), $epoch, "$string -> $format" );
 }
 
 done_testing;
