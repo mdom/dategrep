@@ -31,29 +31,29 @@ sub match_filter {
 
 sub new {
     my ( $class, @args ) = @_;
-    my $self = {@args};
+    my $self     = {@args};
+    my $filename = $self->{filename};
 
-    if ( $self->{filename} eq '-' ) {
+    if ( $filename eq '-' ) {
         $self->{fh} = \*STDIN;
         $class .= '::Stream';
     }
-    elsif ( my $filter = match_filter( $self->{filename} ) ) {
+    elsif ( my $filter = match_filter($filename) ) {
         if ( $^O eq 'MSWin32' or !can_run( $filter->{args}->[0] ) ) {
             eval "require $filter->{class}";
-            open( my $fh, '<', $self->{filename} )
-              or die "Can't open $self->{filename}: $!\n";
+            open( my $fh, '<', $filename )
+              or die "Can't open $filename: $!\n";
             $self->{fh} = $filter->{class}->new($fh);
-            $class .= '::Stream';
         }
         else {
-            open( $self->{fh}, '-|', @{ $filter->{args} }, $self->{filename} )
+            open( $self->{fh}, '-|', @{ $filter->{args} }, $filename )
               or die "Can't open @{ $filter->{args} }: $!\n";
-            $class .= '::Stream';
         }
+        $class .= '::Stream';
     }
     else {
-        open( $self->{fh}, '<', $self->{filename} )
-          or die "Can't open $self->{filename}: $!\n";
+        open( $self->{fh}, '<', $filename )
+          or die "Can't open $filename: $!\n";
         $class .= '::File';
     }
 
