@@ -44,9 +44,14 @@ sub to_epoch_with_modifiers {
 /^\s*(?<time>.*?)( \s+ truncate \s+ (?<truncate>\S+?))?( \s+ add \s+ (?<add>\S+))?\s*$/x;
     my ( $time, $truncate, $add ) = @+{qw(time truncate add)};
     my $epoch;
-    for ( @{ $self->{formats} }, '%T' ) {
-        $epoch = strptime( $time, $_ );
-        last if $epoch;
+    if ( $time eq 'now' ) {
+        $epoch = time;
+    }
+    else {
+        for ( @{ $self->{formats} }, '%T' ) {
+            $epoch = strptime( $time, $_ );
+            last if $epoch;
+        }
     }
 
     return if !$epoch;
