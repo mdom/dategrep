@@ -6,6 +6,7 @@ use Test::More;
 use App::dategrep::Strptime qw(strptime);
 
 $ENV{TZ} = 'GMT';
+$ENV{LC_TIME} = 'C';
 
 eval { strptime( '2018-06-30T12:12:12', '%1' ) };
 like( $@, qr(^Unknown conversion specification 1) );
