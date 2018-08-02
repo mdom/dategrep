@@ -31,6 +31,10 @@ my $month_name_re   = join( '|', keys %abbrevated_months,   keys %months );
 
 ## TODO prefer past
 
+use Test::More;
+diag $weekday_name_re;
+diag $month_name_re;
+
 sub strptime {
     my ( $string, $format ) = @_;
     my @now = localtime;
