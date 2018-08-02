@@ -99,7 +99,7 @@ dategrep directly.
     Defines a time format that is used to parse the input lines for a date.  The
     time format string can contain the conversion specifications described in the
     _strptime(3)_ manual page. Currently only the specifiers
-    "AaBbHMSdmYzZRTFehk%" are supported.
+    "AaBbcHMSdmYzZRTFehk%" are supported.
 
     This option can be given multiple times. In this case dategrep tries
     every format in the order given until it can match a line.
