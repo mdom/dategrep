@@ -164,12 +164,14 @@ for my $like ( keys %likes ) {
     $patterns{$like} = $patterns{ $likes{$like} };
 }
 
-$patterns{c} = compile( langinfo( D_T_FMT() ) );
 $patterns{D} = compile('%m/%d/%y');
 $patterns{F} = compile('%Y-%m-%d');
 $patterns{r} = compile('%I:%M:%S %p');
 $patterns{R} = compile('%H:%M');
 $patterns{T} = compile('%H:%M:%S');
+
+## This must be the last pattern added, as all other specifiers could be used
+$patterns{c} = compile( langinfo( D_T_FMT() ) );
 
 my %cache;
 
