@@ -5,8 +5,9 @@ Revision history for Perl module App::dategrep
   - it's not necessary to specify --format anymore. Without the paramter
     dategrep now tries several time formats until it finds one that matches
   - formats specified with --format just add additional formats to the list of possible time formats
-  - named time formats are now ignored
   - not all files need to have the same time format
+  - new date parsing library App::dategrep::Strptime
+  - new date modifiers truncate ... add ... 
 
 0.58  2016-10-12 12:52:20 CEST
 

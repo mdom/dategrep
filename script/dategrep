@@ -40,6 +40,10 @@ parse every line until we find the first falling in our date range. But at
 least we don't have to wait for the pipe to be closed. As soon as we find the
 first date not in the range, dategrep terminates.
 
+See UPGRADING if you used dategrep before. dategrep sees currently
+a lot of change, so this version might be less reliable as version
+0.58. Please submit bug reports if anything unusual happens.
+
 =head1 EXAMPLES
 
 But just let me show you a few examples.
@@ -96,19 +100,23 @@ The following time formats are understood:
 
 =item %Y-%m-%dT%H:%M:%S%Z
 
+=item now
+
 =back
+
+All dates formats without date specifiers default to today.
 
 Additional it's possible to express offsets against dates by using the special
 syntax I<$date truncate ... add ...>, for example
 
   --from "now truncate 1h add 17m" --to "now truncate 1h add 1h17m"
 
-would search entries from 16:17 to 17:17 if we had now 17:30.
+would search entries from 16:17 to 17:17 if the current time was 17:30.
 
 =item --end|--to DATESPEC
 
-Print all lines until DATESPEC exclusively. Default to the current time. See I<--start>
-for a list of possible formats for DATESPEC.
+Print all lines until DATESPEC exclusively. Defaults to the current time. See
+I<--start> for a list of possible formats for DATESPEC.
 
 =item --last-minutes MINUTES
 
@@ -204,6 +212,13 @@ It is possible to install this script via perl normal install routines.
 Or via CPAN:
 
   cpan App::dategrep
+
+=head1 UPGRADING
+
+dategrep after version 0.58 uses a new library to parse dates. Most
+time conversion specifiers are compatible, but it's probably better
+to check the manual for valid specifiers. In addition the format
+for specifying date offsets has changed.
 
 =head1 COPYRIGHT AND LICENSE
 
