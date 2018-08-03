@@ -13,7 +13,7 @@ use I18N::Langinfo qw(langinfo
   ABMON_1 ABMON_2 ABMON_3 ABMON_4 ABMON_5 ABMON_6 ABMON_7 ABMON_8 ABMON_9 ABMON_10 ABMON_11 ABMON_12
   DAY_1 DAY_2 DAY_3 DAY_4 DAY_5 DAY_6 DAY_7
   MON_1 MON_2 MON_3 MON_4 MON_5 MON_6 MON_7 MON_8 MON_9 MON_10 MON_11 MON_12
-  D_T_FMT AM_STR PM_STR
+  D_T_FMT D_FMT T_FMT AM_STR PM_STR
 );
 
 setlocale( LC_TIME, "" );
@@ -170,8 +170,10 @@ $patterns{r} = compile('%I:%M:%S %p');
 $patterns{R} = compile('%H:%M');
 $patterns{T} = compile('%H:%M:%S');
 
-## This must be the last pattern added, as all other specifiers could be used
+## These must be the last patterns added, as all other specifiers could be used
 $patterns{c} = compile( langinfo( D_T_FMT() ) );
+$patterns{x} = compile( langinfo( D_FMT() ) );
+$patterns{X} = compile( langinfo( T_FMT() ) );
 
 my %cache;
 
