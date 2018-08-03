@@ -151,9 +151,6 @@ my %patterns = (
     t   => '\s+',
     z   => $time_zone,
     Z   => "${time_zone}?",
-    R   => "(?<hours>$hours):(?<minutes>$minutes)",
-    T   => "(?<hours>$hours):(?<minutes>$minutes):(?<seconds>$seconds)",
-    F   => "(?<year>$year)-(?<month>$month)-(?<day>$day)",
     p   => "(?:(?<am> \Q$am\E ) | (?<pm> \Q$pm\E ))",
     y   => '(?<short_year> \d\d )',
     C   => '(?<century> \d\d )',
@@ -169,7 +166,10 @@ for my $like ( keys %likes ) {
 
 $patterns{c} = compile( langinfo( D_T_FMT() ) );
 $patterns{D} = compile('%m/%d/%y');
+$patterns{F} = compile('%Y-%m-%d');
 $patterns{r} = compile('%I:%M:%S %p');
+$patterns{R} = compile('%H:%M');
+$patterns{T} = compile('%H:%M:%S');
 
 my %cache;
 
