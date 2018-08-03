@@ -1,6 +1,4 @@
-[![Build Status](https://travis-ci.org/mdom/dategrep.svg?branch=master)](https://travis-ci.org/mdom/dategrep)
-<a href="https://travis-ci.org/mdom/dategrep"><img src="https://travis-ci.org/mdom/dategrep.svg?branch=master"></a>  <a href='https://coveralls.io/r/mdom/dategrep?branch=master'><img src='https://coveralls.io/repos/mdom/dategrep/badge.png?branch=master' alt='Coverage Status' /></a> <a href="http://cpants.charsbar.org/dist/overview/App-dategrep"><img src="http://cpants.cpanauthors.org/dist/App-dategrep.png" alt="Kwalitee status"></a>
-
+[![Build Status](https://travis-ci.org/mdom/dategrep.svg?branch=master)](https://travis-ci.org/mdom/dategrep) [![Coverage Status](https://img.shields.io/coveralls/mdom/dategrep/master.svg?style=flat)](https://coveralls.io/r/mdom/dategrep?branch=master) [![MetaCPAN Release](https://badge.fury.io/pl/dategrep.svg)](https://metacpan.org/release/dategrep)
 # NAME
 
 dategrep - print lines matching a date range
