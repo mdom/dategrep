@@ -168,6 +168,7 @@ for my $like ( keys %likes ) {
 }
 
 $patterns{c} = compile( langinfo( D_T_FMT() ) );
+$patterns{r} = compile('%I:%M:%S %p');
 
 my %cache;
 
