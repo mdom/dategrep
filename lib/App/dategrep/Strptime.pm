@@ -13,7 +13,7 @@ use I18N::Langinfo qw(langinfo
   ABMON_1 ABMON_2 ABMON_3 ABMON_4 ABMON_5 ABMON_6 ABMON_7 ABMON_8 ABMON_9 ABMON_10 ABMON_11 ABMON_12
   DAY_1 DAY_2 DAY_3 DAY_4 DAY_5 DAY_6 DAY_7
   MON_1 MON_2 MON_3 MON_4 MON_5 MON_6 MON_7 MON_8 MON_9 MON_10 MON_11 MON_12
-  D_T_FMT
+  D_T_FMT AM_STR PM_STR
 );
 
 setlocale( LC_TIME, "" );
@@ -60,6 +60,19 @@ sub strptime {
             $match{month}--;
         }
 
+        if ( $match{hours} && $match{hours} <= 12 ) {
+            if ( $match{am} ) {
+                if ( $match{hours} == 12 ) {
+                    $match{hours} = 0;
+                }
+            }
+            elsif ( $match{pm} ) {
+                if ( $match{hours} < 12 ) {
+                    $match{hours} += 12;
+                }
+            }
+        }
+
         ## TODO Perl version //
         my @args = (
             $match{seconds} // 0,
@@ -94,6 +107,7 @@ sub strptime {
 }
 
 my $hours     = "[0 ][0-9] | 1[0-9] | 2[0-3]";
+my $hours_12  = "[0 ][0-9] | 1[0-2]";
 my $minutes   = "[0 ][0-9] | [1-5][0-9]";
 my $seconds   = "[0 ][0-9] | [1-5][0-9]";
 my $year      = "\\d{4}";
@@ -107,10 +121,14 @@ my $time_zone = qq{
         )
 };
 
+my $am = langinfo( AM_STR() );
+my $pm = langinfo( PM_STR() );
+
 my %patterns = (
     a   => "(?<weekday> $weekday_name_re )",
     b   => "(?<month_name> $month_name_re )",
     H   => "(?<hours> $hours)",
+    I   => "(?<hours> $hours_12)",
     M   => "(?<minutes> $minutes)",
     S   => "(?<seconds> $seconds)",
     d   => "(?<day> $day )",
@@ -122,10 +140,12 @@ my %patterns = (
     R   => "(?<hours>$hours):(?<minutes>$minutes)",
     T   => "(?<hours>$hours):(?<minutes>$minutes):(?<seconds>$seconds)",
     F   => "(?<year>$year)-(?<month>$month)-(?<day>$day)",
+    p   => "(?:(?<am> \Q$am\E ) | (?<pm> \Q$pm\E ))",
     '%' => '%',
 );
 
-my %likes = ( A => 'a', B => 'b', e => 'd', h => 'b', k => 'H' );
+my %likes =
+  ( A => 'a', B => 'b', e => 'd', h => 'b', k => 'H', l => 'I' );
 
 for my $like ( keys %likes ) {
     $patterns{$like} = $patterns{ $likes{$like} };
