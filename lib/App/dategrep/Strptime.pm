@@ -73,6 +73,20 @@ sub strptime {
             }
         }
 
+        if ( $match{short_year} and !$match{year} ) {
+            if ( $match{century} ) {
+                $match{year} = $match{century} * 1000 + $match{short_year};
+            }
+            else {
+                if ( $match{short_year} < 69 ) {
+                    $match{year} = 1900 + $match{short_year};
+                }
+                else {
+                    $match{year} = 2000 + $match{short_year};
+                }
+            }
+        }
+
         ## TODO Perl version //
         my @args = (
             $match{seconds} // 0,
@@ -141,6 +155,8 @@ my %patterns = (
     T   => "(?<hours>$hours):(?<minutes>$minutes):(?<seconds>$seconds)",
     F   => "(?<year>$year)-(?<month>$month)-(?<day>$day)",
     p   => "(?:(?<am> \Q$am\E ) | (?<pm> \Q$pm\E ))",
+    y   => '(?<short_year> \d\d )',
+    C   => '(?<century> \d\d )',
     '%' => '%',
 );
 
