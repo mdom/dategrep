@@ -121,7 +121,7 @@ lines from 19:20:00 to 19:24:59.
 Defines a time format that is used to parse the input lines for a date.  The
 time format string can contain the conversion specifications described in the
 I<strptime(3)> manual page. Currently only the specifiers
-"AaBbcHMSdIlmYzZRTFehkCy%" are supported.
+"AaBbcHMSdIlmnYzZRTFehkCy%" are supported.
 
 This option can be given multiple times. In this case dategrep tries
 every format in the order given until it can match a line.

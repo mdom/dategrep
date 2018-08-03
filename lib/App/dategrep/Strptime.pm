@@ -148,7 +148,7 @@ my %patterns = (
     d   => "(?<day> $day )",
     m   => "(?<month> $month)",
     Y   => "(?<year> $year)",
-    t   => "\\s+",
+    t   => '\s+',
     z   => $time_zone,
     Z   => "${time_zone}?",
     R   => "(?<hours>$hours):(?<minutes>$minutes)",
@@ -161,7 +161,7 @@ my %patterns = (
 );
 
 my %likes =
-  ( A => 'a', B => 'b', e => 'd', h => 'b', k => 'H', l => 'I' );
+  ( A => 'a', B => 'b', e => 'd', h => 'b', k => 'H', l => 'I', n => 't' );
 
 for my $like ( keys %likes ) {
     $patterns{$like} = $patterns{ $likes{$like} };
