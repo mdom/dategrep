@@ -1,5 +1,5 @@
 package App::dategrep::Date;
-use App::dategrep::Strptime qw(strptime);
+use App::dategrep::Strptime;
 
 sub new {
     my ( $class, @args ) = @_;
@@ -49,7 +49,8 @@ sub to_epoch_with_modifiers {
     }
     else {
         for ( @{ $self->{formats} }, '%T' ) {
-            $epoch = strptime( $time, $_ );
+            $epoch = eval { App::dategrep::Strptime::strptime( $time, $_ ) };
+            warn "$@" if $@;
             last if $epoch;
         }
     }
@@ -77,7 +78,8 @@ sub minutes_ago {
 sub guess_format {
     my ( $self, $line ) = @_;
     for my $format ( @{ $self->{formats} } ) {
-        my $date = eval { strptime( $line, $format ) };
+        my $date = eval { App::dategrep::Strptime::strptime( $line, $format ) };
+        warn "$@" if $@;
         return $format if $date;
     }
     return;
@@ -92,7 +94,7 @@ sub to_epoch {
         return ( undef, "No date found in line $line" );
     }
 
-    my $t = eval { strptime( $line, $format ) };
+    my $t = eval { App::dategrep::Strptime::strptime( $line, $format ) };
 
     if ( !$t ) {
         return ( undef, $@ );
