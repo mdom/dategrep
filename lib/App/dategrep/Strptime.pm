@@ -28,7 +28,7 @@ sub build_patterns {
       ABDAY_6, ABDAY_7;
 
     $i = 1;
-    my %abbrevated_months =
+    %abbrevated_months =
       map { langinfo($_) => $i++ } ABMON_1, ABMON_2, ABMON_3, ABMON_4, ABMON_5,
       ABMON_6, ABMON_7, ABMON_8, ABMON_9,
       ABMON_10, ABMON_11, ABMON_12;
@@ -39,7 +39,7 @@ sub build_patterns {
       DAY_6, DAY_7;
 
     $i = 1;
-    my %months = map { langinfo($_) => $i++ } MON_1, MON_2, MON_3, MON_4, MON_5,
+    %months = map { langinfo($_) => $i++ } MON_1, MON_2, MON_3, MON_4, MON_5,
       MON_6, MON_7, MON_8, MON_9, MON_10, MON_11, MON_12;
 
     my $weekday_name_re =
