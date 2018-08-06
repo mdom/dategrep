@@ -14,9 +14,7 @@ set -e
 
 DATEGREP="/usr/local/bin/dategrep"
 DATEGREP_RELEASES="https://api.github.com/repos/mdom/dategrep/releases"
-DATEGREP_URL_TPL="https://github.com/mdom/dategrep/releases/download/%s/dategrep-standalone-small"
-
-apt-get install -y libdate-manip-perl
+DATEGREP_URL_TPL="https://github.com/mdom/dategrep/releases/download/%s/dategrep"
 
 LATEST="$(wget -q -O- "$DATEGREP_RELEASES" | sed -ne '0,/^.*"tag_name": "\(v[0-9.]\+\)".*$/{s//\1/p}')"
 printf -v LATEST_URL "$DATEGREP_URL_TPL" "$LATEST"
