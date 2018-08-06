@@ -1,5 +1,5 @@
 {
-   "abstract" : "print lines matching a date range",
+   "abstract" : "print lines matching a time range",
    "author" : [
       "Mario Domgoergen C<< <mario@domgoergen.com> >>"
    ],

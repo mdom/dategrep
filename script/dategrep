@@ -14,7 +14,7 @@ exit App::dategrep->new->run;
 
 =head1 NAME
 
-dategrep - print lines matching a date range
+dategrep - print lines matching a time range
 
 =head1 SYNOPSIS
 
@@ -25,18 +25,20 @@ dategrep - print lines matching a date range
 
 =head1 DESCRIPTION
 
-Do you even remember how often in your life you needed to find lines in a log
-file falling in a date range? And how often you build brittle regexs in grep to
-match entries spanning over a hour change?
+dategrep reads a file and prints every line with a timestamp that
+falls into a user defined time range.
 
-dategrep hopes to solve this problem once and for all.
+When invoked on a normal file, dategrep uses a binary search to
+find the first matching line. It can also read from stdin and
+compressed files but in this case it has to parse the timestamp of
+every line until the first matching line is found.
 
-If dategrep works on a normal file, it can do a binary search to find the first
-and last line to print pretty efficiently. dategrep can also read from stdin
-and compressed files, but as it can't do any seeking in those files, we have to
-parse every line until we find the first falling in our date range. But at
-least we don't have to wait for the pipe to be closed. As soon as we find the
-first date not in the range, dategrep terminates.
+As soon as it finds the first date not in the range, dategrep
+terminates.
+
+dategrep can already parse some common logs formats like rsyslog
+and apache common log format. Additional formats can be used by
+supplying a L<strptime(3)> format string.
 
 See UPGRADING if you used dategrep before. dategrep sees currently
 a lot of change, so this version might be less reliable as version
@@ -44,36 +46,23 @@ a lot of change, so this version might be less reliable as version
 
 =head1 EXAMPLES
 
-But just let me show you a few examples.
-
-Without any parameter dategrep matches all lines from epoch to the time it
-started. In this case it's just a glorified cat that knows when to stop.
-
-  dategrep syslog
-
-But things start to get interesting if you add the I<start> and I<end> options.
+Print all lines between 12:00 and 12:15:
 
   dategrep --start 12:00 --end 12:15 syslog
 
-If you leave one out it again either defaults to epoch or now.
+Without --start, print all lines after epoch:
 
   dategrep --end 12:15 syslog
 
-Dategrep knows how to handle common time formats like apaches standard
-english format and rsyslog. If you need to handle a new format, you can
-use I<--format>:
+Using a user supplied format string:
 
   dategrep --format "%b %d %H:%M:%S" syslog
 
-If your like me, you often need to call dategrep from cron and need to get all
-lines from the last five minutes. So there's an easy shortcut for that.
+Printing all lines from the last 5 minutes.
 
   dategrep --last-minutes 5 syslog
 
-Pipes or zipped files can also be handled, but those will be slower to filter.
-It's often more efficient to just search on an unzipped file or redirect the
-lines from the pipe to file first. But nothing is stopping you to just call
-dategrep directly.
+Reading from compress files or stdin:
 
   cat syslog | dategrep --end 12:15
   dategrep --end 12:15 syslog.gz
