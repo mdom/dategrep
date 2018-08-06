@@ -16,29 +16,91 @@ use I18N::Langinfo qw(langinfo
   D_T_FMT D_FMT T_FMT AM_STR PM_STR
 );
 
-setlocale( LC_TIME, "" );
+my ( %cache, %patterns, %months, %abbrevated_months );
 
-my $i = 1;
-my %abbrevated_weekdays =
-  map { langinfo($_) => $i++ } ABDAY_1, ABDAY_2, ABDAY_3, ABDAY_4, ABDAY_5,
-  ABDAY_6, ABDAY_7;
+sub build_patterns {
 
-$i = 1;
-my %abbrevated_months =
-  map { langinfo($_) => $i++ } ABMON_1, ABMON_2, ABMON_3, ABMON_4, ABMON_5,
-  ABMON_6, ABMON_7, ABMON_8, ABMON_9,
-  ABMON_10, ABMON_11, ABMON_12;
+    setlocale( LC_TIME, "" );
 
-$i = 1;
-my %weekdays = map { langinfo($_) => $i++ } DAY_1, DAY_2, DAY_3, DAY_4, DAY_5,
-  DAY_6, DAY_7;
+    my $i = 1;
+    my %abbrevated_weekdays =
+      map { langinfo($_) => $i++ } ABDAY_1, ABDAY_2, ABDAY_3, ABDAY_4, ABDAY_5,
+      ABDAY_6, ABDAY_7;
 
-$i = 1;
-my %months = map { langinfo($_) => $i++ } MON_1, MON_2, MON_3, MON_4, MON_5,
-  MON_6, MON_7, MON_8, MON_9, MON_10, MON_11, MON_12;
+    $i = 1;
+    my %abbrevated_months =
+      map { langinfo($_) => $i++ } ABMON_1, ABMON_2, ABMON_3, ABMON_4, ABMON_5,
+      ABMON_6, ABMON_7, ABMON_8, ABMON_9,
+      ABMON_10, ABMON_11, ABMON_12;
 
-my $weekday_name_re = join( '|', keys %abbrevated_weekdays, keys %weekdays );
-my $month_name_re   = join( '|', keys %abbrevated_months,   keys %months );
+    $i = 1;
+    my %weekdays = map { langinfo($_) => $i++ } DAY_1, DAY_2, DAY_3, DAY_4,
+      DAY_5,
+      DAY_6, DAY_7;
+
+    $i = 1;
+    my %months = map { langinfo($_) => $i++ } MON_1, MON_2, MON_3, MON_4, MON_5,
+      MON_6, MON_7, MON_8, MON_9, MON_10, MON_11, MON_12;
+
+    my $weekday_name_re =
+      join( '|', keys %abbrevated_weekdays, keys %weekdays );
+    my $month_name_re = join( '|', keys %abbrevated_months, keys %months );
+
+    my $hours     = "[0 ][0-9] | 1[0-9] | 2[0-3]";
+    my $hours_12  = "[0 ][0-9] | 1[0-2]";
+    my $minutes   = "[0 ][0-9] | [1-5][0-9]";
+    my $seconds   = "[0 ][0-9] | [1-5][0-9]";
+    my $year      = "\\d{4}";
+    my $month     = "[0 ][1-9] | 1[012]";
+    my $day       = "[0 ][1-9] | [12][0-9] | 3[01]";
+    my $time_zone = qq{
+        (?<time_zone>
+              [A-Za-z]+
+            | (?<offset_op>[+-]) (?<offset_hours>$hours)
+            | (?<offset_op>[+-]) (?<offset_hours>$hours):?(?<offset_minutes>$minutes)
+        )
+};
+
+    my $am = langinfo( AM_STR() );
+    my $pm = langinfo( PM_STR() );
+
+    %patterns = (
+        a   => "(?<weekday> $weekday_name_re )",
+        b   => "(?<month_name> $month_name_re )",
+        H   => "(?<hours> $hours)",
+        I   => "(?<hours> $hours_12)",
+        M   => "(?<minutes> $minutes)",
+        S   => "(?<seconds> $seconds)",
+        d   => "(?<day> $day )",
+        m   => "(?<month> $month)",
+        Y   => "(?<year> $year)",
+        t   => '\s+',
+        z   => $time_zone,
+        Z   => "${time_zone}?",
+        p   => "(?:(?<am> \Q$am\E ) | (?<pm> \Q$pm\E ))",
+        y   => '(?<short_year> \d\d )',
+        C   => '(?<century> \d\d )',
+        '%' => '%',
+    );
+
+    my %likes =
+      ( A => 'a', B => 'b', e => 'd', h => 'b', k => 'H', l => 'I', n => 't' );
+
+    for my $like ( keys %likes ) {
+        $patterns{$like} = $patterns{ $likes{$like} };
+    }
+
+    $patterns{D} = compile('%m/%d/%y');
+    $patterns{F} = compile('%Y-%m-%d');
+    $patterns{r} = compile('%I:%M:%S %p');
+    $patterns{R} = compile('%H:%M');
+    $patterns{T} = compile('%H:%M:%S');
+
+## These must be the last patterns added, as all other specifiers could be used
+    $patterns{c} = compile( langinfo( D_T_FMT() ) );
+    $patterns{x} = compile( langinfo( D_FMT() ) );
+    $patterns{X} = compile( langinfo( T_FMT() ) );
+}
 
 ## TODO prefer past
 
@@ -120,63 +182,6 @@ sub strptime {
     return;
 }
 
-my $hours     = "[0 ][0-9] | 1[0-9] | 2[0-3]";
-my $hours_12  = "[0 ][0-9] | 1[0-2]";
-my $minutes   = "[0 ][0-9] | [1-5][0-9]";
-my $seconds   = "[0 ][0-9] | [1-5][0-9]";
-my $year      = "\\d{4}";
-my $month     = "[0 ][1-9] | 1[012]";
-my $day       = "[0 ][1-9] | [12][0-9] | 3[01]";
-my $time_zone = qq{
-        (?<time_zone>
-              [A-Za-z]+
-            | (?<offset_op>[+-]) (?<offset_hours>$hours)
-            | (?<offset_op>[+-]) (?<offset_hours>$hours):?(?<offset_minutes>$minutes)
-        )
-};
-
-my $am = langinfo( AM_STR() );
-my $pm = langinfo( PM_STR() );
-
-my %patterns = (
-    a   => "(?<weekday> $weekday_name_re )",
-    b   => "(?<month_name> $month_name_re )",
-    H   => "(?<hours> $hours)",
-    I   => "(?<hours> $hours_12)",
-    M   => "(?<minutes> $minutes)",
-    S   => "(?<seconds> $seconds)",
-    d   => "(?<day> $day )",
-    m   => "(?<month> $month)",
-    Y   => "(?<year> $year)",
-    t   => '\s+',
-    z   => $time_zone,
-    Z   => "${time_zone}?",
-    p   => "(?:(?<am> \Q$am\E ) | (?<pm> \Q$pm\E ))",
-    y   => '(?<short_year> \d\d )',
-    C   => '(?<century> \d\d )',
-    '%' => '%',
-);
-
-my %likes =
-  ( A => 'a', B => 'b', e => 'd', h => 'b', k => 'H', l => 'I', n => 't' );
-
-for my $like ( keys %likes ) {
-    $patterns{$like} = $patterns{ $likes{$like} };
-}
-
-$patterns{D} = compile('%m/%d/%y');
-$patterns{F} = compile('%Y-%m-%d');
-$patterns{r} = compile('%I:%M:%S %p');
-$patterns{R} = compile('%H:%M');
-$patterns{T} = compile('%H:%M:%S');
-
-## These must be the last patterns added, as all other specifiers could be used
-$patterns{c} = compile( langinfo( D_T_FMT() ) );
-$patterns{x} = compile( langinfo( D_FMT() ) );
-$patterns{X} = compile( langinfo( T_FMT() ) );
-
-my %cache;
-
 sub compile {
     my ($format) = @_;
     if ( $cache{$format} ) {
@@ -203,6 +208,10 @@ sub compile {
         }
     }
     return $cache{$format} = qr($re)x;
+}
+
+BEGIN {
+    build_patterns();
 }
 
 1;
