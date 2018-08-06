@@ -2,6 +2,8 @@ Revision history for Perl module App::dategrep
 
 {{$NEXT}}
 
+2.00 2018-08-06T18:43:47Z
+
     *** BREAKS COMPATIBILITY ***
 
   - new date parsing library App::dategrep::Strptime (old conversion specifiers
