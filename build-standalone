@@ -5,6 +5,10 @@ use warnings;
 
 use File::Find;
 
+my $target = 'dategrep';
+
+open( my $standalone, '>', $target) or die "Can't open target: $!\n";
+
 sub wanted {
     return unless -f;
     open( my $fh, '<', $_ )
@@ -14,7 +18,7 @@ sub wanted {
         next if /^eval "require/;
         s/^use parent 'App/use parent -norequire, 'App/g;
         next if /^=pod/ ... /^=cut/;
-        print;
+        print {$standalone} $_;
     }
 }
 
@@ -24,9 +28,11 @@ open( my $fh, '<', $script ) or die "Can't open $script: $!\n";
 
 while (<$fh>) {
     next if /^use App::dategrep/;
-    print;
+    print {$standalone} $_;
 }
 
 finddepth( \&wanted, 'lib' );
+
+chmod 0755, $target;
 
 exit 0;
