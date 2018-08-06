@@ -3,6 +3,3 @@ abstract_from="script/dategrep"
 license="gpl_3"
 authors_from="script/dategrep"
 badges = ['travis', 'coveralls', 'metacpan']
-
-[release]
-do_not_upload_to_cpan=true

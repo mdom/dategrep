@@ -10,6 +10,8 @@ set -e
 
 PERL5LIB="./lib:${PERL5LIB}"
 
+minil release
+
 last_tag="$(git describe --abbrev=0 --tags)"
 
 github-release release --user mdom --repo dategrep --tag "$last_tag"
