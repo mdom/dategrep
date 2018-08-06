@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use File::Find;
+
+sub wanted {
+    return unless -f;
+    open( my $fh, '<', $_ )
+      or die "Can't open $_: $!\n";
+    while (<$fh>) {
+        next if /^use App::dategrep/;
+        next if /^eval "require/;
+        s/^use parent 'App/use parent -norequire, 'App/g;
+        next if /^=pod/ ... /^=cut/;
+        print;
+    }
+}
+
+my $script = 'script/dategrep';
+
+open( my $fh, '<', $script ) or die "Can't open $script: $!\n";
+
+while (<$fh>) {
+    next if /^use App::dategrep/;
+    print;
+}
+
+finddepth( \&wanted, 'lib' );
+
+exit 0;

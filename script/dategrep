@@ -6,8 +6,6 @@ use App::dategrep;
 
 exit App::dategrep->new->run;
 
-__END__
-
 =pod
 
 =for stopwords dategrep DATESPEC datespec syslog apache blocksize zcat bzcat rsyslog timestamped logrotate ARGV Domgoergen merchantability configfile !syslog
