@@ -2,4 +2,4 @@ readme_from="script/dategrep"
 abstract_from="script/dategrep"
 license="gpl_3"
 authors_from="script/dategrep"
-badges = ['travis', 'coveralls', 'metacpan']
+badges = ['travis', 'coveralls' ]
