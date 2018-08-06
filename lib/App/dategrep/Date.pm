@@ -1,4 +1,6 @@
 package App::dategrep::Date;
+use strict;
+use warnings;
 use App::dategrep::Strptime;
 
 sub new {

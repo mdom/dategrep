@@ -1,4 +1,7 @@
 package App::dategrep;
+use strict;
+use warnings;
+
 use App::dategrep::Iterators;
 use App::dategrep::Date;
 use Pod::Usage;

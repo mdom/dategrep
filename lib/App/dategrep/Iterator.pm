@@ -40,7 +40,7 @@ sub new {
     }
     elsif ( my $filter = match_filter($filename) ) {
         if ( $^O eq 'MSWin32' or !can_run( $filter->{args}->[0] ) ) {
-            eval "require $filter->{class}";
+            eval "require $filter->{class}";    ## no critic
             open( my $fh, '<', $filename )
               or die "Can't open $filename: $!\n";
             $self->{fh} = $filter->{class}->new($fh);
