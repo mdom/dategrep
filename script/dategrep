@@ -199,13 +199,13 @@ Compressed files are just piped into dategrep via bzcat or zcat.
 
 =head1 SEE ALSO
 
-L<https://metacpan.org/pod/Date::Manip>
+L<strptime(3)>
 
 =head1 INSTALLATION
 
 It is possible to install this script via perl normal install routines.
 
-  perl Build.PL && make && make install
+  perl Build.PL && ./Build && ./Build install
 
 Or via CPAN:
 

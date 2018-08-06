@@ -170,13 +170,13 @@ Compressed files are just piped into dategrep via bzcat or zcat.
 
 # SEE ALSO
 
-[https://metacpan.org/pod/Date::Manip](https://metacpan.org/pod/Date::Manip)
+[strptime(3)](http://man.he.net/man3/strptime)
 
 # INSTALLATION
 
 It is possible to install this script via perl normal install routines.
 
-    perl Build.PL && make && make install
+    perl Build.PL && ./Build && ./Build install
 
 Or via CPAN:
 
