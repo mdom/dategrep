@@ -2,13 +2,13 @@ Source: dategrep
 Section: perl
 Priority: optional
 Maintainer: Mario Domgoergen <mario@domgoergen.com>
-Build-Depends: debhelper (>= 8), perl, libtest-output-perl, libmoo-perl, libdate-manip-perl, libconfig-tiny-perl, libtest-mocktime-perl
+Build-Depends: debhelper (>= 8), perl, libtest-output-perl, libtest-mocktime-perl
 Standards-Version: 3.9.2
 Homepage: http://search.cpan.org/dist/App-dategrep/
 
 Package: dategrep
 Architecture: all
-Depends: ${misc:Depends}, ${perl:Depends}, libmoo-perl, libdate-manip-perl, libconfig-tiny-perl
+Depends: ${misc:Depends}, ${perl:Depends}
 Description: print lines matching a date range
  dategrep searches the named input files for lines matching a date range
  and prints them to stdout.
