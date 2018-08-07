@@ -96,10 +96,12 @@ sub build_patterns {
     $patterns{R} = compile('%H:%M');
     $patterns{T} = compile('%H:%M:%S');
 
-## These must be the last patterns added, as all other specifiers could be used
-    $patterns{c} = compile( langinfo( D_T_FMT() ) );
+    ## These must be the last patterns added, as all other specifiers could be used
     $patterns{x} = compile( langinfo( D_FMT() ) );
     $patterns{X} = compile( langinfo( T_FMT() ) );
+
+    ## This must *really* be the last pattern
+    $patterns{c} = compile( langinfo( D_T_FMT() ) );
 }
 
 ## TODO prefer past
