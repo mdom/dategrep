@@ -107,7 +107,8 @@ sub to_epoch {
         return ( undef, "No date found in line $line" );
     }
 
-    my $t = eval { App::dategrep::Strptime::strptime( $line, $format, $defaults ) };
+    my $t =
+      eval { App::dategrep::Strptime::strptime( $line, $format, $defaults ) };
 
     if ( !$t ) {
         return ( undef, $@ );
