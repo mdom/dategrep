@@ -7,8 +7,8 @@ use POSIX qw(tzset);
 use Test::MockTime qw(set_absolute_time);
 
 BEGIN {
-    $ENV{TZ}      = 'GMT';
-    $ENV{LC_TIME} = 'C';
+    $ENV{TZ}     = 'GMT';
+    $ENV{LC_ALL} = 'C';
 }
 
 use App::dategrep::Date;

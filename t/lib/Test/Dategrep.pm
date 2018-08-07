@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 BEGIN {
-    $ENV{LC_TIME} = 'C';
+    $ENV{LC_ALL}  = 'C';
     $ENV{TZ}      = 'GMT';
 }
 

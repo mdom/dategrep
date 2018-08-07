@@ -5,8 +5,8 @@ use warnings;
 use Test::More;
 
 BEGIN {
-    $ENV{LC_TIME} = 'C';
-    $ENV{TZ}      = 'GMT';
+    $ENV{LC_ALL} = 'C';
+    $ENV{TZ}     = 'GMT';
 }
 
 use App::dategrep::Strptime qw(strptime);
