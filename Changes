@@ -2,6 +2,8 @@ Revision history for Perl module App::dategrep
 
 {{$NEXT}}
 
+2.01 2018-08-07T06:42:28Z
+
   - compiles %c last in case it contains %x or %X
   - change name of the distribution to App-dategrep
 
