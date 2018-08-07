@@ -14,7 +14,8 @@ tzset;
 
 set_absolute_time(1533625650);
 
-test_dategrep [ '--from=2018-12-01', '--to=2019-01-10', "$Bin/files/syslog_year.log" ],
+test_dategrep [ '--from=2018-12-01', '--to=2019-01-10',
+    "$Bin/files/syslog_year.log" ],
   <<'EOF';
 Dec 30 09:20:01 foobar /bsd: acpicpu at acpi0 not configured
 Jan 01 09:20:01 foobar /bsd: acpipwrres at acpi0 not configured
