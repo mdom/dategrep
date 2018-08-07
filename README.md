@@ -58,9 +58,9 @@ Reading from compress files or stdin:
 
 # OPTIONS
 
-- --start|--from DATESPEC
+- --start|--from DATE
 
-    Print all lines from DATESPEC inclusively. Defaults to Jan 1, 1970 00:00:00 GMT.
+    Print all lines from DATE inclusively. Defaults to Jan 1, 1970 00:00:00 GMT.
 
     The following time formats are understood:
 
@@ -70,19 +70,26 @@ Reading from compress files or stdin:
     - %Y-%m-%dT%H:%M:%S%Z
     - now
 
-    All dates formats without date specifiers default to today.
+    A missing date defaults to today. Missing time components default
+    to zero.
 
-    Additional it's possible to express offsets against dates by using the special
-    syntax _$date truncate ... add ..._, for example
+    Relative dates can be expresses by truncating dates to the nearest
+    multiple of a duration and by adding a duration.
+
+    A duration string is a signed numbers and a unit suffix, such
+    as "300m", "-1h30m" or "2h45m". Valid time units are "s", "m",
+    "h".
+
+    For example,
 
         --from "now truncate 1h add 17m" --to "now truncate 1h add 1h17m"
 
     would search entries from 16:17 to 17:17 if the current time was 17:30.
 
-- --end|--to DATESPEC
+- --end|--to DATE
 
-    Print all lines until DATESPEC exclusively. Defaults to the current time. See
-    _--start_ for a list of possible formats for DATESPEC.
+    Print all lines until DATE exclusively. Defaults to the current time. See
+    _--start_ for a list of possible formats for DATE.
 
 - --last-minutes MINUTES
 
@@ -165,13 +172,22 @@ Compressed files are just piped into dategrep via bzcat or zcat.
 
 # INSTALLATION
 
+The easiest way to install dategrep is to just build it as a
+standalone script:
+
+    ./build-standalone
+    ./dategrep
+
+Check [https://github.com/mdom/dategrep/releases/latest](https://github.com/mdom/dategrep/releases/latest) for
+prebuild scripts.
+
 It is possible to install this script via perl normal install routines.
 
     perl Build.PL && ./Build && ./Build install
 
 Or via CPAN:
 
-    cpan App::dategrep
+    cpanm App::dategrep
 
 # UPGRADING
 
