@@ -2,6 +2,13 @@ Revision history for Perl module App::dategrep
 
 {{$NEXT}}
 
+2.02 2018-08-07T20:43:46Z
+
+  - set LC_TIME and TZ in all test scripts
+  - allow truncate and add to be in any order
+  - improve documentation
+  - handle year changes in formats without year
+
 2.01 2018-08-07T06:42:28Z
 
   - compiles %c last in case it contains %x or %X
