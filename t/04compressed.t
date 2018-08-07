@@ -11,7 +11,6 @@ use Test::MockTime qw(set_absolute_time);
 
 BEGIN {
     plan( skip_all => 'skip tests using tzset windows' ) if $^O eq 'MSWin32';
-    $ENV{TZ} = 'GMT';
     tzset;
     set_absolute_time(1477661846);    # 28-10-2016
 }

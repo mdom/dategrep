@@ -1,5 +1,11 @@
 use strict;
 use warnings;
+
+BEGIN {
+    $ENV{LC_TIME} = 'C';
+    $ENV{TZ}      = 'GMT';
+}
+
 use Test::Output;
 use App::dategrep;
 
