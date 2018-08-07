@@ -2,6 +2,10 @@ Revision history for Perl module App::dategrep
 
 {{$NEXT}}
 
+2.03 2018-08-07T21:07:42Z
+
+  - use LC_ALL in tests
+
 2.02 2018-08-07T20:43:46Z
 
   - set LC_TIME and TZ in all test scripts

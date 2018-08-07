@@ -8,7 +8,7 @@ use Pod::Usage;
 use Getopt::Long;
 use File::Basename qw(basename);
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 our $app;
 

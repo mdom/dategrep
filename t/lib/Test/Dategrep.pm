@@ -2,8 +2,8 @@ use strict;
 use warnings;
 
 BEGIN {
-    $ENV{LC_ALL}  = 'C';
-    $ENV{TZ}      = 'GMT';
+    $ENV{LC_ALL} = 'C';
+    $ENV{TZ}     = 'GMT';
 }
 
 use Test::Output;
