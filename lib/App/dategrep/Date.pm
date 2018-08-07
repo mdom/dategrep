@@ -39,17 +39,21 @@ sub duration_to_seconds {
 }
 
 sub to_epoch_with_modifiers {
-    my ( $self, $spec ) = @_;
+    my ( $self, $time ) = @_;
 
-    $spec =~ /^
-        \s*
-        (?<time>.*?)
-            ( \s+ truncate \s+ (?<truncate>\S+?))?
-            ( \s+ add \s+ (?<add>\S+))?
-        \s*$
-    /x;
+    $time =~ s/^\s+//;
+    $time =~ s/\s+$//;
 
-    my ( $time, $truncate, $add ) = @+{qw(time truncate add)};
+    my ( $truncate, $add );
+
+    if ( $time =~ s/\s+ truncate \s+ (\S+)//x ) {
+        $truncate = $1;
+    }
+
+    if ( $time =~ s/\s+ add \s+ (\S+)//x ) {
+        $add = $1;
+    }
+
     my $epoch;
     if ( $time eq 'now' ) {
         $epoch = time;
@@ -68,9 +72,11 @@ sub to_epoch_with_modifiers {
         my $duration = $self->duration_to_seconds($truncate);
         $epoch -= $epoch % $duration;
     }
+
     if ($add) {
         $epoch += $self->duration_to_seconds($add);
     }
+
     return $epoch;
 }
 
