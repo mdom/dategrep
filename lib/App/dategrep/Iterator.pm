@@ -5,6 +5,7 @@ use App::dategrep::Date;
 use IPC::Cmd 'can_run';
 use App::dategrep::Iterator::File;
 use App::dategrep::Iterator::Stream;
+use App::dategrep::Strptime;
 
 my @filter = (
     {
@@ -78,7 +79,7 @@ sub print {
             $self->{eof} = 1;
             return;
         }
-        my ( $date, $error ) = $self->{date}->to_epoch($line);
+        my ( $date, $error ) = $self->to_epoch($line);
         if ($date) {
 
             $self->{next_line} = $line;
@@ -111,6 +112,10 @@ sub print {
     return;
 }
 
+sub format_has_year {
+    App::dategrep::Strptime::has_year( shift->{format} );
+}
+
 sub to_epoch {
     my ( $self, $line ) = @_;
     if ( !$self->{format} ) {
@@ -122,7 +127,19 @@ sub to_epoch {
             return;
         }
     }
-    return $self->{date}->to_epoch( $line, $self->{format}, prefer_past => 1 );
+
+    my $seconds =
+      $self->{date}->to_epoch( $line, $self->{format} );
+
+    if (   $seconds
+        && $self->{next_date}
+        && $self->{next_date} > $seconds
+        && !$self->format_has_year )
+    {
+        $seconds = $self->{date}->to_epoch( $line, $self->{format},
+            { year => ( localtime( $self->{next_date} ) )[5] + 1 } );
+    }
+    return $seconds;
 }
 
 1;

@@ -93,7 +93,7 @@ sub guess_format {
 }
 
 sub to_epoch {
-    my ( $self, $line, $format, %options ) = @_;
+    my ( $self, $line, $format, $defaults ) = @_;
 
     $format ||= $self->guess_format($line);
 
@@ -101,7 +101,7 @@ sub to_epoch {
         return ( undef, "No date found in line $line" );
     }
 
-    my $t = eval { App::dategrep::Strptime::strptime( $line, $format ) };
+    my $t = eval { App::dategrep::Strptime::strptime( $line, $format, $defaults ) };
 
     if ( !$t ) {
         return ( undef, $@ );

@@ -16,7 +16,7 @@ use I18N::Langinfo qw(langinfo
   D_T_FMT D_FMT T_FMT AM_STR PM_STR
 );
 
-my ( %cache, %patterns, %months, %abbrevated_months );
+my ( %cache, %patterns, %months, %abbrevated_months, %has_year );
 
 sub build_patterns {
 
@@ -107,7 +107,7 @@ sub build_patterns {
 ## TODO prefer past
 
 sub strptime {
-    my ( $string, $format ) = @_;
+    my ( $string, $format, $defaults ) = @_;
     my @now = localtime;
     my $re  = compile($format);
     if ( $string =~ $re ) {
@@ -158,7 +158,7 @@ sub strptime {
             $match{hours} // 0,
             $match{day} // $now[3],
             $match{month} // $now[4],
-            $match{year} // $now[5],
+            $match{year} // $defaults->{year} // $now[5],
         );
         my $tz = $match{time_zone};
         if ($tz) {
@@ -184,6 +184,10 @@ sub strptime {
     return;
 }
 
+sub has_year {
+    $has_year{ $_[0] };
+}
+
 sub compile {
     my ($format) = @_;
     if ( $cache{$format} ) {
@@ -194,6 +198,9 @@ sub compile {
         if ( $format =~ /\G%(.)/gcx ) {
             if ( exists $patterns{$1} ) {
                 $re .= $patterns{$1};
+                if ( $1 =~ /^[Yy]$/ ) {
+                    $has_year{$format} = 1;
+                }
             }
             else {
                 croak "Unknown conversion specification $1\n";
