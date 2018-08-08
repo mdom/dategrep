@@ -41,6 +41,11 @@
             "Test::Spellunker" : "v0.2.7"
          }
       },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.001001"
+         }
+      },
       "test" : {
          "requires" : {
             "Test::MockTime" : "0",
