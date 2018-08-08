@@ -2,6 +2,8 @@ Revision history for Perl module App::dategrep
 
 {{$NEXT}}
 
+2.04 2018-08-08T14:36:43Z
+
   - Require perl 5.10.1
   - Add %H:%M for --from and --to
 

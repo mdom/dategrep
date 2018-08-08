@@ -5,3 +5,6 @@ license="gpl_3"
 authors_from="script/dategrep"
 badges = ['travis', 'coveralls' ]
 tag_format="v%v"
+
+[ReleaseTest]
+MinimumVersion = false
