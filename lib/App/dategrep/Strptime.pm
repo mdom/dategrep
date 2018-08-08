@@ -151,15 +151,15 @@ sub strptime {
             }
         }
 
-        ## TODO Perl version //
         my @args = (
-            $match{seconds} // 0,
-            $match{minutes} // 0,
-            $match{hours} // 0,
-            $match{day} // $now[3],
-            $match{month} // $now[4],
-            $match{year} // $defaults->{year} // $now[5],
+            $match{seconds} || 0,
+            $match{minutes} || 0,
+            $match{hours}   || 0,
+            $match{day}     || $now[3],
+            $match{month}   || $now[4],
+            $match{year}    || $defaults->{year} || $now[5],
         );
+
         my $tz = $match{time_zone};
         if ($tz) {
             if ( $tz eq 'UTC' || $tz eq 'GMT' || $tz eq 'Z' ) {
