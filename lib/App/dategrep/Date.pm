@@ -16,7 +16,8 @@ sub new {
             '%Y-%m-%d %H:%M%Z',       # iso8601
             '%Y-%m-%d_%H:%M%Z',       # iso8601
         ],
-        now => time,
+        from_to_formats => [ '%H:%M:%S', '%H:%M', '%Y-%m-%d', '%d.%m.%Y', ],
+        now             => time,
     }, $class;
 }
 
@@ -59,7 +60,7 @@ sub to_epoch_with_modifiers {
         $epoch = time;
     }
     else {
-        for ( @{ $self->{formats} }, '%T', '%Y-%m-%d', '%d.%m.%Y' ) {
+        for ( @{ $self->{formats} }, @{ $self->{from_to_formats} }, ) {
             $epoch = eval { App::dategrep::Strptime::strptime( $time, $_ ) };
             warn "$@" if $@;
             last if $epoch;
