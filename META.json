@@ -28,8 +28,19 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
+            "Carp" : "0",
+            "Fcntl" : "0",
+            "File::Basename" : "0",
+            "File::stat" : "0",
+            "Getopt::Long" : "0",
+            "I18N::Langinfo" : "0",
+            "IPC::Cmd" : "0",
             "Module::Build::Tiny" : "0.035",
-            "perl" : "5.008_001"
+            "POSIX" : "0",
+            "Pod::Usage" : "0",
+            "Time::Local" : "0",
+            "parent" : "0",
+            "perl" : "5.010_001"
          }
       },
       "develop" : {
