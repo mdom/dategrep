@@ -2,7 +2,7 @@ Source: dategrep
 Section: perl
 Priority: optional
 Maintainer: Mario Domgoergen <mario@domgoergen.com>
-Build-Depends: debhelper (>= 8), perl, libtest-output-perl, libtest-mocktime-perl
+Build-Depends: debhelper (>= 10), perl, libtest-output-perl, libtest-mocktime-perl, libmodule-build-tiny-perl
 Standards-Version: 3.9.2
 Homepage: http://search.cpan.org/dist/App-dategrep/
 
