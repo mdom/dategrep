@@ -8,3 +8,7 @@ tag_format="v%v"
 
 [ReleaseTest]
 MinimumVersion = false
+
+[release]
+hooks = [ "update-debian-changelog" ]
+
