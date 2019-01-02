@@ -9,7 +9,7 @@ dategrep ($version) unstable; urgency=low
 
   * Update to $version
 
- -- Mario Domgoergen <mario@domgoergen.com>  $(date "+%a, %d %b %Y %H:%M:%S")
+ -- Mario Domgoergen <mario@domgoergen.com>  $(date -R)
 
 EOF
 
