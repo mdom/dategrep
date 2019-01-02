@@ -4,7 +4,7 @@
       "Mario Domgoergen C<< <mario@domgoergen.com> >>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.1, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Minilla/v3.1.4, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "gpl_3"
    ],
@@ -76,7 +76,7 @@
          "web" : "https://github.com/mdom/dategrep"
       }
    },
-   "version" : "2.05",
+   "version" : "2.06",
    "x_contributors" : [
       "Mario Domgoergen <mario@domgoergen.com>",
       "Mario Domgoergen <mdom@taz.de>",

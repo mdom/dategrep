@@ -2,6 +2,8 @@ Revision history for Perl module App::dategrep
 
 {{$NEXT}}
 
+2.06 2019-01-02T09:52:45Z
+
   - Fix strptime tests for relative dates by mocking time
 
 2.05 2018-08-09T13:57:07Z
