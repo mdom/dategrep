@@ -3,11 +3,18 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::MockTime qw(set_absolute_time);
+use POSIX qw(tzset);
 
 BEGIN {
     $ENV{LC_ALL} = 'C';
     $ENV{TZ}     = 'GMT';
 }
+
+plan( skip_all => 'skip tests using tzset windows' ) if $^O eq 'MSWin32';
+tzset;
+
+set_absolute_time(1514884865);
 
 use App::dategrep::Strptime qw(strptime);
 
@@ -27,6 +34,8 @@ __DATA__
 Sun, 06-Nov-1994 08:49:37 UTC | %a, %d-%B-%Y %T %Z |  784111777
 Mon Jul 02                    | %a %b %d           | 1530489600
 Mon Jul  2                    | %a %b %d           | 1530489600
+Mon Jul  2                    | %a %b %e           | 1530489600
+Oct  1 08:12:51               | %b %d %H:%M:%S     | 1538381571
 2018-06-30T12:12:12Z          | %FT%T%z            | 1530360732
 2018-06-30T12:12:12+02:00     | %FT%T%z            | 1530353532
 2018-06-30T12:12:12CET        | %FT%T%z            | 1530353532
