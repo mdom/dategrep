@@ -55,7 +55,7 @@ sub run {
     }
 
     if ( $options{help} ) {
-        pod2usage( -verbose => 1, -exitstatus => 'NOEXIT' );
+        pod2usage( -exitstatus => 'NOEXIT', -verbose => 1 );
         return 0;
     }
     if ( $options{man} ) {
