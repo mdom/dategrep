@@ -10,5 +10,5 @@ tag_format="v%v"
 MinimumVersion = false
 
 [release]
-hooks = [ "update-debian-changelog" ]
+hooks = [ "./update-debian-changelog" ]
 
