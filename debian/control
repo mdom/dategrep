@@ -1,5 +1,5 @@
 Source: dategrep
-Section: perl
+Section: utilities
 Priority: optional
 Maintainer: Mario Domgoergen <mario@domgoergen.com>
 Build-Depends: debhelper (>= 10), perl, libtest-output-perl, libtest-mocktime-perl, libmodule-build-tiny-perl
