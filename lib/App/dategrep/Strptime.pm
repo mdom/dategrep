@@ -2,6 +2,7 @@ package App::dategrep::Strptime;
 
 use strict;
 use warnings;
+use v5.10.0;
 use parent 'Exporter';
 use Time::Local 'timelocal', 'timegm';
 use Carp 'croak';
@@ -152,12 +153,12 @@ sub strptime {
         }
 
         my @args = (
-            $match{seconds} || 0,
-            $match{minutes} || 0,
-            $match{hours}   || 0,
-            $match{day}     || $now[3],
-            $match{month}   || $now[4],
-            $match{year}    || $defaults->{year} || $now[5],
+            $match{seconds} // 0,
+            $match{minutes} // 0,
+            $match{hours} // 0,
+            $match{day} // $now[3],
+            $match{month} // $now[4],
+            $match{year} // $defaults->{year} // $now[5],
         );
 
         my $tz = $match{time_zone};
