@@ -17,6 +17,7 @@ tzset;
 set_absolute_time(1548993183);
 use App::dategrep::Strptime qw(strptime);
 
-ok( eval { strptime( 'Jan 31 16:42:06', '%b %d %H:%M:%S' ); 1 }, 'check if month 0 is used' );
+ok( eval { strptime( 'Jan 31 16:42:06', '%b %d %H:%M:%S' ); 1 },
+    'check if month 0 is used' );
 
 done_testing;
