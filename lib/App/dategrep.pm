@@ -1,5 +1,5 @@
 package App::dategrep;
-use 5.001001;
+use 5.010_001;
 use strict;
 use warnings;
 
