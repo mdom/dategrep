@@ -54,7 +54,7 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.001001"
+            "perl" : "5.010_001"
          }
       },
       "test" : {
