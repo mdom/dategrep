@@ -189,6 +189,21 @@ Or via CPAN:
 
     cpanm App::dategrep
 
+
+Using Docker:
+
+    `docker build -t dategrep .`
+
+Add to .bashrc and re-source:
+
+```
+    function dategrep {
+      docker run --rm -v "${@: -1}":"${@: -1}":ro -ti dategrep:latest "$@"
+    }
+```
+
+
+
 # UPGRADING
 
 dategrep after version 0.58 uses a new library to parse dates. Most
