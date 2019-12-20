@@ -190,17 +190,17 @@ Or via CPAN:
     cpanm App::dategrep
 
 
-Using Docker:
+# Docker
 
-    `docker build -t dategrep .`
+Build locally:
+
+    docker build -t dategrep .
 
 Add to .bashrc and re-source:
 
-```
-function dategrep {
-  docker run --rm -v "${@: -1}":"${@: -1}":ro -ti dategrep:latest "$@"
-}
-```
+    function dategrep {
+        docker run --rm -v "${@: -1}":"${@: -1}":ro -ti dategrep:latest "$@"
+    }
 
 
 
