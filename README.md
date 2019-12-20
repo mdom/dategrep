@@ -197,9 +197,9 @@ Using Docker:
 Add to .bashrc and re-source:
 
 ```
-    function dategrep {
-      docker run --rm -v "${@: -1}":"${@: -1}":ro -ti dategrep:latest "$@"
-    }
+function dategrep {
+  docker run --rm -v "${@: -1}":"${@: -1}":ro -ti dategrep:latest "$@"
+}
 ```
 
 
