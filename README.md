@@ -190,7 +190,7 @@ Or via CPAN:
     cpanm App::dategrep
 
 
-# Docker
+# DOCKER
 
 Build locally:
 
