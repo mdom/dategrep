@@ -189,6 +189,9 @@ Or via CPAN:
 
     cpanm App::dategrep
 
+yamlCase maintains an Dockerfile for dategrep at
+[https://github.com/yamlCase/dategrep/tree/dockerfile\_poc](https://github.com/yamlCase/dategrep/tree/dockerfile_poc).
+
 # UPGRADING
 
 dategrep after version 0.58 uses a new library to parse dates. Most
