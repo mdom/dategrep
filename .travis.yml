@@ -1,5 +1,7 @@
 language: perl
+env:
+  - PERL5LIB=/home/travis/perl5/lib/perl5
 before_install:
-  cpanm -n Devel::Cover::Report::Coveralls Module::Build::Tiny
+  cpanm -n Devel::Cover::Report::Coveralls
 script:
-  perl -I/home/travis/perl5/lib/perl5 Build.PL && ./Build && cover -test -report coveralls
+  perl Build.PL && ./Build && cover -test -report coveralls
