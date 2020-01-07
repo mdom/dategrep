@@ -1,5 +1,5 @@
 language: perl
 before_install:
-  cpanm -n Devel::Cover::Report::Coveralls
+  cpanm -n Devel::Cover::Report::Coveralls Module::Build::Tiny
 script:
   perl Build.PL && ./Build && cover -test -report coveralls
