@@ -4,4 +4,4 @@ env:
 before_install:
   cpanm -n Devel::Cover::Report::Coveralls
 script:
-  perl Build.PL && ./Build && cover -test -report coveralls
+  perl Build.PL && ./Build && /home/travis/perl5/bin/cover -test -report coveralls
