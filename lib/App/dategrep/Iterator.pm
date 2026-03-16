@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use App::dategrep::Date;
 use IPC::Cmd 'can_run';
+use POSIX 'strftime';
 use App::dategrep::Iterator::File;
 use App::dategrep::Iterator::Stream;
 use App::dategrep::Strptime;
@@ -73,12 +74,28 @@ sub print {
         print $self->{next_line};
     }
 
+    my ($start_str, $end_str );
+
+    if ( $self->{lexicographic} ) {
+        $start_str = strftime($self->{format}, localtime($self->{start}));
+        $end_str   = strftime($self->{format}, localtime($self->{end}));
+    }
+
     while (1) {
         my $line = $self->{fh}->getline;
         if ( !$line ) {
             $self->{eof} = 1;
             return;
         }
+
+        if ( $self->{lexicographic} ) {
+            if ( $line ge $start_str && $line lt $end_str ) {
+                print $line;
+                next;
+            }
+            return;
+        }
+
         my ( $date, $error ) = $self->to_epoch($line);
         if ($date) {
 

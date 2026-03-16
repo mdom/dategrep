@@ -42,6 +42,7 @@ sub run {
         'sort-files',     'man',
         'interleave',     'debug=s',
         'version!',       'skip-unparsable!',
+        'lexicographic|lex!',
     );
 
     if ( !$rc ) {
