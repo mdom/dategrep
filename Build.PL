@@ -2,7 +2,7 @@ use Module::Build;
 
 my $builder = Module::Build->new(
     module_name         => 'App::dategrep',
-    dist_version_from   => 'lib/App/dategrep.pm',
+    dist_version_from   => 'bin/dategrep',
     license             => 'perl',
     requires            => {
         'Carp'          => 0,

@@ -1,10 +1,813 @@
 #!/usr/bin/perl
 
+use v5.10;
 use strict;
 use warnings;
-use App::dategrep;
+use Pod::Usage;
+use Getopt::Long;
 
-exit App::dategrep->new->run;
+our $VERSION = '2.08';
+
+sub error {
+    my ( $msg, $rc ) = @_;
+    $rc = defined $rc ? $rc : 1;
+    chomp($msg);
+    warn "$0 $msg\n";
+    return $rc;
+}
+
+my $date = App::dategrep::Date->new;
+
+exit run() if !caller;
+
+sub run {
+    my %options;
+
+    my $rc = GetOptions(
+        \%options,        'start|from=s',
+        'end|to=s',       'format=s@',
+        'last-minutes=i', 'multiline!',
+        'blocksize=i',    'help|?',
+        'sort-files',     'man',
+        'interleave',     'debug=s',
+        'version!',       'skip-unparsable!',
+        'lexicographic|lex!',
+    );
+
+    if ( !$rc ) {
+        pod2usage( -exitstatus => "NOEXIT", -verbose => 0 );
+        return 2;
+    }
+
+    if ( $options{version} ) {
+        print "$VERSION\n";
+        return 0;
+    }
+
+    if ( $options{help} ) {
+        pod2usage( -exitstatus => 'NOEXIT', -verbose => 1 );
+        return 0;
+    }
+    if ( $options{man} ) {
+        pod2usage( -exitstatus => "NOEXIT", -verbose => 2 );
+        return 0;
+    }
+
+    if ( $ENV{DATEGREP_DEFAULT_FORMAT} ) {
+        $date->add_format( $ENV{DATEGREP_DEFAULT_FORMAT} );
+    }
+
+    $date->add_format( grep { /%/ } @{ $options{'format'} } );
+
+    delete $options{'format'};    # Don't call new on iterators with format
+
+    $options{skip_unparsable} = delete $options{'skip-unparsable'};
+
+    if ( $options{skip_unparsable} ) {
+        $options{multiline} = 0;
+    }
+
+    my ( $start, $end ) = ( 0, time );
+
+    if ( defined $options{start} ) {
+        ($start) = $date->to_epoch_with_modifiers( $options{start} );
+        return error("Illegal start time.") if not defined $start;
+    }
+
+    if ( defined $options{'end'} ) {
+        ($end) = $date->to_epoch_with_modifiers( $options{'end'} );
+        return error("Illegal end time.") if not defined $end;
+    }
+
+    if ( defined $options{'last-minutes'} ) {
+        ( $start, $end ) =
+          $date->minutes_ago( $options{'last-minutes'} );
+    }
+
+    if ( $end < $start ) {
+        ( $start, $end ) = ( $end, $start );
+    }
+
+    if ( defined $options{'debug'} && $options{'debug'} eq 'time' ) {
+        print "Start: $start End: $end\n";
+        return 0;
+    }
+
+    if ( !@ARGV ) {
+        push @ARGV, '-';
+    }
+
+    eval {
+
+        my $iterators = App::dategrep::Iterators->new(
+            %options,
+            filenames => \@ARGV,
+            start     => $start,
+            end       => $end,
+            date      => $date,
+        );
+
+        if ( $options{'interleave'} && @ARGV > 1 ) {
+            $iterators->interleave;
+            return 0;
+        }
+
+        if ( $options{'sort-files'} && @ARGV > 1 ) {
+            $iterators->sort;
+        }
+
+        for my $iter ( $iterators->as_array ) {
+            if ($iter) {
+                $iter->print;
+            }
+        }
+    };
+    return error($@) if $@;
+    return 0;
+}
+
+package App::dategrep::Iterator;
+use IPC::Cmd 'can_run';
+use POSIX 'strftime';
+
+my @filter = (
+    {
+        re    => qr/\.(bz|bz2)$/,
+        args  => ['bzcat'],
+        class => 'IO::Uncompress::Bunzip2'
+    },
+    {
+        re    => qr/\.(gz|z)$/,
+        args  => [ 'gzip', '-c', '-d' ],
+        class => 'IO::Uncompress::Gunzip'
+    },
+);
+
+sub match_filter {
+    my ($filename) = @_;
+    for my $filter (@filter) {
+        if ( $filename =~ $filter->{re} ) {
+            return $filter;
+        }
+    }
+    return;
+}
+
+sub new {
+    my ( $class, @args ) = @_;
+    my $self     = {@args};
+    my $filename = $self->{filename};
+
+    if ( $filename eq '-' ) {
+        $self->{fh} = \*STDIN;
+        $class .= '::Stream';
+    }
+    elsif ( my $filter = match_filter($filename) ) {
+        if ( $^O eq 'MSWin32' or !can_run( $filter->{args}->[0] ) ) {
+            eval "require $filter->{class}";    ## no critic
+            open( my $fh, '<', $filename )
+              or die "Can't open $filename: $!\n";
+            $self->{fh} = $filter->{class}->new($fh);
+        }
+        else {
+            open( $self->{fh}, '-|', @{ $filter->{args} }, $filename )
+              or die "Can't open @{ $filter->{args} }: $!\n";
+        }
+        $class .= '::Stream';
+    }
+    else {
+        open( $self->{fh}, '<', $filename )
+          or die "Can't open $filename: $!\n";
+        $class .= '::File';
+    }
+
+    bless $self, $class;
+    $self->skip_to_start;
+    return $self;
+}
+
+sub print {
+    my ( $self, $until ) = @_;
+
+    $until ||= $self->{end};
+    my $ignore = $self->{multiline} || $self->{skip_unparsable};
+
+    if ( $self->{next_line} ) {
+        print $self->{next_line};
+    }
+
+    my ($start_str, $end_str );
+
+    if ( $self->{lexicographic} ) {
+        $start_str = strftime($self->{format}, localtime($self->{start}));
+        $end_str   = strftime($self->{format}, localtime($self->{end}));
+    }
+
+    while (1) {
+        my $line = $self->{fh}->getline;
+        if ( !$line ) {
+            $self->{eof} = 1;
+            return;
+        }
+
+        if ( $self->{lexicographic} ) {
+            if ( $line ge $start_str && $line lt $end_str ) {
+                print $line;
+                next;
+            }
+            return;
+        }
+
+        my ( $date, $error ) = $self->to_epoch($line);
+        if ($date) {
+
+            $self->{next_line} = $line;
+            $self->{next_date} = $date;
+
+            if ( $date >= $self->{end} ) {
+                $self->{eof} = 1;
+                return;
+            }
+            elsif ( $date >= $until ) {
+                return;
+            }
+            elsif ( $date < $self->{start} ) {
+                next;
+            }
+            else {
+                print $line;
+            }
+        }
+        elsif ( $self->{multiline} ) {
+            print $line;
+        }
+        elsif ( $self->{skip_unparsable} ) {
+            next;
+        }
+        else {
+            die "No date found in line $line";
+        }
+    }
+    return;
+}
+
+sub format_has_year {
+    App::dategrep::Strptime::has_year( shift->{format} );
+}
+
+sub to_epoch {
+    my ( $self, $line ) = @_;
+    if ( !$self->{format} ) {
+        my $format = $self->{date}->guess_format($line);
+        if ($format) {
+            $self->{format} = $format;
+        }
+        else {
+            return;
+        }
+    }
+
+    my $seconds =
+      $self->{date}->to_epoch( $line, $self->{format} );
+
+    if (   $seconds
+        && $self->{next_date}
+        && $self->{next_date} > $seconds
+        && !$self->format_has_year )
+    {
+        $seconds = $self->{date}->to_epoch( $line, $self->{format},
+            { year => ( localtime( $self->{next_date} ) )[5] + 1 } );
+    }
+    return $seconds;
+}
+
+package App::dategrep::Date;
+
+sub new {
+    my ( $class, @args ) = @_;
+    bless {
+        formats => [
+            '%b %e %H:%M:%S',         # rsyslog
+            '%b %e %H:%M',            # rsyslog
+            '%d/%b/%Y:%T %z',         # apache
+            '%Y-%m-%dT%H:%M:%S%Z',    # iso8601
+            '%Y-%m-%d %H:%M:%S%Z',    # iso8601
+            '%Y-%m-%dT%H:%M%Z',       # iso8601
+            '%Y-%m-%d %H:%M%Z',       # iso8601
+            '%Y-%m-%d_%H:%M%Z',       # iso8601
+        ],
+        from_to_formats => [ '%H:%M:%S', '%H:%M', '%Y-%m-%d', '%d.%m.%Y', ],
+        now             => time,
+    }, $class;
+}
+
+sub add_format {
+    my $self    = shift;
+    my %formats = map { $_ => 1 } @{ $self->{formats} };
+    my @new     = grep { !$formats{$_} } @_;
+    unshift @{ $self->{formats} }, @new;
+}
+
+sub duration_to_seconds {
+    my ( $self, $duration ) = @_;
+    if ( $duration =~ m{ ([+-])?  (?:(\d+)h)?  (?:(\d+)m)?  (?:(\d+)s)?  }x ) {
+        my ( $op, $hours, $minutes, $seconds ) =
+          ( $1 || '+', $2 || 0, $3 || 0, $4 || 0 );
+        return ( $hours * 3600 + $minutes * 60 + $seconds ) *
+          ( $op eq '+' ? 1 : -1 );
+    }
+    die "Error parsing duration $duration\n";
+}
+
+sub to_epoch_with_modifiers {
+    my ( $self, $time ) = @_;
+
+    $time =~ s/^\s+//;
+    $time =~ s/\s+$//;
+
+    my ( $truncate, $add );
+
+    if ( $time =~ s/\s+ truncate \s+ (\S+)//x ) {
+        $truncate = $1;
+    }
+
+    if ( $time =~ s/\s+ add \s+ (\S+)//x ) {
+        $add = $1;
+    }
+
+    my $epoch;
+    if ( $time eq 'now' ) {
+        $epoch = time;
+    }
+    else {
+        for ( @{ $self->{formats} }, @{ $self->{from_to_formats} }, ) {
+            $epoch = eval { App::dategrep::Strptime::strptime( $time, $_ ) };
+            warn "$@" if $@;
+            last if $epoch;
+        }
+    }
+
+    return if !$epoch;
+
+    if ($truncate) {
+        my $duration = $self->duration_to_seconds($truncate);
+        $epoch -= $epoch % $duration;
+    }
+
+    if ($add) {
+        $epoch += $self->duration_to_seconds($add);
+    }
+
+    return $epoch;
+}
+
+sub minutes_ago {
+    my ( $self, $minutes ) = @_;
+    my $to = $self->{now};
+    $to -= $to % 60;
+    my $from = $to - $minutes * 60;
+    return ( $from, $to );
+}
+
+sub guess_format {
+    my ( $self, $line ) = @_;
+    for my $format ( @{ $self->{formats} } ) {
+        my $date = eval { App::dategrep::Strptime::strptime( $line, $format ) };
+        warn "$@" if $@;
+        return $format if $date;
+    }
+    return;
+}
+
+sub to_epoch {
+    my ( $self, $line, $format, $defaults ) = @_;
+
+    $format ||= $self->guess_format($line);
+
+    if ( !$format ) {
+        return ( undef, "No date found in line $line" );
+    }
+
+    my $t =
+      eval { App::dategrep::Strptime::strptime( $line, $format, $defaults ) };
+
+    if ( !$t ) {
+        return ( undef, $@ );
+    }
+
+    return $t;
+}
+
+package App::dategrep::Iterators;
+
+sub as_array {
+    return @{ shift->{iterators} };
+}
+
+sub new {
+    my ( $class, %options ) = @_;
+
+    my $filenames = delete $options{filenames};
+    my @filenames = ref $filenames ? @$filenames : $filenames;
+
+    my @iterators;
+    for my $filename (@filenames) {
+        push @iterators,
+          App::dategrep::Iterator->new( %options, filename => $filename );
+    }
+
+    return bless { iterators => \@iterators }, $class;
+}
+
+sub sort {
+    my $self      = shift;
+    my @iterators = @{ $self->{iterators} };
+    $self->{iterators} = [
+        sort { $a->{next_date} <=> $b->{next_date} }
+        grep { !$_->{eof} } @{ $self->{iterators} }
+    ];
+    return;
+}
+
+sub interleave {
+    my $self = shift;
+
+    while ( $self->sort, $self->{iterators}->[0] ) {
+        my $until;
+        if ( $self->{iterators}->[1] ) {
+            $until = $self->{iterators}->[1]->{next_date};
+        }
+        $self->{iterators}->[0]->print($until);
+    }
+    return;
+}
+
+1;
+package App::dategrep::Strptime;
+
+use v5.10.0;
+use parent 'Exporter';
+use Time::Local 'timelocal', 'timegm';
+use Carp 'croak';
+our @EXPORT_OK = qw(strptime);
+use POSIX 'locale_h';
+use POSIX 'strftime';
+use I18N::Langinfo qw(langinfo
+  ABDAY_1 ABDAY_2 ABDAY_3 ABDAY_4 ABDAY_5 ABDAY_6 ABDAY_7
+  ABMON_1 ABMON_2 ABMON_3 ABMON_4 ABMON_5 ABMON_6 ABMON_7 ABMON_8 ABMON_9 ABMON_10 ABMON_11 ABMON_12
+  DAY_1 DAY_2 DAY_3 DAY_4 DAY_5 DAY_6 DAY_7
+  MON_1 MON_2 MON_3 MON_4 MON_5 MON_6 MON_7 MON_8 MON_9 MON_10 MON_11 MON_12
+  D_T_FMT D_FMT T_FMT AM_STR PM_STR
+);
+
+my ( %cache, %patterns, %months, %abbrevated_months, %has_year );
+
+sub build_patterns {
+
+    setlocale( LC_TIME, "" );
+
+    my $i = 1;
+    my %abbrevated_weekdays =
+      map { langinfo($_) => $i++ } ABDAY_1, ABDAY_2, ABDAY_3, ABDAY_4, ABDAY_5,
+      ABDAY_6, ABDAY_7;
+
+    $i = 1;
+    %abbrevated_months =
+      map { langinfo($_) => $i++ } ABMON_1, ABMON_2, ABMON_3, ABMON_4, ABMON_5,
+      ABMON_6, ABMON_7, ABMON_8, ABMON_9,
+      ABMON_10, ABMON_11, ABMON_12;
+
+    $i = 1;
+    my %weekdays = map { langinfo($_) => $i++ } DAY_1, DAY_2, DAY_3, DAY_4,
+      DAY_5,
+      DAY_6, DAY_7;
+
+    $i = 1;
+    %months = map { langinfo($_) => $i++ } MON_1, MON_2, MON_3, MON_4, MON_5,
+      MON_6, MON_7, MON_8, MON_9, MON_10, MON_11, MON_12;
+
+    my $weekday_name_re =
+      join( '|', keys %abbrevated_weekdays, keys %weekdays );
+    my $month_name_re = join( '|', keys %abbrevated_months, keys %months );
+
+    my $hours     = "[0 ][0-9] | 1[0-9] | 2[0-3]";
+    my $hours_12  = "[0 ][0-9] | 1[0-2]";
+    my $minutes   = "[0 ][0-9] | [1-5][0-9]";
+    my $seconds   = "(?:[0 ][0-9] | [1-5][0-9])(?:\.[0-9]+)?";
+    my $year      = "\\d{4}";
+    my $month     = "[0 ][1-9] | 1[012]";
+    my $day       = "[0 ][1-9] | [12][0-9] | 3[01]";
+    my $time_zone = qq{
+        (?<time_zone>
+              [A-Za-z]+
+            | (?<offset_op>[+-]) (?<offset_hours>$hours)
+            | (?<offset_op>[+-]) (?<offset_hours>$hours):?(?<offset_minutes>$minutes)
+        )
+};
+
+    my $am = langinfo( AM_STR() );
+    my $pm = langinfo( PM_STR() );
+
+    %patterns = (
+        a   => "(?<weekday> $weekday_name_re )",
+        b   => "(?<month_name> $month_name_re )",
+        H   => "(?<hours> $hours)",
+        I   => "(?<hours> $hours_12)",
+        M   => "(?<minutes> $minutes)",
+        S   => "(?<seconds> $seconds)",
+        d   => "(?<day> $day )",
+        m   => "(?<month> $month)",
+        Y   => "(?<year> $year)",
+        t   => '\s+',
+        z   => $time_zone,
+        Z   => "${time_zone}?",
+        p   => "(?:(?<am> \Q$am\E ) | (?<pm> \Q$pm\E ))",
+        y   => '(?<short_year> \d\d )',
+        C   => '(?<century> \d\d )',
+        '%' => '%',
+    );
+
+    my %likes =
+      ( A => 'a', B => 'b', e => 'd', h => 'b', k => 'H', l => 'I', n => 't' );
+
+    for my $like ( keys %likes ) {
+        $patterns{$like} = $patterns{ $likes{$like} };
+    }
+
+    $patterns{D} = compile('%m/%d/%y');
+    $patterns{F} = compile('%Y-%m-%d');
+    $patterns{r} = compile('%I:%M:%S %p');
+    $patterns{R} = compile('%H:%M');
+    $patterns{T} = compile('%H:%M:%S');
+
+    ## These must be the last patterns added, as all other specifiers could be used
+    my $d_fmt = langinfo( D_FMT() );
+    if ($d_fmt eq '%x' ) {
+        $d_fmt = '%m/%d/%y';
+    }
+    my $t_fmt = langinfo( T_FMT() );
+    if ( $t_fmt eq '%X' ) {
+        $t_fmt = '%H:%M:%S';
+    }
+    my $dt_fmt = langinfo ( D_T_FMT() );
+    if ( $dt_fmt eq '%c' ) {
+        $dt_fmt = '%a %b %e %H:%M:%S %Y';
+    }
+
+    $patterns{x} = compile( $d_fmt ) ;
+    $patterns{X} = compile( $t_fmt );
+
+    ## This must *really* be the last pattern
+    $patterns{c} = compile( $dt_fmt );
+}
+
+## TODO prefer past
+
+sub strptime {
+    my ( $string, $format, $defaults ) = @_;
+    my @now = localtime;
+    my $re  = compile($format);
+    if ( $string =~ $re ) {
+        my %match = %+;
+
+        if ( my $month_name = $match{month_name} ) {
+            $match{month} =
+              $months{$month_name} || $abbrevated_months{$month_name};
+            if ( !$match{month} ) {
+                croak "Illegal month name $month_name\n";
+            }
+        }
+        if ( $match{month} ) {
+            $match{month}--;
+        }
+
+        if ( $match{hours} && $match{hours} <= 12 ) {
+            if ( $match{am} ) {
+                if ( $match{hours} == 12 ) {
+                    $match{hours} = 0;
+                }
+            }
+            elsif ( $match{pm} ) {
+                if ( $match{hours} < 12 ) {
+                    $match{hours} += 12;
+                }
+            }
+        }
+
+        if ( $match{short_year} and !$match{year} ) {
+            if ( $match{century} ) {
+                $match{year} = $match{century} * 1000 + $match{short_year};
+            }
+            else {
+                if ( $match{short_year} < 69 ) {
+                    $match{year} = 1900 + $match{short_year};
+                }
+                else {
+                    $match{year} = 2000 + $match{short_year};
+                }
+            }
+        }
+
+        if ( $match{seconds} ) {
+            $match{seconds} =~ s/\.[0-9]+//;
+        }
+
+        my @args = (
+            $match{seconds} // 0,
+            $match{minutes} // 0,
+            $match{hours} // 0,
+            $match{day} // $now[3],
+            $match{month} // $now[4],
+            $match{year} // $defaults->{year} // $now[5],
+        );
+
+        my $tz = $match{time_zone};
+        if ($tz) {
+            if ( $tz eq 'UTC' || $tz eq 'GMT' || $tz eq 'Z' ) {
+                return timegm(@args);
+            }
+            elsif ( $tz =~ /^[+-]/ ) {
+                my $t = timegm(@args);
+                my $offset =
+                  ( ( $match{offset_hours} || 0 ) * 3600 +
+                      ( $match{offset_minutes} || 0 ) * 60 ) *
+                  ( $match{offset_op} eq '+' ? -1 : 1 );
+                return $t + $offset;
+            }
+            else {
+                ## TODO won't work on windows, needs POSIX::tzset()
+                local $ENV{TZ} = $tz;
+                return timelocal(@args);
+            }
+        }
+        return timelocal(@args);
+    }
+    return;
+}
+
+sub has_year {
+    $has_year{ $_[0] };
+}
+
+sub compile {
+    my ($format) = @_;
+    if ( $cache{$format} ) {
+        return $cache{$format};
+    }
+    my $re = '';
+    while (1) {
+        if ( $format =~ /\G%(.)/gcx ) {
+            if ( exists $patterns{$1} ) {
+                $re .= $patterns{$1};
+                if ( $1 =~ /^[Yy]$/ ) {
+                    $has_year{$format} = 1;
+                }
+            }
+            else {
+                croak "Unknown conversion specification $1\n";
+            }
+        }
+        elsif ( $format =~ /\G(.+?)(?=%)/gcx ) {
+            $re .= "\Q$1\E";
+        }
+        elsif ( $format =~ /\G(.+?)$/gcx ) {
+            $re .= "\Q$1\E";
+        }
+        else {
+            last;
+        }
+    }
+    return $cache{$format} = qr($re)x;
+}
+
+BEGIN {
+    build_patterns();
+}
+
+1;
+package App::dategrep::Iterator::Stream;
+use parent -norequire, 'App::dategrep::Iterator';
+
+sub skip_to_start {
+    my $self = shift;
+    my $ignore = $self->{multiline} || $self->{skip_unparsable};
+    while (1) {
+        my $line = $self->{fh}->getline;
+        if ( !$line ) {
+            $self->{eof} = 1;
+            return;
+        }
+        my ( $date, $error ) = $self->to_epoch($line);
+        if ( !$date && $ignore ) {
+            next;
+        }
+        elsif ( !$date ) {
+            die "No date found in line $line";
+        }
+        elsif ( $date < $self->{start} ) {
+            next;
+        }
+        elsif ( $date >= $self->{start} && $date < $self->{end} ) {
+            $self->{next_line} = $line;
+            $self->{next_date} = $date;
+            return;
+        }
+        else {
+            $self->{eof} = 1;
+            return;
+        }
+    }
+}
+
+1;
+package App::dategrep::Iterator::File;
+use parent -norequire, 'App::dategrep::Iterator';
+use Fcntl ':seek';
+use File::stat;
+
+sub skip_to_start {
+    my $self = shift;
+
+    my $min = $self->_search( $self->{start} );
+
+    if ( not defined $min ) {
+        $self->{eof} = 1;
+        return;
+    }
+
+    my $line = $self->{fh}->getline;
+    my ( $date, $error ) = $self->to_epoch($line);
+
+    if ( $date >= $self->{end} ) {
+        $self->{eof} = 1;
+        return;
+    }
+
+    $self->{next_line} = $line;
+    $self->{next_date} = $date;
+    return;
+}
+
+sub _search {
+    my $self = shift;
+    my ( $key, $min_byte ) = @_;
+    my $fh = $self->{fh};
+
+    my $size            = stat($fh)->size;
+    my $blksize         = stat($fh)->blksize || 8192;
+    my $multiline       = $self->{multiline};
+    my $skip_unparsable = $self->{skip_unparsable};
+
+    # find the right block
+    my ( $min, $max, $mid ) = ( 0, int( $size / $blksize ) );
+
+    if ( defined $min_byte ) {
+        $min = int( $min_byte / $blksize );
+    }
+
+  BLOCK: while ( $max - $min > 1 ) {
+        $mid = int( ( $max + $min ) / 2 );
+        $fh->seek( $mid * $blksize, SEEK_SET ) or return;
+        $fh->getline if $mid;    # probably a partial line
+      LINE: while (1) {
+            my $line = $fh->getline;
+            if ( !$line ) {
+                ## This can happen if line size is way bigger than blocksize
+                last BLOCK;
+            }
+            my ($epoch) = $self->to_epoch($line);
+            if ( !$epoch ) {
+                next LINE if $multiline || $skip_unparsable;
+                die "No date found in line $line";
+            }
+
+            $epoch < $key
+              ? $min = int( ( $fh->tell - length($line) ) / $blksize )
+              : $max = $mid;
+
+            next BLOCK;
+        }
+    }
+
+    # find the right line
+    $min *= $blksize;
+    $fh->seek( $min, SEEK_SET ) or return;
+    $fh->getline if $min;    # probably a partial line
+    for ( ; ; ) {
+        $min = $fh->tell;
+        defined( my $line = $fh->getline ) or last;
+        my ($epoch) = $self->to_epoch($line);
+        if ( !$epoch ) {
+            next if $multiline || $skip_unparsable;
+            die "No date found in line $line";
+        }
+        if ( $epoch >= $key ) {
+            $fh->seek( $min, SEEK_SET );
+            return $min;
+        }
+    }
+    return;
+}
 
 =pod
 
@@ -244,5 +1047,3 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-=cut
